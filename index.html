@@ -34,6 +34,8 @@ main{padding:12px 12px 0;max-width:640px;margin:0 auto}
 .sess.skip{opacity:.55}
 .st{display:flex;gap:10px;align-items:flex-start}
 .st .tt{flex:1;min-width:0}
+button.tt.tap{background:none;border:0;color:inherit;font:inherit;text-align:left;padding:0;cursor:pointer;min-height:44px}
+.chev{color:var(--mut);font-size:18px;padding:12px 2px 0}
 .tt b{display:block;font-size:17px}
 .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--mut);margin-right:6px;text-transform:uppercase;letter-spacing:.03em}
 .det{white-space:pre-wrap;color:#cfd5dc;font-size:15px;margin:8px 0 0}
@@ -68,6 +70,8 @@ label.f{display:block;font-size:14px;color:var(--mut);margin:10px 2px 4px}
 .chip{min-width:48px;min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--tx);font:inherit;font-weight:700;font-size:17px;padding:0 10px}
 .chip.on{background:var(--blue);border-color:var(--blue);color:#06101f}
 .chip.tgt{border-color:var(--acc)}
+.avrow{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px}
+.avrow .chip{min-width:0;min-height:44px;font-size:13px;padding:0 2px}
 .chips.sm .chip{min-width:44px;min-height:44px;font-size:15px}
 .kg{display:flex;align-items:center;gap:8px;margin-top:10px}
 .kg input{flex:1;text-align:center;font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;min-height:60px}
@@ -112,6 +116,7 @@ h3{margin:4px 0 6px;font-size:17px}
 svg text{fill:var(--mut);font-size:10px}
 .pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700;margin-left:4px}
 .pill.o{background:#2b2108;color:var(--warn)}
+.pill.g{background:#0f2417;color:#4ade80}
 .sess{border-left:5px solid var(--tc,var(--line))}
 .tag.c{background:color-mix(in srgb, var(--tc) 18%, transparent);color:var(--tc)}
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px}
@@ -155,7 +160,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.5.1';
+const APP_VERSION = '2.6.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -530,17 +535,16 @@ function sessCard(it, m, opt){
   const open = ui.open[s.id] ?? !!opt.open;
   let h = '<div class="card sess'+(done?' done':'')+(skip?' skip':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
   h += '<button class="chk'+(done?' on':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
-  h += '<div class="tt"><span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span><span class="small">'+planLine(s)+'</span><b>'+esc(s.title)+'</b>';
+  h += (s.t!=='rest' ? '<button class="tt tap" data-open="'+s.id+'" data-isopen="'+(open?1:0)+'" aria-expanded="'+open+'">' : '<div class="tt">')+'<span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span><span class="small">'+planLine(s)+'</span><b>'+esc(s.title)+'</b>';
   if(it.date!==it.orig) h += '<div class="small">↪ verplaatst van '+fmtDay(it.orig)+'</div>';
   if(skip) h += '<div class="small" style="color:var(--warn)">Niet uitgevoerd: '+esc(skip)+'</div>';
   if(st.alt) h += '<div class="small" style="color:var(--blue)">Alternatief: '+esc(st.alt)+'</div>';
-  h += '</div></div>';
+  h += s.t!=='rest' ? '</button><span class="chev" aria-hidden="true">'+(open?'▴':'▾')+'</span></div>' : '</div></div>';
   const ef = easyFlag(s, a), iv = intervalEval(s, a);
   if(ef) h += '<div class="banner rood" style="margin:8px 0 0;padding:6px 10px;font-size:14px">⚠ '+esc(ef)+'</div>';
   if(iv) h += '<div class="banner '+(iv.good?'groen':'oranje')+'" style="margin:8px 0 0;padding:6px 10px;font-size:14px">'+(iv.good?'✓ ':'⚠ ')+esc(iv.txt)+'</div>';
   if(a) h += '<div class="strava"><b>✓ Strava</b> '+actLine(a)+(open && a.laps?'<br><button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>'+(ui.laps[s.id]?lapsTable(a):''):'')+'</div>';
   const quick = [];
-  if(s.t!=='rest') quick.push('<button class="btn sm'+(open?' warn':'')+'" data-open="'+s.id+'">'+(open?'Inklappen ▴':'Details & invullen ▾')+'</button>');
   if(s.ex && !skip) quick.push('<button class="btn sm pri" data-logger="'+s.id+'">Logger</button>');
   if(quick.length) h += '<div class="row">'+quick.join('')+'</div>';
   if(open){
@@ -625,9 +629,8 @@ function rWeek(){
     if(!acts.length) h += '<div class="card mut">Geen activiteiten bekend.</div>';
     $('view').innerHTML = h; return; }
   const t = today(); const m = matchWeek(w); let h = '';
-  h += w.status==='concept' ? '<div class="banner concept"><b>Concept</b> — nog niet afgestemd. Wordt definitief na je zondag-check-in.</div>' : '<div class="banner def"><b>Definitief</b></div>';
   h += weekStrip(w.start, null, 'week');
-  h += '<div class="card"><b>'+esc(w.phase)+'</b><div class="mut">'+esc(w.focus)+'</div></div>';
+  h += '<div class="card"><span class="pill '+(w.status==='concept'?'o':'g')+'" style="float:right;font-size:13px">'+(w.status==='concept'?'Concept':'Definitief')+'</span><b>'+esc(w.phase)+'</b><div class="mut">'+esc(w.focus)+'</div>'+(w.status==='concept'?'<div class="small">Nog niet afgestemd; wordt definitief na je zondag-check-in.</div>':'')+'</div>';
   if(w.note) h += '<div class="card" id="coachnote" style="border-color:#23406a"><b>🧭 Coach</b><div class="det">'+esc(w.note)+'</div></div>';
   const cf = availConflicts(w); if(cf.length) h += '<div class="banner oranje" id="availwarn"><b>Past niet in je beschikbaarheid</b><br>'+cf.map(esc).join('<br>')+'<div class="small" style="color:inherit;opacity:.8">Verplaats via “Details → Lukt niet”, of laat het zondag aanpassen.</div></div>';
   if(w.days.length){ h += statsCard(w); const wn = loadWarnings(w); if(wn.length) h += '<div class="banner oranje" id="loadwarn"><b>Let op opbouw</b><br>'+wn.map(esc).join('<br>')+'<div class="small" style="color:inherit;opacity:.8">Vuistregel (± 20% per week, langste loop ± 25%), geen harde grens. Bespreek het zondag als het bewust is.</div></div>'; }
@@ -815,7 +818,7 @@ function rInsight(){
   const hilly = (STRAVA.activities||[]).filter(a => RUNS.includes(a.sport) && a.km && a.hm >= 300).map(a => ({a, t:(a.el||a.sec), ek:(a.km + a.hm/100), vph: a.hm/((a.sec)/3600), mpk: a.hm/a.km})).map(x => Object.assign(x, {rate: x.ek/(x.t/3600)})).filter(x => x.rate >= 4.5 && x.vph < 1500).sort((x,y)=> y.a.date.localeCompare(x.a.date));
   const ref = hilly.find(x => x.t >= 3*3600 && x.mpk >= 25) || null; const MZ_EK = 84 + 48;
   if(ref){ const prog = MZ_EK/ref.rate; h += '<div class="banner '+(prog > 18 ? 'rood' : prog > 16.5 ? 'oranje' : 'groen')+'" style="margin-top:10px" id="mzprog"><b>Mozart-prognose ± '+fmtN(prog)+' u</b> (limiet 19 u)<div class="small" style="color:inherit">Grove schatting: 132 effort-km (84 km + 4800 hm/100) gedeeld door je tempo in '+esc(ref.a.name)+' ('+fmtN(ref.rate)+' effort-km/u, incl. stops). Wordt beter zodra je recentere lange heuvelsessies loopt.</div></div>'; }
-  if(hilly.length) h += '<div style="margin-top:10px"><b style="font-size:15px">Klimsessies (≥ 300 hm)</b><table><tr><th>Datum</th><th class="r">hm</th><th class="r">hm/u</th><th class="r">effort-km/u</th></tr>'+hilly.slice(0,6).map(x => '<tr><td>'+fmtDay(x.a.date)+' '+x.a.date.slice(2,4)+'<div class="small">'+esc(x.a.name.slice(0,34))+'</div></td><td class="r">'+x.a.hm+'</td><td class="r">'+Math.round(x.vph)+'</td><td class="r">'+fmtN(x.rate)+'</td></tr>').join('')+'</table><div class="small">hm/u = hoogtemeters per bewegend uur over de hele sessie (inclusief vlak/dalen), geen pure klimsnelheid.</div></div>';
+  if(hilly.length) h += '<details style="margin-top:10px"><summary><b style="font-size:15px">Klimsessies (≥ 300 hm)</b></summary><table><tr><th>Datum</th><th class="r">hm</th><th class="r">hm/u</th><th class="r">effort-km/u</th></tr>'+hilly.slice(0,6).map(x => '<tr><td>'+fmtDay(x.a.date)+' '+x.a.date.slice(2,4)+'<div class="small">'+esc(x.a.name.slice(0,34))+'</div></td><td class="r">'+x.a.hm+'</td><td class="r">'+Math.round(x.vph)+'</td><td class="r">'+fmtN(x.rate)+'</td></tr>').join('')+'</table><div class="small">hm/u = hoogtemeters per bewegend uur over de hele sessie (inclusief vlak/dalen), geen pure klimsnelheid.</div></details>';
   h += '</div>';
   h += '<div class="card"><h3>Hardlopen km/week</h3>'+barSvg(wk.map(x=>x.km), lab)+'</div>';
   h += '<div class="card"><h3>Looptijd rustig / matig / hard</h3>'+stackSvg(splits, lab)+'<div class="small">Per ronde ingedeeld waar ronden bekend zijn (tempo t.o.v. drempel), anders per sessie op gemiddelde HF (rustig ≤ '+easyHr()+', hard ≥ 160) of tempo. Grof, maar laat het patroon zien. Richting ≥ 75–80% rustig.</div></div>';
@@ -827,10 +830,10 @@ function rInsight(){
   let tr = '';
   for(const c of MAIN_LIFTS){ const byD = {}; for(const x of S.sets) if(work(x) && x.code===c){ const v = e1(x); if(v) byD[x.date] = Math.max(byD[x.date]||0, v); }
     const ds = Object.keys(byD).sort(); if(ds.length >= 2){ const d0 = parseD(ds[0]); tr += '<div style="margin-top:8px"><b>'+esc(EXN(c).n)+'</b>'+lineSvg([{pts:ds.map(d => [(parseD(d)-d0)/864e5, byD[d]]), c:'#f5b942'}])+'</div>'; } }
-  h += '<div class="card"><h3>Kracht: geschatte 1RM</h3>'+(tr || '<div class="mut">Verschijnt zodra een hoofdoefening twee keer gelogd is.</div>')+'<div class="small">Schatting (Epley), geen gemeten 1RM.</div></div>';
+  if(tr) h += '<div class="card"><h3>Kracht: geschatte 1RM</h3>'+tr+'<div class="small">Schatting (Epley), geen gemeten 1RM.</div></div>';
   const pl = {}; for(let i=27;i>=0;i--){ const d = addDays(t,-i); const y = dailyOf(d); for(const [k,v] of Object.entries(y.pains||{})){ const r = pl[k] || (pl[k] = {n:0, max:0, last:null, lv:0}); r.n++; r.max = Math.max(r.max, v); r.last = d; r.lv = v; } }
   const pk = Object.keys(pl);
-  h += '<div class="card"><h3>Pijn per plek, 28 dagen</h3>'+(pk.length ? '<table><tr><th>Plek</th><th class="r">Dagen</th><th class="r">Max</th><th>Laatst</th></tr>'+pk.sort((a,b)=>pl[b].n-pl[a].n).map(k => '<tr><td>'+esc(k)+'</td><td class="r">'+pl[k].n+'</td><td class="r">'+pl[k].max+'</td><td>'+fmtDay(pl[k].last)+' ('+pl[k].lv+')</td></tr>').join('')+'</table><div class="small">Meer dan 3 dagen achter elkaar op dezelfde plek, of een stijgende score: zeg het zondag.</div>' : '<div class="mut">Geen pijn gemeld. Mooi.</div>')+'</div>';
+  if(pk.length) h += '<div class="card"><h3>Pijn per plek, 28 dagen</h3>'+(pk.length ? '<table><tr><th>Plek</th><th class="r">Dagen</th><th class="r">Max</th><th>Laatst</th></tr>'+pk.sort((a,b)=>pl[b].n-pl[a].n).map(k => '<tr><td>'+esc(k)+'</td><td class="r">'+pl[k].n+'</td><td class="r">'+pl[k].max+'</td><td>'+fmtDay(pl[k].last)+' ('+pl[k].lv+')</td></tr>').join('')+'</table><div class="small">Meer dan 3 dagen achter elkaar op dezelfde plek, of een stijgende score: zeg het zondag.</div>' : '<div class="mut">Geen pijn gemeld. Mooi.</div>')+'</div>';
   const bd = S.body.slice().sort((p,q)=> p.date.localeCompare(q.date));
   if(bd.length){ const t0 = parseD(bd[0].date); const W = bd.filter(x=>x.w).map(x => [(parseD(x.date)-t0)/864e5, x.w]); const SM = bd.filter(x=>x.ssm).map(x => [(parseD(x.date)-t0)/864e5, x.ssm]);
     const ib = bd.filter(x=>x.ssm); const f = ib[0], l = ib[ib.length-1]; const seg = bd.filter(x=>x.seg).pop();
@@ -846,7 +849,7 @@ function rInsight(){
   h += blockHtml();
   h += recordsHtml();
   const fl = S.cardio.filter(c => !c.del && (c.kh || c.wat)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,10);
-  h += '<div class="card"><h3>Voedingslog</h3>'+(fl.length ? '<table><tr><th>Datum</th><th>Duur</th><th class="r">g/u</th><th class="r">Maag</th></tr>'+fl.map(c => '<tr><td>'+fmtDay(c.date)+'<div class="small">'+esc(c.wat||'')+'</div></td><td>'+(c.sec?fmtSec(c.sec):'')+'</td><td class="r">'+(c.kh||'')+'</td><td class="r">'+(c.maag||'')+'</td></tr>').join('')+'</table>' : '<div class="mut">Log voeding via “Log duur” bij lange sessies.</div>')+'</div>';
+  if(fl.length) h += '<div class="card"><h3>Voedingslog</h3>'+(fl.length ? '<table><tr><th>Datum</th><th>Duur</th><th class="r">g/u</th><th class="r">Maag</th></tr>'+fl.map(c => '<tr><td>'+fmtDay(c.date)+'<div class="small">'+esc(c.wat||'')+'</div></td><td>'+(c.sec?fmtSec(c.sec):'')+'</td><td class="r">'+(c.kh||'')+'</td><td class="r">'+(c.maag||'')+'</td></tr>').join('')+'</table>' : '<div class="mut">Log voeding via “Log duur” bij lange sessies.</div>')+'</div>';
   h += '<div class="row"><button class="btn" data-manual="1">＋ Handmatige duursessie</button></div>';
   $('view').innerHTML = h;
 }
@@ -884,16 +887,17 @@ function recordsHtml(){
   }
   h += '</table><div class="small" style="margin-top:6px">Bron: Strava-beste prestaties (ook delen van langere runs), bijgewerkt '+esc(STRAVA.updated||'–')+', plus handmatige sessies met vinkje “Wedstrijd/test”.</div></div>';
   const races = (STRAVA.activities||[]).filter(a => a.race && RUNS.includes(a.sport)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,8);
-  if(races.length) h += '<div class="card"><h3>Wedstrijden</h3><table><tr><th>Datum</th><th>Wedstrijd</th><th class="r">Tijd</th></tr>'+races.map(a => '<tr><td>'+fmtDay(a.date)+' '+a.date.slice(2,4)+'</td><td>'+esc(a.name)+'<div class="small">'+(a.km?fmtN(a.km)+' km':'')+(a.hm?' · '+a.hm+' hm':'')+'</div></td><td class="r">'+fmtSec(a.el||a.sec)+'</td></tr>').join('')+'</table></div>';
+  const rRow = a => '<tr><td>'+fmtDay(a.date)+' '+a.date.slice(2,4)+'</td><td>'+esc(a.name)+'<div class="small">'+(a.km?fmtN(a.km)+' km':'')+(a.hm?' · '+a.hm+' hm':'')+'</div></td><td class="r">'+fmtSec(a.el||a.sec)+'</td></tr>';
+  if(races.length) h += '<div class="card"><h3>Wedstrijden</h3><table><tr><th>Datum</th><th>Wedstrijd</th><th class="r">Tijd</th></tr>'+races.slice(0,3).map(rRow).join('')+'</table>'+(races.length>3?'<details><summary class="small">Meer wedstrijden ('+(races.length-3)+')</summary><table>'+races.slice(3).map(rRow).join('')+'</table></details>':'')+'</div>';
   const by = {};
   for(const x of S.sets) if(work(x) && x.kg && unitOf(x.code)==='kg' && !EXN(x.code).time){
     const v = e1(x); const r = by[x.code] || (by[x.code] = {max:null, e1:null});
     if(!r.max || x.kg>r.max.kg || (x.kg===r.max.kg && x.reps>r.max.reps)) r.max = x;
     if(v && (!r.e1 || v>r.e1)) r.e1 = v; }
-  h += '<div class="card" id="recstr"><h3>Records kracht</h3>';
   const codes = Object.keys(by);
-  if(!codes.length) h += '<div class="mut">Nog geen sets gelogd.</div>';
-  else { h += '<table><tr><th>Oefening</th><th>Zwaarste set</th><th class="r">e1RM*</th></tr>';
+  if(!codes.length) return h;
+  h += '<div class="card" id="recstr"><h3>Records kracht</h3>';
+  { h += '<table><tr><th>Oefening</th><th>Zwaarste set</th><th class="r">e1RM*</th></tr>';
     for(const c of codes.sort((a,b)=>EXN(a).n.localeCompare(EXN(b).n))){ const r = by[c];
       h += '<tr><td>'+esc(EXN(c).n)+'</td><td>'+fmtKg(r.max.kg)+' × '+r.max.reps+'<div class="small">'+fmtDay(r.max.date)+'</div></td><td class="r">'+(r.e1?fmtKg(Math.round(r.e1*2)/2):'–')+'</td></tr>'; }
     h += '</table><div class="small" style="margin-top:6px">* Schatting (Epley), sets tot 12 reps.</div>'; }
@@ -938,13 +942,15 @@ function rCheck(){
   h += '<div class="row"><button class="btn pri" id="x_sunday">📋 Kopieer zondag-export</button></div><textarea id="x_out" readonly style="margin-top:10px;min-height:90px" placeholder="Export verschijnt hier; plak hem in de chat."></textarea>';
   $('view').innerHTML = h;
 }
+const SLOT_SHORT = {'Alleen ochtend':'Ochtend', 'Alleen avond':'Avond'};
 function availHtml(nextMon){
   const nid = weekIdOf(nextMon); const av = S.avail[nid] || {d:{}, n:''};
-  let h = '<div class="card" id="avail"><b>Beschikbaarheid week '+nid.split('-W')[1]+'</b><div class="small">Wanneer kun je trainen, hoe vaak en hoe lang maximaal?</div>';
+  let h = '<div class="card" id="avail"><b>Beschikbaarheid week '+nid.split('-W')[1]+'</b><div class="small">Tik per dag wat kan; daarna verschijnt een veld voor max. minuten en een notitie. Leeg = zoals gewoonlijk.</div>';
   for(let i=0;i<7;i++){ const dd = addDays(nextMon,i); const x = (av.d||{})[i] || {};
-    h += '<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:8px"><b>'+fmtDay(dd)+'</b>'+(i===2||i===4?' <span class="small">(vaak thuiswerk)</span>':'');
-    h += '<div class="chips sm">'+SLOTS.map(sl => '<button class="chip'+(x.slot===sl?' on':'')+'" style="font-size:14px" data-av="'+nid+'" data-i="'+i+'" data-slot="'+sl+'">'+sl+'</button>').join('')+'</div>';
-    h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="max min" data-avmin="'+nid+'" data-i="'+i+'" value="'+esc(x.min||'')+'"><input type="text" placeholder="bijv. pas na 19:00, gym met maat" data-avnote="'+nid+'" data-i="'+i+'" value="'+esc(x.note||'')+'"></div></div>'; }
+    h += '<div style="border-top:1px solid var(--line);margin-top:8px;padding-top:6px"><b style="font-size:15px">'+fmtDay(dd)+'</b>'+(i===2||i===4?' <span class="small">thuiswerk?</span>':'');
+    h += '<div class="avrow">'+SLOTS.map(sl => '<button class="chip'+(x.slot===sl?' on':'')+'" data-av="'+nid+'" data-i="'+i+'" data-slot="'+sl+'">'+(SLOT_SHORT[sl]||sl)+'</button>').join('')+'</div>';
+    if(x.slot && x.slot!=='Niet' || x.min || x.note) h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="max min" data-avmin="'+nid+'" data-i="'+i+'" value="'+esc(x.min||'')+'"><input type="text" placeholder="bijv. pas na 19:00, gym met maat" data-avnote="'+nid+'" data-i="'+i+'" value="'+esc(x.note||'')+'"></div>';
+    h += '</div>'; }
   h += '<label class="f">Algemeen (reizen, events, wensen)</label><input type="text" data-avn="'+nid+'" value="'+esc(av.n||'')+'"></div>';
   return h;
 }
@@ -1033,7 +1039,7 @@ function rMeer(){
   h += '<textarea id="x_out" readonly style="margin-top:10px;min-height:120px" placeholder="Hier verschijnt de export."></textarea>';
   h += '<div class="small">Laatste back-up: '+(st.lastBackup?fmtDay(iso(new Date(st.lastBackup))):'nooit')+'</div></div>';
   h += '<div class="card"><h3>Agenda</h3><div class="mut">Eén keer abonneren; je agenda werkt zichzelf bij (iPhone ververst periodiek, niet direct).</div>';
-  h += '<div class="row"><a class="btn pri" id="ics_sub" style="display:flex;align-items:center;justify-content:center;text-decoration:none" href="'+base.replace(/^https?:/,'webcal:')+'ics/all.ics">📆 Abonneer op trainingsagenda</a></div><div class="small" style="word-break:break-all">'+esc(base)+'ics/all.ics</div></div>';
+  h += '<div class="row"><a class="btn pri" id="ics_sub" style="display:flex;align-items:center;justify-content:center;text-decoration:none" href="'+base.replace(/^https?:/,'webcal:')+'ics/all.ics">📆 Abonneer op trainingsagenda</a></div></div>';
   h += '<div class="card"><h3>Herstellen</h3><div class="mut">Plak een back-upcode (begint met YC1:).</div><textarea id="r_in" style="margin-top:8px"></textarea>';
   h += '<div class="row"><button class="btn '+(ui.restoreArmed?'bad':'warn')+'" id="r_go">'+(ui.restoreArmed?'Bevestig: alles vervangen':'Herstel back-up')+'</button></div>';
   if(st.sheetUrl) h += '<div class="row"><button class="btn" id="r_sheet">'+(ui.sheetArmed?'Bevestig: vervangen door Sheet-data':'Herstel uit Google Sheet')+'</button></div>';
@@ -1084,7 +1090,7 @@ document.addEventListener('click', ev => {
     if(!cur && !(S.done[ds.done]||{}).min){ const ss = S.sets.filter(x => x.sid===ds.done && !x.del).map(x=>x.ts); if(ss.length > 1) setDone(ds.done, {min: String(Math.round((Math.max(...ss)-Math.min(...ss))/60000) + 5)}); } const f = sessById(ds.done); const auto = f && matchWeek(f.w).by[ds.done];
     if(auto && !cur){ toast('Al gedaan volgens Strava'); return; } setDone(ds.done, {d:!cur}); rerender(); return; }
   if(ds.srpe){ const cur = (S.done[ds.srpe]||{}).rpe, v = Number(ds.v); setDone(ds.srpe, {rpe: cur===v ? null : v}); rerender(); return; }
-  if(ds.open){ ui.open[ds.open] = !b.textContent.includes('Inklappen'); rerender(); return; }
+  if(ds.open){ ui.open[ds.open] = b.dataset.isopen!=='1'; rerender(); return; }
   if(b.id==='ring'){ $('timer').classList.toggle('ctl'); return; }
   if(ds.strip){ if(ds.mode==='day'){ ui.day = ds.strip===today() ? null : ds.strip; ui.tab = 'vandaag'; render(); window.scrollTo(0,0); }
     else { const el = document.getElementById('d_'+ds.strip); if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); } return; }
