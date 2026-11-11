@@ -128,7 +128,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.2.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -178,7 +178,7 @@ const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','V
 const RUNS = ['Run','TrailRun','VirtualRun'];
 
 /* ---------- opslag ---------- */
-function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
+function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
   settings:{ftp:null,lthr:null,tpace:null,sheetUrl:'',lastBackup:null,seenPlan:null}, queue:[]}; }
 function migrate(o){
   const b = blank();
@@ -205,7 +205,12 @@ async function loadData(){
   try { const r = await fetch('plan.json', {cache:'no-cache'}); PLAN = await r.json(); } catch(e){ PLAN = null; }
   try { const r = await fetch('strava.json', {cache:'no-cache'}); if(r.ok) STRAVA = await r.json(); } catch(e){}
 }
-const EXN = c => (PLAN && PLAN.exercises[c]) || {n:c, inc:2.5};
+const EXN = c => (PLAN && PLAN.exercises[c]) || (S.custom||{})[c] || {n:c, inc:2.5};
+const GROUPS = ['borst','rug','schouders','biceps','triceps','quads','hamstrings','bilspieren','adductoren','kuiten','scheen','core','plyo','hyrox','overig'];
+/* Oefeningen van een sessie = plan + zelf toegevoegd. Wissels via S.swaps; overgeslagen via S.exskip. */
+function sessEx(s){ return (s.ex||[]).concat((S.extra[s.id]||[])); }
+function allExercises(){ const all = Object.assign({}, (PLAN&&PLAN.exercises)||{}, S.custom||{}); return Object.keys(all).map(c => ({c, x:all[c]})).sort((a,b)=> a.x.n.localeCompare(b.x.n)); }
+function defaultsFor(code){ const u = unitOf(code); return u==='kg' ? {s:3,lo:8,hi:12,rir:2,rest:90} : u==='s' ? {s:3,lo:30,hi:45,rir:0,rest:45} : u==='m' ? {s:3,lo:20,hi:40,rir:0,rest:60} : {s:3,lo:8,hi:12,rir:0,rest:60}; }
 const unitOf = c => EXN(c).u || 'kg';
 const setting = k => S.settings[k] ?? (PLAN && PLAN.athlete[k]);
 const num = v => { if(v===null || v===undefined) return null; const s = String(v).trim().replace(',', '.'); if(s==='') return null; const n = Number(s); return isNaN(n) ? null : n; };
@@ -407,7 +412,7 @@ function sessCard(it, m, opt){
   if(quick.length) h += '<div class="row">'+quick.join('')+'</div>';
   if(open){
     if(s.detail) h += '<div class="det">'+esc(s.detail)+'</div>';
-    if(s.ex) h += '<div class="det small">'+s.ex.map(e => esc(EXN(S.swaps[s.id+'|'+e.c]||e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>';
+    if(s.ex) h += '<div class="det small">'+sessEx(s).filter(e => !S.exskip[s.id+'|'+e.c]).map(e => esc(EXN(S.swaps[s.id+'|'+e.c]||e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>';
     if(!skip && s.t!=='rest'){
       h += '<div class="small" style="margin-top:10px">RPE sessie</div><div class="chips sm">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip'+(st.rpe===r?' on':'')+'" data-srpe="'+s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
       h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="min" data-min="'+s.id+'" value="'+esc(st.min||'')+'">';
@@ -505,20 +510,20 @@ function rLog(){
   const {s, date} = f;
   let h = '<div class="card"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><b>'+esc(s.title)+'</b><div class="mut">'+fmtDay(date)+' · scherm blijft aan</div>';
   h += '<div class="row"><button class="btn sm" data-pick="1">Andere sessie</button><button class="btn sm '+((S.done[s.id]||{}).d?'pri':'')+'" data-done="'+s.id+'">'+((S.done[s.id]||{}).d?'✓ Afgerond':'Sessie afronden')+'</button></div></div>';
-  for(const e of s.ex){
+  for(const e of sessEx(s)){
     const code = S.swaps[s.id+'|'+e.c] || e.c, u = unitOf(code), X = EXN(code), timed = !!X.time;
+    if(S.exskip[s.id+'|'+e.c]){ h += '<div class="card small" id="ex_'+e.c+'" style="opacity:.6;display:flex;align-items:center;justify-content:space-between;gap:8px"><span><s>'+esc(X.n)+'</s> · overgeslagen</span><button class="btn sm" data-exskip="'+e.c+'">Toch doen</button></div>'; continue; }
     const now = S.sets.filter(x => x.sid===s.id && x.code===code && !x.del).sort((a,b)=>a.ts-b.ts);
     const prev = prevGroup(code, s.id, date); const sug = suggest(e, code, prev);
     const kk = 'kg_'+s.id+code; const kgVal = ui[kk] ?? (now.length ? (now[now.length-1].kg ?? '') : (sug.kg ?? ''));
     const rk = s.id+'|'+code; const rirSel = ui.rir[rk] ?? e.rir;
-    h += '<div class="card" id="ex_'+e.c+'"><b>'+esc(X.n)+'</b>'+(code!==e.c?' <span class="pill o">i.p.v. '+esc(EXN(e.c).n)+'</span>':'');
+    h += '<div class="card" id="ex_'+e.c+'"><b>'+esc(X.n)+'</b>'+(code!==e.c?' <span class="pill o">i.p.v. '+esc(EXN(e.c).n)+'</span>':'')+(e.add?' <span class="pill o">toegevoegd</span>':'');
     h += '<div class="mut">'+e.s+' × '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u==='s'?'sec':u)+(e.rir?' · RIR '+e.rir:'')+(e.rest?' · rust '+fmtSec(e.rest):'')+' <span class="small">['+code+']</span></div>';
     if(e.note) h += '<div class="hint mut">'+esc(e.note)+'</div>';
     if(prev) h += '<div class="hint mut">Vorige keer ('+fmtDay(prev[0].date)+'): '+prev.map(x => (x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':'')).join(', ')+'</div>';
     h += '<div class="hint sug">'+sug.txt+'</div>';
-    const alts = [e.c].concat(EXN(e.c).alt||[]).filter((c,i,a)=> a.indexOf(c)===i);
-    if(alts.length>1){ h += '<button class="btn link" data-swapopen="'+e.c+'">Wissel oefening ▾</button>';
-      if(ui.swap[e.c]) h += '<div class="chips sm">'+alts.map(c => '<button class="chip'+(c===code?' on':'')+'" data-swap="'+e.c+'" data-to="'+c+'" style="font-size:14px">'+esc(EXN(c).n)+'</button>').join('')+'</div>'; }
+    h += '<div class="row" style="margin-top:4px"><button class="btn link" data-swapopen="'+e.c+'">'+(ui.swap[e.c]?'Wissel ▴':'⇄ Wissel')+'</button>'+(e.add?'<button class="btn link" data-exdel="'+e.c+'">✕ Verwijder</button>':'<button class="btn link" data-exskip="'+e.c+'">Sla over</button>')+'</div>';
+    if(ui.swap[e.c]) h += pickerHtml(s, 'swap', e.c);
     if((X.inc||0) > 0) h += '<div class="kg"><button class="btn" data-kgd="'+code+'" data-dir="-1">−</button><input type="text" inputmode="decimal" placeholder="kg" data-kg="'+code+'" value="'+esc(kgVal===null?'':String(kgVal).replace('.', ','))+'"><button class="btn" data-kgd="'+code+'" data-dir="1">+</button></div>';
     if(timed){
       const run = ui.sw[code];
@@ -532,12 +537,27 @@ function rLog(){
     h += '<div class="sets">'+now.map((x,i) => '<span class="set">'+(i+1)+': '+(x.kg?fmtKg(x.kg)+' × ':'')+x.reps+(u!=='kg'?' '+(u==='s'?'sec':u):'')+(x.rir!=null?' @'+x.rir:'')+(x.sec?' · '+fmtSec(x.sec):'')+'<button data-del="'+x.id+'" aria-label="Verwijder">×</button></span>').join('')+'<span class="small" style="align-self:center">'+(now.length>=e.s?'✓ ':'')+now.length+'/'+e.s+'</span></div>';
     h += '</div>';
   }
+  h += '<div class="row"><button class="btn" data-addopen="1">'+(ui.addOpen?'Toevoegen ▴':'＋ Oefening toevoegen')+'</button></div>';
+  if(ui.addOpen) h += pickerHtml(s, 'add', '');
+  h += '<div class="small" style="margin:10px 2px">Geen zin om te loggen? Prima: tik “Sessie afronden” of vink hem af op Vandaag/Week.</div>';
   $('view').innerHTML = h; tick();
 }
 
+function pickerHtml(s, mode, forC){
+  const sug = mode==='swap' ? [forC].concat(EXN(forC).alt||[]).filter((c,i,a)=> a.indexOf(c)===i) : [];
+  let h = '<div class="picker card" style="background:var(--card2);margin-top:10px">';
+  if(sug.length>1) h += '<div class="small">Voorgesteld</div><div class="chips sm">'+sug.map(c => '<button class="chip" style="font-size:14px" data-pickex="'+c+'" data-mode="swap" data-for="'+forC+'">'+esc(EXN(c).n)+'</button>').join('')+'</div>';
+  h += '<input type="search" data-exsearch="1" placeholder="Zoek oefening (bv. leg, row, curl)…" style="margin-top:8px">';
+  h += '<div class="exlist" style="max-height:260px;overflow:auto;margin-top:6px">'+allExercises().map(({c,x}) => '<button class="btn sm" style="width:100%;text-align:left;margin-top:4px;display:flex;justify-content:space-between;gap:8px" data-pickex="'+c+'" data-mode="'+mode+'" data-for="'+(forC||'')+'" data-name="'+esc((x.n+' '+(x.g||'')+' '+c).toLowerCase())+'"><span>'+esc(x.n)+'</span><span class="small">'+esc(x.g||'')+'</span></button>').join('')+'</div>';
+  h += '<div class="small" style="margin-top:10px">Staat hij er niet tussen? Eigen oefening:</div>';
+  h += '<input type="text" data-newname="1" placeholder="Naam, bv. Sled drag" style="margin-top:6px">';
+  h += '<div class="row nw"><select data-newunit="1"><option value="kg">kg × reps</option><option value="reps">alleen reps</option><option value="s">seconden</option><option value="m">meters</option></select><select data-newgroup="1">'+GROUPS.map(g=>'<option>'+g+'</option>').join('')+'</select></div>';
+  h += '<div class="row"><button class="btn sm pri" data-newex="1" data-mode="'+mode+'" data-for="'+(forC||'')+'">'+(mode==='swap'?'Maak en wissel':'Maak en voeg toe')+'</button></div>';
+  return h+'</div>';
+}
 function logSet(code, reps, extra){
   const f = sessById(ui.sid); if(!f || reps==null || isNaN(reps)) return;
-  const e = f.s.ex.find(x => (S.swaps[f.s.id+'|'+x.c]||x.c)===code) || {};
+  const e = sessEx(f.s).find(x => (S.swaps[f.s.id+'|'+x.c]||x.c)===code) || {};
   const inp = document.querySelector('[data-kg="'+code+'"]'); const kg = inp ? num(inp.value) : null;
   const ts = Date.now(); const id = f.s.id+'|'+code+'|'+ts; const rk = f.s.id+'|'+code;
   const rec = Object.assign({id, date:f.date, sid:f.s.id, code, pc:e.c, kg, reps:Number(reps), ts}, extra||{});
@@ -717,7 +737,9 @@ function weekText(start){
       if(a){ L.push('    Strava: '+actLine(a)); if(a.laps) L.push('    Ronden: '+a.laps.map(l => l.m+'m '+fmtSec(l.sec)+(l.hr?'@'+l.hr:'')).join(', ')); }
       const sets = S.sets.filter(x => x.sid===s.id && !x.del).sort((a,b)=>a.ts-b.ts);
       if(sets.length){ const g = {}; for(const x of sets) (g[x.code] = g[x.code] || []).push((x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':''));
-        for(const c in g){ const pc = sets.find(x=>x.code===c).pc; L.push('    '+EXN(c).n+(pc && pc!==c?' (i.p.v. '+EXN(pc).n+')':'')+': '+g[c].join(', ')); } } }
+        for(const c in g){ const pc = sets.find(x=>x.code===c).pc; const added = (S.extra[s.id]||[]).some(x=>x.c===pc); L.push('    '+EXN(c).n+(added?' (toegevoegd)':'')+(pc && pc!==c?' (i.p.v. '+EXN(pc).n+')':'')+': '+g[c].join(', ')); } }
+      const skipped = sessEx(s).filter(e => S.exskip[s.id+'|'+e.c]).map(e => EXN(e.c).n); if(skipped.length) L.push('    Overgeslagen oefeningen: '+skipped.join(', '));
+      if(st.d && s.ex && !sets.length) L.push('    (afgevinkt zonder te loggen)'); }
     for(const a of ex) L.push('[+] Niet gepland, Strava: '+a.name+' · '+actLine(a));
   }
   const cs = S.cardio.filter(c => !c.del && c.date>=start && c.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
@@ -784,7 +806,16 @@ window.addEventListener('online', scheduleSync);
 
 /* ---------- events ---------- */
 function rerender(){ const y = window.scrollY; render(); window.scrollTo(0, y); }
-function exFor(code){ const f = sessById(ui.sid); return f && f.s.ex.find(x => (S.swaps[f.s.id+'|'+x.c]||x.c)===code); }
+function exFor(code){ const f = sessById(ui.sid); return f && sessEx(f.s).find(x => (S.swaps[f.s.id+'|'+x.c]||x.c)===code); }
+function applyPickNoop(){ const sid = ui.sid; enqueue('sessmod', sid, (sessById(sid)||{}).date||'', {extra:S.extra[sid]||[], exskip:Object.fromEntries(Object.entries(S.exskip).filter(([k])=>k.startsWith(sid+'|')))}); }
+function applyPick(code, mode, forC){
+  const sid = ui.sid;
+  if(mode==='swap'){ const k = sid+'|'+forC; if(code===forC) delete S.swaps[k]; else S.swaps[k] = code; ui.swap[forC] = false; toast('Gewisseld: '+EXN(code).n); }
+  else { const list = S.extra[sid] || (S.extra[sid] = []); if(list.some(x => x.c===code) || (sessById(sid).s.ex||[]).some(x => (S.swaps[sid+'|'+x.c]||x.c)===code)){ toast('Staat al in deze sessie'); return; }
+    list.push(Object.assign({c:code, add:true}, defaultsFor(code))); ui.addOpen = false; toast('Toegevoegd: '+EXN(code).n); }
+  enqueue('sessmod', sid, (sessById(sid)||{}).date||'', {swaps:Object.fromEntries(Object.entries(S.swaps).filter(([k])=>k.startsWith(sid+'|'))), extra:S.extra[sid]||[], exskip:Object.fromEntries(Object.entries(S.exskip).filter(([k])=>k.startsWith(sid+'|')))});
+  rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+(mode==='swap'?forC:code)); if(el) el.scrollIntoView({block:'center'}); }, 30);
+}
 document.addEventListener('click', ev => {
   const b = ev.target.closest('button'); if(!b) return; const ds = b.dataset;
   if(ds.tab){ ui.tab = ds.tab; if(ds.tab==='log' && !ui.sid){ const it = weekItems(weekByStart(mondayOf(today()))).find(i => i.date===today() && i.s.ex && !isSkipped(i.s.id)); if(it) ui.sid = it.s.id; } window.scrollTo(0,0); render(); return; }
@@ -810,6 +841,14 @@ document.addEventListener('click', ev => {
   if(ds.rep){ logSet(ds.rep, Number(ds.r)); return; }
   if(ds.repgo){ const i = document.querySelector('[data-repx="'+ds.repgo+'"]'); const v = num(i && i.value); if(v!=null) logSet(ds.repgo, v); return; }
   if(ds.swapopen){ ui.swap[ds.swapopen] = !ui.swap[ds.swapopen]; rerender(); return; }
+  if(ds.pickex){ applyPick(ds.pickex, ds.mode, ds.for); return; }
+  if(ds.newex){ const box = b.closest('.picker'); const n = box.querySelector('[data-newname]').value.trim(); if(!n){ toast('Geef een naam'); return; }
+    const u = box.querySelector('[data-newunit]').value, g = box.querySelector('[data-newgroup]').value;
+    const code = 'U_'+Date.now().toString(36); S.custom[code] = Object.assign({n, g, inc: u==='kg' ? 2.5 : 0}, u==='kg' ? {} : {u}); save(); applyPick(code, ds.mode, ds.for); return; }
+  if(ds.addopen){ ui.addOpen = !ui.addOpen; rerender(); return; }
+  if(ds.exskip){ const k = ui.sid+'|'+ds.exskip; if(S.exskip[k]) delete S.exskip[k]; else S.exskip[k] = true; applyPickNoop(); rerender(); return; }
+  if(ds.exdel){ const list = S.extra[ui.sid]||[]; const has = S.sets.some(x => x.sid===ui.sid && x.code===(S.swaps[ui.sid+'|'+ds.exdel]||ds.exdel) && !x.del);
+    if(has){ toast('Heeft al sets; verwijder die eerst of laat hem staan'); return; } S.extra[ui.sid] = list.filter(x => x.c!==ds.exdel); applyPickNoop(); rerender(); return; }
   if(ds.swap){ const k = ui.sid+'|'+ds.swap; if(ds.to===ds.swap) delete S.swaps[k]; else S.swaps[k] = ds.to; save(); ui.swap[ds.swap] = false; rerender(); toast('Oefening: '+EXN(ds.to).n); return; }
   if(ds.sw){ const c = ds.sw; const e = exFor(c);
     if(!ui.sw[c]){ ui.sw[c] = Date.now(); unlockAudio(); stopTimer(); startTicker(); rerender(); }
@@ -852,7 +891,8 @@ document.addEventListener('change', ev => { const t = ev.target, ds = t.dataset;
   if(ds.kg) ui['kg_'+ui.sid+ds.kg] = t.value;
   if(t.id && t.id.startsWith('c_')) updCalc();
 });
-document.addEventListener('input', ev => { if(ev.target.id && ev.target.id.startsWith('c_')) updCalc(); });
+document.addEventListener('input', ev => { const t = ev.target; if(t.id && t.id.startsWith('c_')) updCalc();
+  if(t.dataset && t.dataset.exsearch){ const q = t.value.trim().toLowerCase(); t.closest('.picker').querySelectorAll('.exlist [data-name]').forEach(b => b.style.display = !q || b.dataset.name.includes(q) ? '' : 'none'); } });
 document.addEventListener('keydown', ev => { const t = ev.target; if(ev.key==='Enter' && t.dataset && t.dataset.repx){ const v = num(t.value); if(v!=null) logSet(t.dataset.repx, v); } });
 
 /* ---------- start ---------- */
