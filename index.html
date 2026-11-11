@@ -128,7 +128,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -156,6 +156,22 @@ const TYPE_LABEL = {run:'Lopen',bike:'Fiets',swim:'Zwem',strength:'Kracht',plyo:
 const DAYS = ['ma','di','wo','do','vr','za','zo'];
 const SLOTS = ['Niet','1×','2×','Alleen ochtend','Alleen avond','Lang'];
 const SKIPS = ['Ziek','Agenda','Vermoeid','Pijn','Weer','Anders'];
+/* Standaard-alternatieven per sessietype. Het plan kan per sessie eigen 'alts' meegeven. */
+function altOptions(s){
+  if(Array.isArray(s.alts) && s.alts.length) return s.alts;
+  const long = (s.km||0) >= 18;
+  return ({
+    run: long ? ['Ingekort: 60–70% van de afstand, zelfde rustige tempo','KICKR 2 u Z2 (60–70% FTP) i.p.v. lopen','Easy 45–60 min, HF ≤ 145']
+              : ['Ingekort: helft van de hoofdset, zelfde tempo','Easy 30–40 min, HF ≤ 145','KICKR 45–60 min Z2 i.p.v. lopen'],
+    bike: ['Ingekort: 45 min Z2','Easy run 30–40 min, HF ≤ 145','Zwemmen 1500 m rustig'],
+    swim: ['KICKR 45 min Z2','Mobiliteit 20 min'],
+    strength: ['Mini: eerste 3 oefeningen, 2 werksets, zelfde gewicht','Thuis 25 min: push-ups, split squats, elastiek-rows, calf raises, 3 rondes'],
+    plyo: ['Alleen pogo’s 2×15 + 3 box jumps','Overslaan, alleen warming-up + loopscholing'],
+    hyrox: ['Engine op KICKR: 6 × 3 min hard / 2 min rustig','Mini: 2 rondes i.p.v. 4','Upper B + core i.p.v. Hyrox'],
+    mobility: ['Kort: 5 min couch stretch + 90/90'],
+    race: []
+  })[s.t] || [];
+}
 const MAIN_LIFTS = ['SQ','RDL','BSS','HT','BP','OHP','PU','LP'];
 const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','VirtualRun'], bike:['Ride','VirtualRide','GravelRide','MountainBikeRide'],
   swim:['Swim'], strength:['WeightTraining'], hyrox:['Workout','HighIntensityIntervalTraining','Crossfit','WeightTraining']};
@@ -357,7 +373,8 @@ function weekStats(w){
 const avg = xs => xs.length ? Math.round(xs.reduce((p,q)=>p+q,0)/xs.length) : null;
 function statsCard(w){
   const st = weekStats(w); const pct = (d,p) => p ? Math.min(100, Math.round(d/p*100)) : (d?100:0);
-  let h = '<div class="card" id="stats"><h3>Weekcijfers <span class="small">gepland → gedaan</span></h3>';
+  let h = '<div class="card" id="stats"><div class="kv" style="border:0;padding:0;align-items:center"><span><b>Week</b> <span class="small">gedaan / gepland</span><br>'+st.sessDone+'/'+st.sessPlan+' sessies · '+fmtN(st.runDone)+'/'+fmtN(st.runPlan)+' km'+(st.vertPlan?' · '+Math.round(st.vertDone)+'/'+st.vertPlan+' hm':'')+'</span><button class="btn link" data-stats="1">'+(ui.stats?'▴':'Meer ▾')+'</button></div>';
+  if(!ui.stats) return h+'</div>';
   const kv = (l, p, d) => '<div class="kv"><span>'+l+'</span><span>'+p+' → <b>'+d+'</b></span></div>';
   h += kv('Sessies', st.sessPlan, st.sessDone);
   h += kv('Hardlopen', fmtN(st.runPlan)+' km', fmtN(st.runDone)+' km'); h += '<div class="bar"><i style="width:'+pct(st.runDone,st.runPlan)+'%"></i></div>';
@@ -372,33 +389,41 @@ function statsCard(w){
 }
 
 /* ---------- sessiekaart ---------- */
+function planLine(s){ const p = []; if(s.km) p.push(fmtN(s.km)+' km'); if(s.min) p.push('~'+s.min+' min'); if(s.hm) p.push(s.hm+' hm'); return p.join(' · '); }
 function sessCard(it, m, opt){
-  const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id], skip = st.skip;
-  let h = '<div class="card sess'+(st.d?' done':'')+(skip?' skip':'')+'" id="s_'+s.id+'"><div class="st">';
-  h += '<button class="chk'+(st.d?' on':(a?' st2':''))+'" data-done="'+s.id+'" aria-label="Afvinken">'+(st.d?'✓':(a?'S':'✓'))+'</button>';
-  h += '<div class="tt"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span>'+(s.km?'<span class="small">'+fmtN(s.km)+' km</span> ':'')+(s.min?'<span class="small">~'+s.min+' min</span>':'')+(s.hm?' <span class="small">'+s.hm+' hm</span>':'')+'<b>'+esc(s.title)+'</b>';
-  if(it.date!==it.orig) h += '<div class="small">↪ verplaatst van '+fmtDay(it.orig)+'</div>';
-  if(skip) h += '<div class="small" style="color:var(--warn)">Overgeslagen: '+esc(skip)+'</div>';
-  h += '</div></div>';
-  if(a){ h += '<div class="strava"><b>Strava</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div>'+(a.laps?'<button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>':'')+(ui.laps[s.id]?lapsTable(a):'')+'</div>'; }
+  const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id], skip = st.skip, done = !skip && (st.d || !!a);
   const open = ui.open[s.id] ?? !!opt.open;
-  if(s.detail || s.ex){ h += '<button class="btn link" data-open="'+s.id+'">'+(open?'Details ▴':'Details ▾')+'</button>';
-    if(open){ if(s.detail) h += '<div class="det">'+esc(s.detail)+'</div>';
-      if(s.ex) h += '<div class="det small">'+s.ex.map(e => esc(EXN(S.swaps[s.id+'|'+e.c]||e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>'; } }
-  if(!skip && s.t!=='rest'){
-    h += '<div class="small" style="margin-top:8px">RPE sessie</div><div class="chips sm">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip'+(st.rpe===r?' on':'')+'" data-srpe="'+s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
-    h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="min" data-min="'+s.id+'" value="'+esc(st.min||'')+'">';
-    h += '<input type="text" placeholder="Notitie" data-note="'+s.id+'" value="'+esc(st.note||'')+'"></div>'; }
-  const btns = [];
-  if(s.ex && !skip) btns.push('<button class="btn pri" data-logger="'+s.id+'">Logger</button>');
-  if(['run','bike','swim','race'].includes(s.t) && !skip) btns.push('<button class="btn" data-cardio="'+s.id+'">Log duur</button>');
-  btns.push('<button class="btn" data-menu="'+s.id+'" aria-label="Verplaatsen of overslaan">⋯</button>');
-  h += '<div class="row">'+btns.join('')+'</div>';
-  if(ui.menu[s.id]){
-    const w = sessById(s.id).w;
-    h += '<div class="small" style="margin-top:10px">Verplaats naar</div><div class="chips sm">'+[0,1,2,3,4,5,6].map(i => { const dd = addDays(w.start,i); return '<button class="chip'+(dd===it.date?' on':'')+'" data-move="'+s.id+'" data-to="'+dd+'">'+DAYS[i]+'</button>'; }).join('')+'</div>';
-    h += '<div class="small" style="margin-top:10px">Overslaan omdat…</div><div class="chips sm">'+SKIPS.map(r => '<button class="chip'+(skip===r?' on':'')+'" data-skip="'+s.id+'" data-r="'+r+'">'+r+'</button>').join('')+'</div>';
-    if(skip || it.date!==it.orig) h += '<div class="row"><button class="btn sm" data-reset="'+s.id+'">Terug naar origineel</button></div>';
+  let h = '<div class="card sess'+(done?' done':'')+(skip?' skip':'')+'" id="s_'+s.id+'"><div class="st">';
+  h += '<button class="chk'+(done?' on':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
+  h += '<div class="tt"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><span class="small">'+planLine(s)+'</span><b>'+esc(s.title)+'</b>';
+  if(it.date!==it.orig) h += '<div class="small">↪ verplaatst van '+fmtDay(it.orig)+'</div>';
+  if(skip) h += '<div class="small" style="color:var(--warn)">Niet uitgevoerd: '+esc(skip)+'</div>';
+  if(st.alt) h += '<div class="small" style="color:var(--blue)">Alternatief: '+esc(st.alt)+'</div>';
+  h += '</div></div>';
+  if(a) h += '<div class="strava"><b>✓ Strava</b> '+actLine(a)+(open && a.laps?'<br><button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>'+(ui.laps[s.id]?lapsTable(a):''):'')+'</div>';
+  const quick = [];
+  if(s.t!=='rest') quick.push('<button class="btn sm'+(open?' warn':'')+'" data-open="'+s.id+'">'+(open?'Inklappen ▴':'Details & invullen ▾')+'</button>');
+  if(s.ex && !skip) quick.push('<button class="btn sm pri" data-logger="'+s.id+'">Logger</button>');
+  if(quick.length) h += '<div class="row">'+quick.join('')+'</div>';
+  if(open){
+    if(s.detail) h += '<div class="det">'+esc(s.detail)+'</div>';
+    if(s.ex) h += '<div class="det small">'+s.ex.map(e => esc(EXN(S.swaps[s.id+'|'+e.c]||e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>';
+    if(!skip && s.t!=='rest'){
+      h += '<div class="small" style="margin-top:10px">RPE sessie</div><div class="chips sm">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip'+(st.rpe===r?' on':'')+'" data-srpe="'+s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
+      h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="min" data-min="'+s.id+'" value="'+esc(st.min||'')+'">';
+      h += '<input type="text" placeholder="Notitie" data-note="'+s.id+'" value="'+esc(st.note||'')+'"></div>'; }
+    const btns = [];
+    if(['run','bike','swim','race'].includes(s.t) && !skip) btns.push('<button class="btn" data-cardio="'+s.id+'">'+(a?'RPE/voeding':'Log duur')+'</button>');
+    if(s.t!=='rest') btns.push('<button class="btn'+(ui.menu[s.id]?' warn':'')+'" data-menu="'+s.id+'">Lukt niet ▾</button>');
+    if(btns.length) h += '<div class="row">'+btns.join('')+'</div>';
+    if(ui.menu[s.id]){
+      const w = sessById(s.id).w; const alts = altOptions(s);
+      if(alts.length) h += '<div class="small" style="margin-top:10px">Alternatief doen</div><div class="chips sm">'+alts.map((t,i) => '<button class="chip'+(st.alt===t?' on':'')+'" style="font-size:14px;text-align:left;flex:1 1 100%" data-alt="'+s.id+'" data-i="'+i+'">'+esc(t)+'</button>').join('')+'</div>';
+      h += '<div class="small" style="margin-top:10px">Verplaats naar</div><div class="chips sm">'+[0,1,2,3,4,5,6].map(i => { const dd = addDays(w.start,i); return '<button class="chip'+(dd===it.date?' on':'')+'" data-move="'+s.id+'" data-to="'+dd+'">'+DAYS[i]+'</button>'; }).join('')+'</div>';
+      h += '<div class="small" style="margin-top:10px">Niet uitvoeren omdat…</div><div class="chips sm">'+SKIPS.map(r => '<button class="chip'+(skip===r?' on':'')+'" data-skip="'+s.id+'" data-r="'+r+'">'+r+'</button>').join('')+'</div>';
+      if(skip || st.alt || it.date!==it.orig) h += '<div class="row"><button class="btn sm" data-reset="'+s.id+'">Terug naar origineel</button></div>';
+      h += '<div class="small" style="margin-top:6px">Gemiste training niet inhalen; kies liever een alternatief of laat hem vallen.</div>';
+    }
   }
   return h+'</div>';
 }
@@ -487,14 +512,14 @@ function rLog(){
     const kk = 'kg_'+s.id+code; const kgVal = ui[kk] ?? (now.length ? (now[now.length-1].kg ?? '') : (sug.kg ?? ''));
     const rk = s.id+'|'+code; const rirSel = ui.rir[rk] ?? e.rir;
     h += '<div class="card" id="ex_'+e.c+'"><b>'+esc(X.n)+'</b>'+(code!==e.c?' <span class="pill o">i.p.v. '+esc(EXN(e.c).n)+'</span>':'');
-    h += '<div class="mut">'+e.s+' × '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u)+(e.rir?' · RIR '+e.rir:'')+(e.rest?' · rust '+fmtSec(e.rest):'')+' <span class="small">['+code+']</span></div>';
+    h += '<div class="mut">'+e.s+' × '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u==='s'?'sec':u)+(e.rir?' · RIR '+e.rir:'')+(e.rest?' · rust '+fmtSec(e.rest):'')+' <span class="small">['+code+']</span></div>';
     if(e.note) h += '<div class="hint mut">'+esc(e.note)+'</div>';
     if(prev) h += '<div class="hint mut">Vorige keer ('+fmtDay(prev[0].date)+'): '+prev.map(x => (x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':'')).join(', ')+'</div>';
     h += '<div class="hint sug">'+sug.txt+'</div>';
     const alts = [e.c].concat(EXN(e.c).alt||[]).filter((c,i,a)=> a.indexOf(c)===i);
     if(alts.length>1){ h += '<button class="btn link" data-swapopen="'+e.c+'">Wissel oefening ▾</button>';
       if(ui.swap[e.c]) h += '<div class="chips sm">'+alts.map(c => '<button class="chip'+(c===code?' on':'')+'" data-swap="'+e.c+'" data-to="'+c+'" style="font-size:14px">'+esc(EXN(c).n)+'</button>').join('')+'</div>'; }
-    h += '<div class="kg"><button class="btn" data-kgd="'+code+'" data-dir="-1">−</button><input type="text" inputmode="decimal" placeholder="kg" data-kg="'+code+'" value="'+esc(kgVal===null?'':String(kgVal).replace('.', ','))+'"><button class="btn" data-kgd="'+code+'" data-dir="1">+</button></div>';
+    if((X.inc||0) > 0) h += '<div class="kg"><button class="btn" data-kgd="'+code+'" data-dir="-1">−</button><input type="text" inputmode="decimal" placeholder="kg" data-kg="'+code+'" value="'+esc(kgVal===null?'':String(kgVal).replace('.', ','))+'"><button class="btn" data-kgd="'+code+'" data-dir="1">+</button></div>';
     if(timed){
       const run = ui.sw[code];
       h += '<div class="row"><button class="btn '+(run?'warn':'pri')+'" data-sw="'+code+'" '+(run?'data-swlive="'+code+'"':'')+'>'+(run?'■ Stop · 0:00':'▶ Start '+e.lo+' '+u)+'</button></div>';
@@ -502,9 +527,9 @@ function rLog(){
     } else {
       if(u==='kg' && e.rir!==0) h += '<div class="small" style="margin-top:8px">RIR van deze set</div><div class="chips sm">'+[0,1,2,3,4].map(r => '<button class="chip'+(r===rirSel?' on':'')+'" data-rir="'+rk+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
       let vals = []; if(e.hi - e.lo <= 8){ for(let r = Math.max(1, e.lo-1); r <= e.hi+2; r++) vals.push(r); } else vals = [e.lo, e.hi];
-      h += '<div class="small" style="margin-top:8px">Tik reps = set loggen</div><div class="chips">'+vals.map(r => '<button class="chip'+(r>=e.lo&&r<=e.hi?' tgt':'')+'" data-rep="'+code+'" data-r="'+r+'">'+r+'</button>').join('')+'<input class="num" style="flex:0 0 80px" type="text" inputmode="numeric" placeholder="ander" data-repx="'+code+'"><button class="btn sm" data-repgo="'+code+'">✓</button></div>';
+      h += '<div class="small" style="margin-top:8px">Tik '+(u==='s'?'seconden':u==='kg'||u==='reps'?'reps':u)+' = set loggen</div><div class="chips">'+vals.map(r => '<button class="chip'+(r>=e.lo&&r<=e.hi?' tgt':'')+'" data-rep="'+code+'" data-r="'+r+'">'+r+'</button>').join('')+'<input class="num" style="flex:0 0 80px" type="text" inputmode="numeric" placeholder="ander" data-repx="'+code+'"><button class="btn sm" data-repgo="'+code+'">✓</button></div>';
     }
-    h += '<div class="sets">'+now.map((x,i) => '<span class="set">'+(i+1)+': '+(x.kg?fmtKg(x.kg)+' × ':'')+x.reps+(u!=='kg'?' '+u:'')+(x.rir!=null?' @'+x.rir:'')+(x.sec?' · '+fmtSec(x.sec):'')+'<button data-del="'+x.id+'" aria-label="Verwijder">×</button></span>').join('')+'<span class="small" style="align-self:center">'+(now.length>=e.s?'✓ ':'')+now.length+'/'+e.s+'</span></div>';
+    h += '<div class="sets">'+now.map((x,i) => '<span class="set">'+(i+1)+': '+(x.kg?fmtKg(x.kg)+' × ':'')+x.reps+(u!=='kg'?' '+(u==='s'?'sec':u):'')+(x.rir!=null?' @'+x.rir:'')+(x.sec?' · '+fmtSec(x.sec):'')+'<button data-del="'+x.id+'" aria-label="Verwijder">×</button></span>').join('')+'<span class="small" style="align-self:center">'+(now.length>=e.s?'✓ ':'')+now.length+'/'+e.s+'</span></div>';
     h += '</div>';
   }
   $('view').innerHTML = h; tick();
@@ -681,14 +706,14 @@ function setDaily(d, k, v){ const x = S.daily[d] || (S.daily[d] = {}); if(v===nu
 function weekText(start){
   const w = weekByStart(start); const wid = weekIdOf(start); const end = addDays(start, 6); const L = []; const m = matchWeek(w);
   L.push('WEEK '+wid+' ('+fmtDay(start)+' – '+fmtDay(end)+')'+(w?' · '+w.phase+' · '+w.status:'')+' · app '+APP_VERSION);
-  L.push('Legenda: [x] afgevinkt · [S] alleen in Strava · [–] overgeslagen · [ ] niet gedaan');
+  L.push('Legenda: [x] afgevinkt · [S] alleen in Strava · [A] alternatief gekozen, niet afgevinkt · [–] niet uitgevoerd · [ ] niet gedaan');
   for(let i=0;i<7;i++){ const dd = addDays(start,i); const its = weekItems(w).filter(x => x.date===dd); const y = dailyOf(dd);
     const ex = m.extra.filter(x => x.date===dd); const hasD = y.rd!=null||y.sl!=null||y.legs!=null||y.pain!=null;
     if(!its.length && !ex.length && !hasD) continue;
     L.push(''); L.push(fmtDay(dd).toUpperCase()+(hasD ? '  [Oura readiness '+(y.rd??'–')+', slaap '+(y.sl??'–')+(y.hrv!=null?', HRV '+y.hrv:'')+(y.rhr!=null?', rust-HF '+y.rhr:'')+(y.legs!=null?', benen '+y.legs+'/5':'')+(y.pain!=null?', pijn '+y.pain+'/10':'')+']' : ''));
     for(const it of its){ const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id];
-      const mark = st.skip ? '[–]' : st.d ? '[x]' : a ? '[S]' : '[ ]';
-      L.push(mark+' '+s.title+(s.km?' (gepland '+s.km+' km)':'')+(it.date!==it.orig?' · verplaatst van '+fmtDay(it.orig):'')+(st.skip?' · overgeslagen: '+st.skip:'')+(st.rpe?' · RPE '+st.rpe:'')+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
+      const mark = st.skip ? '[–]' : st.d ? '[x]' : a ? '[S]' : st.alt ? '[A]' : '[ ]';
+      L.push(mark+' '+s.title+(s.km?' (gepland '+s.km+' km)':'')+(it.date!==it.orig?' · verplaatst van '+fmtDay(it.orig):'')+(st.skip?' · niet uitgevoerd: '+st.skip:'')+(st.alt?' · ALTERNATIEF: '+st.alt:'')+(st.rpe?' · RPE '+st.rpe:'')+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
       if(a){ L.push('    Strava: '+actLine(a)); if(a.laps) L.push('    Ronden: '+a.laps.map(l => l.m+'m '+fmtSec(l.sec)+(l.hr?'@'+l.hr:'')).join(', ')); }
       const sets = S.sets.filter(x => x.sid===s.id && !x.del).sort((a,b)=>a.ts-b.ts);
       if(sets.length){ const g = {}; for(const x of sets) (g[x.code] = g[x.code] || []).push((x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':''));
@@ -763,14 +788,17 @@ function exFor(code){ const f = sessById(ui.sid); return f && f.s.ex.find(x => (
 document.addEventListener('click', ev => {
   const b = ev.target.closest('button'); if(!b) return; const ds = b.dataset;
   if(ds.tab){ ui.tab = ds.tab; if(ds.tab==='log' && !ui.sid){ const it = weekItems(weekByStart(mondayOf(today()))).find(i => i.date===today() && i.s.ex && !isSkipped(i.s.id)); if(it) ui.sid = it.s.id; } window.scrollTo(0,0); render(); return; }
-  if(ds.done){ const cur = (S.done[ds.done]||{}).d; setDone(ds.done, {d:!cur}); rerender(); return; }
+  if(ds.done){ const cur = (S.done[ds.done]||{}).d; const f = sessById(ds.done); const auto = f && matchWeek(f.w).by[ds.done];
+    if(auto && !cur){ toast('Al gedaan volgens Strava'); return; } setDone(ds.done, {d:!cur}); rerender(); return; }
   if(ds.srpe){ const cur = (S.done[ds.srpe]||{}).rpe, v = Number(ds.v); setDone(ds.srpe, {rpe: cur===v ? null : v}); rerender(); return; }
   if(ds.open){ const it = ui.tab==='vandaag'; ui.open[ds.open] = !(ui.open[ds.open] ?? it); rerender(); return; }
+  if(ds.stats){ ui.stats = !ui.stats; rerender(); return; }
   if(ds.laps){ ui.laps[ds.laps] = !ui.laps[ds.laps]; rerender(); return; }
   if(ds.menu){ ui.menu[ds.menu] = !ui.menu[ds.menu]; rerender(); return; }
   if(ds.move){ const f = sessById(ds.move); if(ds.to===f.d.date) delete S.moves[ds.move]; else S.moves[ds.move] = ds.to; enqueue('move', ds.move, ds.to, {to:ds.to, from:f.d.date}); rerender(); toast('Verplaatst naar '+fmtDay(ds.to)); return; }
-  if(ds.skip){ const cur = (S.done[ds.skip]||{}).skip; setDone(ds.skip, cur===ds.r ? {skip:null} : {skip:ds.r, d:false}); rerender(); return; }
-  if(ds.reset){ delete S.moves[ds.reset]; setDone(ds.reset, {skip:null}); enqueue('move', ds.reset, '', {to:null}); rerender(); return; }
+  if(ds.skip){ const cur = (S.done[ds.skip]||{}).skip; setDone(ds.skip, cur===ds.r ? {skip:null} : {skip:ds.r, d:false, alt:null}); ui.menu[ds.skip] = false; rerender(); return; }
+  if(ds.alt){ const f = sessById(ds.alt); const t = altOptions(f.s)[Number(ds.i)]; const cur = (S.done[ds.alt]||{}).alt; setDone(ds.alt, cur===t ? {alt:null} : {alt:t, skip:null}); ui.menu[ds.alt] = false; rerender(); toast(cur===t ? 'Alternatief weggehaald' : 'Alternatief gekozen'); return; }
+  if(ds.reset){ delete S.moves[ds.reset]; setDone(ds.reset, {skip:null, alt:null}); enqueue('move', ds.reset, '', {to:null}); rerender(); return; }
   if(ds.logger){ ui.sid = ds.logger; ui.tab = 'log'; window.scrollTo(0,0); render(); return; }
   if(ds.pick){ ui.sid = null; rLog(); return; }
   if(ds.cardio){ const f = sessById(ds.cardio); ui.prefill = {sid:ds.cardio, date:f.date, sport:({bike:'bike',swim:'swim'})[f.s.t]||'run'}; ui.tab='duur'; render(); window.scrollTo(0,0); return; }

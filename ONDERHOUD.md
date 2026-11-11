@@ -11,7 +11,8 @@ Deze regels gelden voor elke release, ook kleine. Ze beschermen de data op de te
 5. **Cachenummer ophogen bij elke release.** `const CACHE = 'coach-vN'` in `sw.js` en `APP_VERSION` in `index.html`.
 6. **`migrate()` alleen uitbreiden**: velden toevoegen met een standaardwaarde, nooit velden verwijderen of hernoemen. Onbekende velden blijven bewaard.
 7. **Geen gezondheidsdetails in `plan.json` of `strava.json`.** De repo en de site zijn openbaar. Strava-namen/omschrijvingen met persoonlijke info weglaten.
-8. **Test-selectors stabiel houden.** De regressietest vult de *vorige* versie in met: `data-tab`, `data-done`, `data-min`, `data-note`, `data-logger`, `data-kg`, `data-rep`/`data-r`, `data-cardio`, `#c_km #c_time #c_hr #c_save`, `data-rpe`, `data-ck`/`data-cv`/`data-cvs`, `data-ct`, `#s_ftp #s_save`. Deze nooit hernoemen.
+8. **Test-selectors stabiel houden.** De regressietest vult de *vorige* versie in met: `data-tab`, `data-done`, `data-min`, `data-note`, `data-logger`, `data-kg`, `data-rep`/`data-r`, `data-cardio`, `#c_km #c_time #c_hr #c_save`, `data-rpe`, `data-ck`/`data-cv`/`data-cvs`, `data-ct`, `#s_ftp #s_save`. Deze nooit hernoemen. Sinds v2.1 staan invulvelden achter `data-open` ("Details & invullen"); de test klapt die zelf uit.
+10. **Alternatieven:** per sessie kan het plan `"alts": ["…"]` meegeven; anders gelden de standaardalternatieven per type in `altOptions()`. Gekozen alternatief staat in `done[sid].alt`.
 9. **Neven-sleutel** `yorick-coach.undo` bevat alleen de stand vóór het laatste herstel. Geen andere sleutels toevoegen.
 
 ## Weekritme (zondag)

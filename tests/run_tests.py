@@ -69,18 +69,22 @@ class Srv:
 
 def store(pg): return json.loads(pg.evaluate("localStorage.getItem('yorick-coach')") or "{}")
 def tab(pg, t): pg.click(f'[data-tab="{t}"]')
+def ensure_open(pg, sid):
+    """Kaart uitklappen als de invulvelden ingeklapt zijn (vanaf v2.1)."""
+    if pg.locator(f'[data-min="{sid}"]').count() == 0 and pg.locator(f'[data-open="{sid}"]').count():
+        pg.click(f'[data-open="{sid}"]')
 
 def fill_prev(pg):
     """Invullen met de VORIGE versie. Alleen stabiele selectors (bestaan sinds v1)."""
     tab(pg, "week"); pg.wait_for_selector(".sess")
-    pg.click('[data-done="2026-11-17-a"]')
+    pg.click('[data-done="2026-11-17-a"]'); ensure_open(pg, "2026-11-17-a")
     pg.fill('[data-min="2026-11-17-a"]', "50"); pg.press('[data-min="2026-11-17-a"]', "Tab")
     pg.fill('[data-note="2026-11-17-a"]', "test-notitie"); pg.press('[data-note="2026-11-17-a"]', "Tab")
     pg.click('[data-logger="2026-11-17-b"]'); pg.wait_for_selector('[data-kg="SQ"]')
     pg.fill('[data-kg="SQ"]', "60"); pg.dispatch_event('[data-kg="SQ"]', "change")
     for r in ("6", "6", "5"): pg.click(f'[data-rep="SQ"][data-r="{r}"]')
     ok(pg.is_visible("#timer.show"), "rusttimer start automatisch na set (vorige versie)")
-    tab(pg, "week"); pg.click('[data-cardio="2026-11-17-a"]')
+    tab(pg, "week"); ensure_open(pg, "2026-11-17-a"); pg.click('[data-cardio="2026-11-17-a"]')
     pg.fill("#c_km", "10"); pg.fill("#c_time", "50:00"); pg.fill("#c_hr", "150"); pg.click('[data-rpe="3"]'); pg.click("#c_save")
     tab(pg, "check"); pg.click('[data-ck="cijfer"][data-cv="7"]')
     pg.fill('[data-ct="pijn"]', "kuit links 2/10"); pg.dispatch_event('[data-ct="pijn"]', "change")
@@ -106,17 +110,28 @@ def features(pg, shots=True):
     if shots: pg.screenshot(path=str(OUT/"vandaag.png"))
     # sessie-RPE + verplaatsen + overslaan
     tab(pg, "week"); pg.wait_for_selector("#stats")
+    for sid in ("2026-11-17-a", "2026-11-19-a", "2026-11-18-b", "2026-11-21-a"): ensure_open(pg, sid)
     pg.click('[data-srpe="2026-11-17-a"][data-v="4"]')
     pg.click('[data-menu="2026-11-19-a"]'); pg.click('[data-move="2026-11-19-a"][data-to="2026-11-20"]')
     ok(store(pg)["moves"].get("2026-11-19-a") == "2026-11-20", "sessie verplaatst naar vrijdag")
     pg.click('[data-menu="2026-11-18-b"]'); pg.click('[data-skip="2026-11-18-b"][data-r="Agenda"]')
     ok(store(pg)["done"]["2026-11-18-b"].get("skip") == "Agenda", "sessie overgeslagen met reden")
-    ok("Belasting" in pg.inner_text("#stats"), "weekcijfers zichtbaar")
+    pg.click('[data-menu="2026-11-21-a"]'); pg.click('[data-alt="2026-11-21-a"][data-i="0"]')
+    ok(store(pg)["done"]["2026-11-21-a"].get("alt", "").startswith("Ingekort"), "alternatief gekozen voor lange duurloop")
+    ok("Alternatief: Ingekort" in pg.inner_text("#s_2026-11-21-a"), "alternatief zichtbaar op de kaart")
+    pg.click('[data-logger="2026-11-18-a"]'); pg.wait_for_selector('[data-rep="POGO"]')
+    ok(pg.locator('[data-kg="POGO"]').count() == 0 and pg.locator('[data-kg="BOX"]').count() == 0, "geen kg-veld bij plyo")
+    pg.click('[data-rep="BOX"][data-r="3"]'); bx = [x for x in store(pg)["sets"] if x["code"] == "BOX"][-1]
+    ok(bx.get("kg") is None and bx["reps"] == 3, "box jump gelogd zonder kg")
+    tab(pg, "week")
+    ok("sessies" in pg.inner_text("#stats"), "compacte weekcijfers zichtbaar")
+    pg.click('[data-stats="1"]'); ok("Belasting" in pg.inner_text("#stats"), "weekcijfers uitklapbaar")
     if shots: pg.screenshot(path=str(OUT/"week.png"), full_page=False)
     # Strava-koppeling vorige week
     pg.click("#prev"); pg.wait_for_selector("#s_2026-11-10-a")
     ok("10,01 km" in pg.inner_text("#s_2026-11-10-a"), "Strava gekoppeld aan geplande sessie (di 10 nov)")
-    pg.click('[data-laps="2026-11-10-a"]'); ok("4:38" in pg.inner_text("#s_2026-11-10-a"), "rondetijden uit Strava zichtbaar")
+    ok("done" in pg.get_attribute("#s_2026-11-10-a", "class"), "Strava-sessie automatisch als gedaan getoond")
+    ensure_open(pg, "2026-11-10-a"); pg.click('[data-laps="2026-11-10-a"]'); ok("4:38" in pg.inner_text("#s_2026-11-10-a"), "rondetijden uit Strava zichtbaar")
     pg.click("#next")
     # Logger: komma, RIR, wissel
     pg.click("#next"); pg.click('[data-logger="2026-11-24-b"]'); pg.wait_for_selector('[data-kg="SQ"]')
@@ -147,8 +162,10 @@ def features(pg, shots=True):
     pg.fill('[data-avmin][data-i="0"]', "90"); pg.dispatch_event('[data-avmin][data-i="0"]', "change")
     pg.click("#x_sunday"); txt = pg.input_value("#x_out")
     ok("BESCHIKBAARHEID 2026-W48" in txt and "2× · max 90 min" in txt, "beschikbaarheid in zondag-export")
-    ok("Back squat: 60×6, 60×6, 60×5" in txt and "Cijfer voor deze week: 7" in txt, "export bevat sets en check-in")
-    ok("overgeslagen: Agenda" in txt and "verplaatst van" in txt and "RPE 4" in txt, "export bevat overslaan, verplaatsen en RPE")
+    good = bool(re.search(r"Back squat: 60×6(@\d)?, 60×6(@\d)?, 60×5(@\d)?", txt)) and "Cijfer voor deze week: 7" in txt
+    if not good: print(txt[:2500])
+    ok(good, "export bevat sets en check-in")
+    ok("niet uitgevoerd: Agenda" in txt and "ALTERNATIEF: Ingekort" in txt and "verplaatst van" in txt and "RPE 4" in txt, "export bevat niet-uitvoeren, alternatief, verplaatsen en RPE")
     ok("Oura readiness 55" in txt, "export bevat Oura-ochtendcheck")
     if shots: pg.screenshot(path=str(OUT/"checkin.png"))
     # Back-up, herstel, ongedaan maken
