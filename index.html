@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Coach">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Coach</title>
+<style>
+:root{--bg:#0d0f12;--card:#171a1f;--card2:#1f232a;--line:#2a2f37;--tx:#eef1f5;--mut:#9aa3ae;--acc:#4ade80;--acc2:#22c55e;--warn:#f5b942;--bad:#f87171;--blue:#60a5fa}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(150px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 14px 8px;border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:8px}
+.hrow h1{font-size:19px;margin:0;flex:1;text-align:center}
+main{padding:12px 12px 0;max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.day{margin-bottom:16px}
+.day h2{font-size:16px;margin:4px 2px 8px;color:var(--mut);font-weight:600}
+.day h2::first-letter{text-transform:uppercase}
+.day.today h2{color:var(--acc)}
+.sess.done{border-color:#1f5134;background:#132018}
+.st{display:flex;gap:10px;align-items:flex-start}
+.st .tt{flex:1}
+.tt b{display:block;font-size:17px}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--mut);margin-right:6px;text-transform:uppercase;letter-spacing:.03em}
+.det{white-space:pre-wrap;color:#cfd5dc;font-size:15px;margin:8px 0 0}
+.mut{color:var(--mut);font-size:14px}
+.btn{min-height:48px;min-width:48px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--tx);font:inherit;font-weight:600;padding:0 14px;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--acc2);border-color:var(--acc2);color:#04140a}
+.btn.warn{background:#3a2a0b;border-color:var(--warn);color:var(--warn)}
+.btn.bad{background:#3a1414;border-color:var(--bad);color:var(--bad)}
+.btn.sm{min-height:44px;padding:0 10px;font-size:15px}
+.chk{width:52px;height:52px;border-radius:14px;border:2px solid var(--line);background:var(--card2);color:transparent;font-size:26px;font-weight:800;flex:none}
+.chk.on{background:var(--acc2);border-color:var(--acc2);color:#04140a}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.row>*{flex:1 1 auto;min-width:0}
+.row.nw{flex-wrap:nowrap}
+.row.nw input.num{flex:0 0 84px;width:84px}
+input,select,textarea{font:inherit;color:var(--tx);background:#0f1216;border:1px solid var(--line);border-radius:12px;min-height:48px;padding:10px 12px;width:100%}
+textarea{min-height:84px}
+input.num{width:100px;flex:0 0 100px;text-align:center}
+label.f{display:block;font-size:14px;color:var(--mut);margin:10px 2px 4px}
+.banner{border-radius:12px;padding:10px 12px;margin-bottom:10px;font-size:15px}
+.banner.concept{background:#2b2108;border:1px solid var(--warn);color:var(--warn)}
+.banner.def{background:#0f2417;border:1px solid #1f5134;color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{min-width:52px;min-height:52px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--tx);font:inherit;font-weight:700;font-size:18px}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#06101f}
+.chip.tgt{border-color:var(--acc)}
+.kg{display:flex;align-items:center;gap:8px;margin-top:10px}
+.kg input{flex:1;text-align:center;font-size:22px;font-weight:700}
+.sets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.set{background:#0f2417;border:1px solid #1f5134;border-radius:10px;padding:6px 8px;font-size:15px;display:flex;align-items:center;gap:6px}
+.set button{background:none;border:0;color:var(--bad);font-size:20px;min-width:32px;min-height:32px}
+.hint{font-size:14px;margin-top:6px}
+.hint.sug{color:var(--acc)}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:6;display:grid;grid-template-columns:repeat(6,1fr);background:#0b0d10;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{background:none;border:0;color:var(--mut);font:inherit;font-size:12px;font-weight:600;min-height:58px;padding:4px 0}
+nav.tabs button span{display:block;font-size:20px;line-height:1.2}
+nav.tabs button.on{color:var(--acc)}
+#timer{position:fixed;left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom));z-index:7;background:#11331f;border:1px solid var(--acc2);border-radius:14px;padding:8px 10px;display:none;align-items:center;gap:8px;max-width:624px;margin:0 auto}
+#timer.show{display:flex}
+#timer.end{background:#3a2a0b;border-color:var(--warn)}
+#timer .t{flex:1;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--mut);font-weight:600;font-size:13px}
+.calc{background:#0f1a2a;border:1px solid #23406a;border-radius:12px;padding:10px;margin-top:10px;font-size:15px}
+.calc b{color:var(--blue)}
+h3{margin:4px 0 6px;font-size:17px}
+.small{font-size:13px;color:var(--mut)}
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--acc2);color:#04140a;font-weight:700;padding:10px 16px;border-radius:12px;z-index:9;display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <button class="btn sm" id="prev" aria-label="Vorige week">‹</button>
+    <h1 id="htitle">Coach</h1>
+    <button class="btn sm" id="next" aria-label="Volgende week">›</button>
+  </div>
+</header>
+<main id="view"><p class="mut">Laden…</p></main>
+<div id="timer"><div class="t" id="tval">0:00</div>
+  <button class="btn sm" data-tadd="-15">−15</button><button class="btn sm" data-tadd="15">+15</button><button class="btn sm" id="tstop">Stop</button></div>
+<div class="toast" id="toast"></div>
+<nav class="tabs" id="tabs">
+  <button data-tab="week"><span>📅</span>Week</button>
+  <button data-tab="log"><span>🏋️</span>Logger</button>
+  <button data-tab="duur"><span>⏱️</span>Duur</button>
+  <button data-tab="rec"><span>🏆</span>Records</button>
+  <button data-tab="check"><span>✅</span>Check-in</button>
+  <button data-tab="meer"><span>⚙️</span>Meer</button>
+</nav>
+<script>
+'use strict';
+/* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
+const KEY = 'yorick-coach';
+const APP_VERSION = '1.0.0';
+const SCHEMA = 1;
+
+/* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
+const QSETS = {
+  1: [
+    {k:'cijfer', q:'Cijfer voor deze week', t:'scale', min:1, max:10},
+    {k:'zwaarte', q:'Zwaarte van de week (gem. sessie-RPE)', t:'scale', min:1, max:10},
+    {k:'herstel', q:'Slaap & herstel (1 slecht – 5 top)', t:'scale', min:1, max:5},
+    {k:'oura', q:'Oura: gem. HRV / rust-HF (optioneel)', t:'text'},
+    {k:'pijn', q:'Pijntjes: waar, 0–10, wanneer (leeg = geen)', t:'area'},
+    {k:'besch', q:'Beschikbaarheid volgende week', t:'avail'},
+    {k:'richting', q:'Volgende week', t:'pick', opts:['Tandje erbij','Zo laten','Terug']},
+    {k:'opm', q:'Overig voor de coach', t:'area'}
+  ]
+};
+const QV_CURRENT = 1;
+const TYPE_LABEL = {run:'Lopen',bike:'Fiets',swim:'Zwem',strength:'Kracht',plyo:'Plyo',hyrox:'Hyrox',mobility:'Mobiliteit',rest:'Rust',race:'Wedstrijd'};
+const DAYS = ['ma','di','wo','do','vr','za','zo'];
+
+/* ---------- opslag ---------- */
+function blank(){ return {schema:SCHEMA, done:{}, sets:[], cardio:[], checkins:{}, settings:{ftp:null,lthr:null,tpace:null,sheetUrl:''}, queue:[]}; }
+function migrate(o){
+  const b = blank();
+  if(!o || typeof o !== 'object') return b;
+  for(const k of Object.keys(b)) if(o[k] === undefined) o[k] = b[k];
+  for(const k of Object.keys(b.settings)) if(o.settings[k] === undefined) o.settings[k] = b.settings[k];
+  if(!Array.isArray(o.sets)) o.sets = [];
+  if(!Array.isArray(o.cardio)) o.cardio = [];
+  if(!Array.isArray(o.queue)) o.queue = [];
+  o.schema = Math.max(o.schema||1, SCHEMA);
+  return o; // onbekende velden blijven bewaard
+}
+function load(){ try { return migrate(JSON.parse(localStorage.getItem(KEY))); } catch(e){ return blank(); } }
+let S = load();
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ toast('Opslaan mislukt: '+e.message); } }
+function enqueue(kind, id, date, data){
+  S.queue = S.queue.filter(q => !(q.kind===kind && q.id===id));
+  S.queue.push({kind, id, date, data, ts:Date.now()});
+  save(); scheduleSync();
+}
+
+/* ---------- plan ---------- */
+let PLAN = null;
+async function loadPlan(){
+  try { const r = await fetch('plan.json', {cache:'no-cache'}); PLAN = await r.json(); }
+  catch(e){ PLAN = null; }
+}
+const EXN = c => (PLAN && PLAN.exercises[c]) || {n:c, inc:2.5};
+const unitOf = c => EXN(c).u || 'kg';
+const setting = k => S.settings[k] ?? (PLAN && PLAN.athlete[k]);
+
+/* ---------- datum ---------- */
+const pad = n => String(n).padStart(2,'0');
+function iso(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function today(){ return iso(new Date()); }
+function parseD(s){ const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d, 12); }
+function addDays(s, n){ const d = parseD(s); d.setDate(d.getDate()+n); return iso(d); }
+function weekIdOf(s){ const d = parseD(s); const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dn = (t.getUTCDay()+6)%7; t.setUTCDate(t.getUTCDate()-dn+3); const fy = t.getUTCFullYear();
+  const f = new Date(Date.UTC(fy,0,4)); const w = 1 + Math.round(((t - f)/864e5 - 3 + ((f.getUTCDay()+6)%7))/7);
+  return fy+'-W'+pad(w); }
+function mondayOf(s){ const d = parseD(s); const dn = (d.getDay()+6)%7; return addDays(s, -dn); }
+function fmtDay(s){ const d = parseD(s); return DAYS[(d.getDay()+6)%7]+' '+d.getDate()+' '+['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'][d.getMonth()]; }
+function fmtSec(t){ t = Math.round(t); const h = Math.floor(t/3600), m = Math.floor(t%3600/60), s = t%60; return h ? h+':'+pad(m)+':'+pad(s) : m+':'+pad(s); }
+function parseTime(str){ if(!str) return NaN; const p = String(str).trim().replace(',', '.').split(':').map(Number); if(p.some(isNaN)) return NaN;
+  return p.length===3 ? p[0]*3600+p[1]*60+p[2] : p.length===2 ? p[0]*60+p[1] : p[0]*60; }
+function weekByStart(start){ return PLAN && PLAN.weeks.find(w => w.start === start); }
+function weekById(id){ return PLAN && PLAN.weeks.find(w => w.id === id); }
+function sessById(sid){ if(!PLAN) return null; for(const w of PLAN.weeks) for(const d of w.days) for(const s of d.s) if(s.id===sid) return {w, d, s}; return null; }
+
+/* ---------- UI-status ---------- */
+const ui = {tab:'week', week:mondayOf(today()), sid:null, prefill:null, chkWeek:null, restoreArmed:false};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(()=> t.style.display='none', 1600); }
+
+/* ---------- rusttimer ---------- */
+let tEnd = 0, tInt = null, actx = null;
+function beep(){ try { actx = actx || new (window.AudioContext||window.webkitAudioContext)(); const o = actx.createOscillator(), g = actx.createGain();
+  o.frequency.value = 880; o.connect(g); g.connect(actx.destination); g.gain.value = .2; o.start(); o.stop(actx.currentTime + .35); } catch(e){} }
+function unlockAudio(){ try { actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume(); } catch(e){} }
+function startTimer(sec){ if(!sec) return; tEnd = Date.now() + sec*1000; sessionStorage.setItem('tEnd', tEnd); $('timer').classList.add('show'); $('timer').classList.remove('end'); tick(); clearInterval(tInt); tInt = setInterval(tick, 250); }
+function tick(){ const left = Math.ceil((tEnd - Date.now())/1000);
+  if(left <= 0){ $('tval').textContent = 'Rust voorbij'; if(!$('timer').classList.contains('end')){ $('timer').classList.add('end'); beep(); if(navigator.vibrate) navigator.vibrate([200,100,200]); } }
+  else $('tval').textContent = fmtSec(left); }
+function stopTimer(){ clearInterval(tInt); tEnd = 0; sessionStorage.removeItem('tEnd'); $('timer').classList.remove('show','end'); }
+
+/* ---------- zones (berekend) ---------- */
+function hrZone(hr){ const l = Number(setting('lthr')); if(!hr || !l) return null; const p = hr/l*100;
+  const z = p<85?'Z1 herstel':p<90?'Z2 aeroob':p<95?'Z3 tempo':p<100?'Z4 sub-drempel':p<=102?'Z5a drempel':p<=106?'Z5b VO2':'Z5c anaeroob';
+  return z+' ('+Math.round(p)+'% LTHR)'; }
+function paceZone(sec){ const t = Number(setting('tpace')); if(!sec || !t) return null; const r = sec/t;
+  return r>1.29?'Z1 herstel':r>1.13?'Z2 aeroob':r>1.05?'Z3 tempo':r>1.00?'Z4 sub-drempel':r>=0.97?'Z5a drempel':r>=0.90?'Z5b VO2':'Z5c snelheid'; }
+function powZone(w){ const f = Number(setting('ftp')); if(!w || !f) return null; const p = w/f*100;
+  const z = p<=55?'Z1 herstel':p<=75?'Z2 duur':p<=90?'Z3 tempo':p<=105?'Z4 drempel':p<=120?'Z5 VO2':p<=150?'Z6 anaeroob':'Z7';
+  return z+' ('+Math.round(p)+'% FTP)'; }
+function calcCardio(c){
+  const out = []; const sec = c.sec, km = c.km;
+  if(sec && km){ if(c.sport==='bike') out.push('Snelheid <b>'+(km/(sec/3600)).toFixed(1)+' km/u</b>');
+    else if(c.sport==='swim') out.push('Tempo <b>'+fmtSec(sec/(km*10))+' /100 m</b>');
+    else { const p = sec/km; out.push('Tempo <b>'+fmtSec(p)+' /km</b>'); const pz = paceZone(p); if(pz) out.push('Tempozone '+pz+' <span class="small">(vlak terrein)</span>'); } }
+  const hz = hrZone(c.hr); if(hz) out.push('HF-zone '+hz);
+  const pw = powZone(c.w); if(pw && c.sport==='bike') out.push('Vermogen '+pw);
+  if(c.rpe && sec) out.push('Sessiebelasting (RPE × min) <b>'+Math.round(c.rpe*sec/60)+'</b>');
+  return out;
+}
+
+/* ---------- dubbele progressie ---------- */
+function prevGroup(code, sid, date){
+  const xs = S.sets.filter(x => x.code===code && x.sid!==sid && x.date<=date && !x.del);
+  if(!xs.length) return null;
+  const last = xs.reduce((a,b)=> a.date>b.date || (a.date===b.date && a.ts>b.ts) ? a : b);
+  return S.sets.filter(x => x.code===code && x.sid===last.sid && !x.del).sort((a,b)=>a.ts-b.ts);
+}
+function suggest(e, prev){
+  const u = unitOf(e.c), inc = EXN(e.c).inc;
+  if(!prev) return {kg:null, txt: u==='kg' ? 'Eerste keer: kies een gewicht waarmee je '+e.lo+'–'+e.hi+' haalt bij RIR '+e.rir+'.' : 'Doel: '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u)+'.'};
+  const kg = Math.max(...prev.map(x=>Number(x.kg)||0));
+  const top = prev.filter(x => (Number(x.kg)||0)===kg);
+  const allHi = top.length >= e.s && top.every(x => x.reps >= e.hi);
+  if(u==='kg' && allHi && inc) return {kg: +(kg+inc).toFixed(2), txt:'Alle sets op '+e.hi+' → <b>'+fmtKg(kg+inc)+' kg</b> × '+e.lo+'–'+e.hi};
+  const minR = Math.min(...top.map(x=>x.reps));
+  if(u==='kg') return {kg: kg||null, txt:'Zelfde gewicht <b>'+fmtKg(kg)+' kg</b>, mik op '+Math.min(e.hi, minR+1)+'+ reps per set'};
+  return {kg: kg||null, txt:'Vorige keer '+top.map(x=>x.reps).join(', ')+' '+u+(kg?' @ '+fmtKg(kg)+' kg':'')+'. Doel: gelijk of +1.'};
+}
+const fmtKg = k => (Math.round(k*100)/100).toString().replace('.', ',');
+
+/* ---------- renderen ---------- */
+function render(){
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab===ui.tab));
+  const nav = ['week','check'].includes(ui.tab);
+  $('prev').style.visibility = $('next').style.visibility = nav ? 'visible' : 'hidden';
+  if(!PLAN){ $('view').innerHTML = '<div class="card">Plan kon niet geladen worden. Controleer je verbinding en herlaad.</div>'; if(ui.tab!=='meer') return; }
+  ({week:rWeek, log:rLog, duur:rDuur, rec:rRec, check:rCheck, meer:rMeer})[ui.tab]();
+}
+
+function rWeek(){
+  const w = weekByStart(ui.week); const wid = weekIdOf(ui.week);
+  $('htitle').textContent = 'Week '+wid.split('-W')[1]+' · '+fmtDay(ui.week);
+  if(!w){ $('view').innerHTML = '<div class="card">Geen plan voor deze week.</div>'; return; }
+  const t = today(); let h = '';
+  h += w.status==='concept' ? '<div class="banner concept"><b>Concept</b> — nog niet afgestemd. Wordt definitief na je zondag-check-in.</div>' : '<div class="banner def"><b>Definitief</b></div>';
+  h += '<div class="card"><b>'+esc(w.phase)+'</b><div class="mut">'+esc(w.focus)+'</div>';
+  h += '<div class="row"><a class="btn sm" style="display:flex;align-items:center;justify-content:center;text-decoration:none" href="ics/'+w.id+'.ics">📆 Naar agenda (.ics)</a></div></div>';
+  if(!w.days.length) h += '<div class="card mut">Nog niet uitgewerkt. Volgt na de check-in van de week ervoor.</div>';
+  for(const d of w.days){
+    h += '<div class="day'+(d.date===t?' today':'')+'"><h2>'+fmtDay(d.date)+(d.date===t?' · vandaag':'')+'</h2>';
+    for(const s of d.s){
+      const st = S.done[s.id] || {};
+      h += '<div class="card sess'+(st.d?' done':'')+'" id="s_'+s.id+'"><div class="st">';
+      h += '<button class="chk'+(st.d?' on':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
+      h += '<div class="tt"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span>'+(s.min?'<span class="small">~'+s.min+' min</span>':'')+'<b>'+esc(s.title)+'</b></div></div>';
+      if(s.detail) h += '<div class="det">'+esc(s.detail)+'</div>';
+      if(s.ex) h += '<div class="det small">'+s.ex.map(e => esc(EXN(e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>';
+      h += '<div class="row nw"><input class="num" type="number" inputmode="numeric" placeholder="min" data-min="'+s.id+'" value="'+esc(st.min||'')+'">';
+      h += '<input type="text" placeholder="Notitie" data-note="'+s.id+'" value="'+esc(st.note||'')+'"></div>';
+      const btns = [];
+      if(s.ex) btns.push('<button class="btn pri" data-logger="'+s.id+'">Logger</button>');
+      if(['run','bike','swim','race'].includes(s.t)) btns.push('<button class="btn" data-cardio="'+s.id+'">Log duur</button>');
+      if(btns.length) h += '<div class="row">'+btns.join('')+'</div>';
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+  $('view').innerHTML = h;
+}
+
+function setDone(sid, patch){
+  const cur = S.done[sid] || {}; const n = Object.assign({}, cur, patch, {ts:Date.now()});
+  S.done[sid] = n; const f = sessById(sid);
+  enqueue('done', sid, f ? f.d.date : '', n);
+}
+
+function rLog(){
+  $('htitle').textContent = 'Logger';
+  let f = ui.sid && sessById(ui.sid);
+  if(!f){
+    const w = weekByStart(mondayOf(today())); const opts = [];
+    if(w) for(const d of w.days) for(const s of d.s) if(s.ex) opts.push({d, s});
+    let h = '<div class="card"><h3>Kies een sessie</h3><div class="mut">Sessies met oefeningen deze week.</div></div>';
+    if(!opts.length) h += '<div class="card mut">Geen krachtsessies gevonden deze week.</div>';
+    for(const o of opts) h += '<button class="btn" style="width:100%;margin-bottom:8px;text-align:left" data-logger="'+o.s.id+'">'+(o.d.date===today()?'▶ ':'')+fmtDay(o.d.date)+' · '+esc(o.s.title)+'</button>';
+    $('view').innerHTML = h; return;
+  }
+  const {d, s} = f;
+  let h = '<div class="card"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><b>'+esc(s.title)+'</b><div class="mut">'+fmtDay(d.date)+'</div>';
+  h += '<div class="row"><button class="btn sm" data-pick="1">Andere sessie</button><button class="btn sm '+((S.done[s.id]||{}).d?'pri':'')+'" data-done="'+s.id+'">'+((S.done[s.id]||{}).d?'✓ Afgerond':'Sessie afronden')+'</button></div></div>';
+  for(const e of s.ex){
+    const u = unitOf(e.c), now = S.sets.filter(x => x.sid===s.id && x.code===e.c && !x.del).sort((a,b)=>a.ts-b.ts);
+    const prev = prevGroup(e.c, s.id, d.date); const sug = suggest(e, prev);
+    const kgVal = ui['kg_'+s.id+e.c] ?? (now.length ? now[now.length-1].kg : (sug.kg ?? ''));
+    h += '<div class="card" id="ex_'+e.c+'"><b>'+esc(EXN(e.c).n)+'</b>';
+    h += '<div class="mut">'+e.s+' × '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u)+(e.rir?' · RIR '+e.rir:'')+(e.rest?' · rust '+fmtSec(e.rest):'')+' <span class="small">['+e.c+']</span></div>';
+    if(e.note) h += '<div class="hint mut">'+esc(e.note)+'</div>';
+    if(prev) h += '<div class="hint mut">Vorige keer ('+fmtDay(prev[0].date)+'): '+prev.map(x => (x.kg?fmtKg(x.kg)+'×':'')+x.reps).join(', ')+'</div>';
+    h += '<div class="hint sug">'+sug.txt+'</div>';
+    h += '<div class="kg"><button class="btn" data-kgd="'+e.c+'" data-dir="-1">−</button><input type="number" inputmode="decimal" step="0.5" placeholder="kg" data-kg="'+e.c+'" value="'+esc(kgVal)+'"><button class="btn" data-kgd="'+e.c+'" data-dir="1">+</button></div>';
+    let vals = [];
+    if(e.hi - e.lo <= 8){ for(let r = Math.max(1, e.lo-1); r <= e.hi+2; r++) vals.push(r); } else vals = [e.lo, e.hi];
+    h += '<div class="chips">'+vals.map(r => '<button class="chip'+(r>=e.lo&&r<=e.hi?' tgt':'')+'" data-rep="'+e.c+'" data-r="'+r+'">'+r+'</button>').join('')+'<input class="num" style="flex:0 0 80px" type="number" inputmode="numeric" placeholder="ander" data-repx="'+e.c+'"><button class="btn sm" data-repgo="'+e.c+'">✓</button></div>';
+    h += '<div class="sets">'+now.map((x,i) => '<span class="set">'+(i+1)+': '+(x.kg?fmtKg(x.kg)+' × ':'')+x.reps+(u!=='kg'?' '+u:'')+'<button data-del="'+x.id+'" aria-label="Verwijder">×</button></span>').join('')+(now.length>=e.s?'<span class="small" style="align-self:center">✓ '+now.length+'/'+e.s+'</span>':'<span class="small" style="align-self:center">'+now.length+'/'+e.s+'</span>')+'</div>';
+    h += '</div>';
+  }
+  $('view').innerHTML = h;
+}
+
+function logSet(code, reps){
+  const f = sessById(ui.sid); if(!f || !reps) return;
+  const e = f.s.ex.find(x => x.c===code); const inp = document.querySelector('[data-kg="'+code+'"]');
+  const kg = inp && inp.value !== '' ? Number(String(inp.value).replace(',', '.')) : null;
+  const ts = Date.now(); const id = f.s.id+'|'+code+'|'+ts;
+  const rec = {id, date:f.d.date, sid:f.s.id, code, kg, reps:Number(reps), ts};
+  S.sets.push(rec); ui['kg_'+f.s.id+code] = kg ?? '';
+  enqueue('set', id, f.d.date, rec);
+  unlockAudio(); startTimer(e && e.rest); rLog();
+  toast((kg?fmtKg(kg)+' kg × ':'')+reps+' gelogd');
+}
+
+function rDuur(){
+  $('htitle').textContent = 'Duursessie loggen';
+  const p = ui.prefill || {}; const typeMap = {run:'run', race:'run', bike:'bike', swim:'swim'};
+  const sp = p.sport || 'run';
+  let h = '<div class="card">';
+  if(p.sid){ const f = sessById(p.sid); if(f) h += '<div class="mut">Hoort bij: '+fmtDay(f.d.date)+' · '+esc(f.s.title)+'</div>'; }
+  h += '<label class="f">Datum</label><input type="date" id="c_date" value="'+(p.date||today())+'">';
+  h += '<label class="f">Sport</label><select id="c_sport">'+[['run','Hardlopen'],['trail','Trail'],['bike','Fiets'],['swim','Zwemmen'],['other','Anders']].map(o => '<option value="'+o[0]+'"'+(o[0]===sp?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
+  h += '<div class="row"><div><label class="f">Afstand (km)</label><input id="c_km" type="number" inputmode="decimal" step="0.01" placeholder="10,0"></div><div><label class="f">Tijd (u:mm:ss)</label><input id="c_time" type="text" inputmode="numeric" placeholder="52:30"></div></div>';
+  h += '<div class="row"><div><label class="f">Gem. HF</label><input id="c_hr" type="number" inputmode="numeric" placeholder="bpm"></div><div><label class="f">Gem. watt</label><input id="c_w" type="number" inputmode="numeric" placeholder="W"></div></div>';
+  h += '<label class="f">RPE</label><div class="chips" id="c_rpe">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip" data-rpe="'+r+'">'+r+'</button>').join('')+'</div>';
+  h += '<label class="f">Notitie</label><input id="c_note" type="text" placeholder="Voeding, gevoel, terrein…">';
+  h += '<label class="f" style="display:flex;gap:10px;align-items:center"><input id="c_race" type="checkbox" style="width:28px;min-height:28px"> Wedstrijd/test (telt mee voor records)</label>';
+  h += '<div class="calc" id="c_calc"><span class="mut">Vul afstand en tijd in voor berekening.</span></div>';
+  h += '<div class="row"><button class="btn pri" id="c_save">Opslaan</button></div></div>';
+  const recent = S.cardio.filter(c=>!c.del).sort((a,b)=> b.date.localeCompare(a.date) || b.ts-a.ts).slice(0,15);
+  h += '<div class="card"><h3>Recent</h3>'+(recent.length?'':'<div class="mut">Nog niets gelogd.</div>');
+  for(const c of recent) h += '<div style="border-bottom:1px solid var(--line);padding:8px 0;display:flex;gap:8px"><div style="flex:1"><b>'+fmtDay(c.date)+' · '+c.sport+(c.race?' 🏁':'')+'</b><div class="small">'+(c.km?c.km+' km · ':'')+(c.sec?fmtSec(c.sec):'')+(c.hr?' · '+c.hr+' bpm':'')+(c.w?' · '+c.w+' W':'')+(c.rpe?' · RPE '+c.rpe:'')+'</div><div class="small">'+calcCardio(c).join(' · ')+'</div>'+(c.note?'<div class="small">'+esc(c.note)+'</div>':'')+'</div><button class="btn sm bad" data-cdel="'+c.id+'">×</button></div>';
+  h += '</div>';
+  $('view').innerHTML = h; ui.rpe = null;
+}
+function cardioForm(){ const km = Number(String($('c_km').value).replace(',', '.'))||null, sec = parseTime($('c_time').value);
+  return {date:$('c_date').value, sport:$('c_sport').value, km, sec: isNaN(sec)?null:sec, hr:Number($('c_hr').value)||null, w:Number($('c_w').value)||null, rpe:ui.rpe||null, note:$('c_note').value.trim(), race:$('c_race').checked}; }
+function updCalc(){ const c = cardioForm(); const sp = c.sport==='trail' ? 'run' : c.sport; const o = calcCardio(Object.assign({}, c, {sport:sp}));
+  $('c_calc').innerHTML = o.length ? '<div class="small">Berekend door de app (geen Strava-data):</div>'+o.join('<br>') : '<span class="mut">Vul afstand en tijd in voor berekening.</span>'; }
+
+const STD = [['1 km',1],['5 km',5],['10 km',10],['15 km',15],['21,1 km',21.0975],['42,2 km',42.195]];
+function rRec(){
+  $('htitle').textContent = 'Records';
+  let h = '<div class="card"><h3>Afstanden</h3><table><tr><th>Afstand</th><th>Tijd</th><th>Bron</th></tr>';
+  for(const [lab, km] of STD){
+    const cands = [];
+    for(const p of (PLAN.pr||[])) if(p.dist===lab) cands.push({sec:p.sec, src:p.src});
+    for(const c of S.cardio) if(!c.del && c.race && c.km && c.sec && ['run','trail'].includes(c.sport) && Math.abs(c.km-km)/km <= 0.02) cands.push({sec:c.sec, src:'App · '+fmtDay(c.date)});
+    const b = cands.sort((a,b)=>a.sec-b.sec)[0];
+    h += '<tr><td>'+lab+'</td><td><b>'+(b?fmtSec(b.sec):'–')+'</b>'+(b?'<div class="small">'+fmtSec(b.sec/km)+' /km</div>':'')+'</td><td class="small">'+(b?esc(b.src):'')+'</td></tr>';
+  }
+  h += '</table><div class="small" style="margin-top:6px">Alleen sessies met vinkje “Wedstrijd/test” tellen. Strava-waarden zijn de startwaarden.</div></div>';
+  const by = {};
+  for(const x of S.sets) if(!x.del && x.kg && unitOf(x.code)==='kg'){
+    const e1 = x.reps<=12 ? x.kg*(1+x.reps/30) : null; const r = by[x.code] || (by[x.code] = {max:null, e1:null});
+    if(!r.max || x.kg>r.max.kg || (x.kg===r.max.kg && x.reps>r.max.reps)) r.max = x;
+    if(e1 && (!r.e1 || e1>r.e1.v)) r.e1 = {v:e1, x};
+  }
+  h += '<div class="card"><h3>Kracht</h3>';
+  const codes = Object.keys(by);
+  if(!codes.length) h += '<div class="mut">Nog geen sets gelogd.</div>';
+  else { h += '<table><tr><th>Oefening</th><th>Zwaarste set</th><th>e1RM*</th></tr>';
+    for(const c of codes.sort((a,b)=>EXN(a).n.localeCompare(EXN(b).n))){ const r = by[c];
+      h += '<tr><td>'+esc(EXN(c).n)+'</td><td>'+fmtKg(r.max.kg)+' × '+r.max.reps+'<div class="small">'+fmtDay(r.max.date)+'</div></td><td>'+(r.e1?fmtKg(Math.round(r.e1.v*2)/2):'–')+'</td></tr>'; }
+    h += '</table><div class="small" style="margin-top:6px">* Schatting (Epley) op basis van sets tot 12 reps. Geen gemeten 1RM.</div>'; }
+  h += '</div>';
+  $('view').innerHTML = h;
+}
+
+function rCheck(){
+  if(!ui.chkWeek) ui.chkWeek = mondayOf(today());
+  const wid = weekIdOf(ui.chkWeek); $('htitle').textContent = 'Check-in week '+wid.split('-W')[1];
+  const ci = S.checkins[wid]; const qv = ci ? ci.qv : QV_CURRENT; const a = (ci && ci.a) || {};
+  let h = '<div class="card"><div class="mut">Week van '+fmtDay(ui.chkWeek)+' t/m '+fmtDay(addDays(ui.chkWeek,6))+'. Wordt automatisch bewaard.</div></div>';
+  for(const q of QSETS[qv]){
+    h += '<div class="card"><b>'+esc(q.q)+'</b>';
+    if(q.t==='scale'){ h += '<div class="chips">'; for(let i=q.min;i<=q.max;i++) h += '<button class="chip'+(a[q.k]===i?' on':'')+'" data-ck="'+q.k+'" data-cv="'+i+'">'+i+'</button>'; h += '</div>'; }
+    else if(q.t==='pick'){ h += '<div class="chips">'+q.opts.map(o => '<button class="chip" style="flex:1;font-size:15px'+(a[q.k]===o?'':'')+'" '+(a[q.k]===o?'data-on="1"':'')+' data-ck="'+q.k+'" data-cvs="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div>'; }
+    else if(q.t==='text') h += '<input type="text" data-ct="'+q.k+'" value="'+esc(a[q.k]||'')+'" style="margin-top:8px">';
+    else if(q.t==='area') h += '<textarea data-ct="'+q.k+'" style="margin-top:8px">'+esc(a[q.k]||'')+'</textarea>';
+    else if(q.t==='avail'){ const av = a[q.k] || {}; const nm = addDays(ui.chkWeek, 7);
+      h += '<div class="small">Week van '+fmtDay(nm)+'</div><table>';
+      for(let i=0;i<7;i++){ const dd = addDays(nm,i); h += '<tr><td style="width:70px">'+fmtDay(dd).split(' ').slice(0,2).join(' ')+'</td><td><select data-av="'+i+'"><option value="">–</option>'+['Vrij','2× mogelijk','Beperkt','Niet'].map(o => '<option'+(av[i]===o?' selected':'')+'>'+o+'</option>').join('')+'</select></td></tr>'; }
+      h += '</table><input type="text" data-avn="1" placeholder="Toelichting (tijden, reizen, events)" value="'+esc(av.n||'')+'" style="margin-top:8px">'; }
+    h += '</div>';
+  }
+  $('view').innerHTML = h;
+  document.querySelectorAll('[data-on]').forEach(b => b.classList.add('on'));
+}
+function setAns(k, v){ const wid = weekIdOf(ui.chkWeek); const ci = S.checkins[wid] || (S.checkins[wid] = {qv:QV_CURRENT, a:{}});
+  ci.a[k] = v; ci.ts = Date.now(); enqueue('checkin', wid, ui.chkWeek, ci); }
+
+function weekText(start){
+  const w = weekByStart(start); const wid = weekIdOf(start); const end = addDays(start, 6); const L = [];
+  L.push('WEEK '+wid+' ('+fmtDay(start)+' – '+fmtDay(end)+')'+(w?' · '+w.phase+' · '+w.status:''));
+  if(w) for(const d of w.days){ L.push(''); L.push(fmtDay(d.date).toUpperCase());
+    for(const s of d.s){ const st = S.done[s.id] || {}; L.push((st.d?'[x] ':'[ ] ')+s.title+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
+      const sets = S.sets.filter(x => x.sid===s.id && !x.del).sort((a,b)=>a.ts-b.ts);
+      if(sets.length){ const g = {}; for(const x of sets) (g[x.code] = g[x.code] || []).push((x.kg?fmtKg(x.kg)+'×':'')+x.reps);
+        for(const c in g) L.push('    '+EXN(c).n+': '+g[c].join(', ')); } } }
+  const cs = S.cardio.filter(c => !c.del && c.date>=start && c.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
+  if(cs.length){ L.push(''); L.push('DUURSESSIES (gelogd)'); for(const c of cs) L.push('- '+fmtDay(c.date)+' '+c.sport+(c.race?' (wedstrijd/test)':'')+': '+(c.km?c.km+' km ':'')+(c.sec?fmtSec(c.sec)+' ':'')+(c.hr?c.hr+' bpm ':'')+(c.w?c.w+' W ':'')+(c.rpe?'RPE '+c.rpe:'')+(c.note?' · '+c.note:'')+' | berekend: '+calcCardio(c.sport==='trail'?Object.assign({},c,{sport:'run'}):c).join('; ').replace(/<[^>]+>/g,'')); }
+  const ci = S.checkins[wid];
+  if(ci){ L.push(''); L.push('CHECK-IN (vragenset v'+ci.qv+')'); for(const q of QSETS[ci.qv]){ let v = ci.a[q.k];
+      if(q.t==='avail' && v){ const nm = addDays(start,7); v = [0,1,2,3,4,5,6].map(i => fmtDay(addDays(nm,i)).split(' ')[0]+': '+(v[i]||'–')).join(', ')+(v.n?' · '+v.n:''); }
+      L.push('- '+q.q+': '+(v===undefined||v===''?'–':v)); } }
+  else { L.push(''); L.push('CHECK-IN: niet ingevuld'); }
+  return L.join('\n');
+}
+function backupCode(){ const j = JSON.stringify(S); return 'YC1:'+btoa(unescape(encodeURIComponent(j))); }
+function parseBackup(code){ code = code.trim(); if(code.startsWith('YC1:')) code = code.slice(4);
+  const j = code.startsWith('{') ? code : decodeURIComponent(escape(atob(code))); const o = JSON.parse(j);
+  if(!o || typeof o!=='object' || !('sets' in o)) throw new Error('Geen geldige back-up'); return migrate(o); }
+
+function rMeer(){
+  $('htitle').textContent = 'Meer';
+  const st = S.settings; const wk = mondayOf(today()); const tp = setting('tpace');
+  let h = '<div class="card"><h3>Week exporteren</h3><div class="mut">Plak dit zondag in de chat.</div>';
+  h += '<div class="row"><select id="x_week">'+[-1,0].map(o => { const s = addDays(wk, o*7); return '<option value="'+s+'"'+(o===0?' selected':'')+'>Week '+weekIdOf(s).split('-W')[1]+' ('+fmtDay(s)+')</option>'; }).join('')+'</select></div>';
+  h += '<div class="row"><button class="btn pri" id="x_text">Kopieer weektekst</button><button class="btn" id="x_json">Kopieer back-upcode</button></div>';
+  h += '<textarea id="x_out" readonly style="margin-top:10px;min-height:120px" placeholder="Hier verschijnt de export."></textarea></div>';
+  h += '<div class="card"><h3>Herstellen</h3><div class="mut">Plak een back-upcode (begint met YC1:).</div><textarea id="r_in" style="margin-top:8px"></textarea>';
+  h += '<div class="row"><button class="btn '+(ui.restoreArmed?'bad':'warn')+'" id="r_go">'+(ui.restoreArmed?'Bevestig: alles vervangen':'Herstel back-up')+'</button></div></div>';
+  h += '<div class="card"><h3>Instellingen</h3><div class="small">Leeg = waarde uit het plan.</div>';
+  h += '<div class="row"><div><label class="f">FTP (W)</label><input id="s_ftp" type="number" inputmode="numeric" placeholder="'+(PLAN?PLAN.athlete.ftp:'')+'" value="'+esc(st.ftp??'')+'"></div><div><label class="f">LTHR (bpm)</label><input id="s_lthr" type="number" inputmode="numeric" placeholder="'+(PLAN?PLAN.athlete.lthr:'')+'" value="'+esc(st.lthr??'')+'"></div></div>';
+  h += '<label class="f">Drempeltempo (m:ss /km)</label><input id="s_tpace" type="text" inputmode="numeric" placeholder="'+(PLAN?fmtSec(PLAN.athlete.tpace):'')+'" value="'+(st.tpace?fmtSec(st.tpace):'')+'">';
+  h += '<label class="f">Google Sheet web-app-URL (optioneel)</label><input id="s_url" type="url" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(st.sheetUrl||'')+'">';
+  h += '<div class="row"><button class="btn pri" id="s_save">Bewaar instellingen</button><button class="btn" id="s_sync">Sync nu ('+S.queue.length+')</button></div>';
+  h += '<div class="small" style="margin-top:8px">Wachtrij: '+S.queue.length+' item(s). Versturen gaat zonder ontvangstbevestiging (no-cors). Leidend blijft je back-upcode.</div></div>';
+  h += '<div class="card small">App '+APP_VERSION+' · plan v'+(PLAN?PLAN.version+' ('+PLAN.updated+')':'–')+' · opslag "'+KEY+'" · '+S.sets.length+' sets, '+S.cardio.length+' duursessies</div>';
+  $('view').innerHTML = h;
+}
+async function copy(txt){ $('x_out').value = txt; try { await navigator.clipboard.writeText(txt); toast('Gekopieerd'); } catch(e){ $('x_out').select(); document.execCommand('copy'); toast('Gekopieerd'); } }
+
+/* ---------- sync naar Google Sheet ---------- */
+let syncT = null;
+function scheduleSync(){ clearTimeout(syncT); syncT = setTimeout(flush, 2000); }
+async function flush(){
+  const url = S.settings.sheetUrl; if(!url || !S.queue.length || !navigator.onLine) return;
+  const batch = S.queue.slice(0, 50);
+  try { await fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(batch)});
+    const sent = new Set(batch.map(b => b.kind+'|'+b.id+'|'+b.ts)); S.queue = S.queue.filter(q => !sent.has(q.kind+'|'+q.id+'|'+q.ts)); save();
+    if(S.queue.length) scheduleSync(); if(ui.tab==='meer') rMeer();
+  } catch(e){ /* offline: blijft in wachtrij */ }
+}
+window.addEventListener('online', scheduleSync);
+
+/* ---------- events ---------- */
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('button'); if(!b) return; const ds = b.dataset;
+  if(ds.tab){ ui.tab = ds.tab; if(ds.tab==='duur' && !ui.keepPrefill) ui.prefill = null; ui.keepPrefill = false; window.scrollTo(0,0); render(); return; }
+  if(ds.done){ const cur = (S.done[ds.done]||{}).d; setDone(ds.done, {d:!cur}); render(); return; }
+  if(ds.logger){ ui.sid = ds.logger; ui.tab = 'log'; window.scrollTo(0,0); render(); return; }
+  if(ds.pick){ ui.sid = null; rLog(); return; }
+  if(ds.cardio){ const f = sessById(ds.cardio); ui.prefill = {sid:ds.cardio, date:f.d.date, sport:({bike:'bike',swim:'swim'})[f.s.t]||'run'}; ui.tab='duur'; ui.keepPrefill = true; render(); window.scrollTo(0,0); return; }
+  if(ds.kgd){ const inp = document.querySelector('[data-kg="'+ds.kgd+'"]'); const inc = EXN(ds.kgd).inc || 1; const v = (Number(String(inp.value).replace(',', '.'))||0) + inc*Number(ds.dir);
+    inp.value = Math.max(0, +v.toFixed(2)); ui['kg_'+ui.sid+ds.kgd] = inp.value; return; }
+  if(ds.rep){ logSet(ds.rep, Number(ds.r)); return; }
+  if(ds.repgo){ const i = document.querySelector('[data-repx="'+ds.repgo+'"]'); if(i && i.value) logSet(ds.repgo, Number(i.value)); return; }
+  if(ds.del){ const x = S.sets.find(s => s.id===ds.del); if(x){ x.del = true; x.ts2 = Date.now(); enqueue('set', x.id, x.date, x); } rLog(); return; }
+  if(ds.rpe){ ui.rpe = Number(ds.rpe); document.querySelectorAll('[data-rpe]').forEach(c => c.classList.toggle('on', c===b)); updCalc(); return; }
+  if(ds.cdel){ const c = S.cardio.find(x => x.id===ds.cdel); if(c){ c.del = true; enqueue('cardio', c.id, c.date, c); } rDuur(); return; }
+  if(ds.ck){ setAns(ds.ck, ds.cv!==undefined ? Number(ds.cv) : ds.cvs); rCheck(); return; }
+  if(ds.tadd){ tEnd += Number(ds.tadd)*1000; $('timer').classList.remove('end'); tick(); return; }
+  switch(b.id){
+    case 'prev': case 'next': { const n = b.id==='next' ? 7 : -7; if(ui.tab==='check') ui.chkWeek = addDays(ui.chkWeek||mondayOf(today()), n); else ui.week = addDays(ui.week, n); render(); return; }
+    case 'tstop': stopTimer(); return;
+    case 'c_save': { const c = cardioForm(); if(!c.date || (!c.km && !c.sec)){ toast('Vul minstens afstand of tijd in'); return; }
+      c.ts = Date.now(); c.id = 'c|'+c.date+'|'+c.ts; if(ui.prefill && ui.prefill.sid){ c.sid = ui.prefill.sid; if(!(S.done[c.sid]||{}).d) setDone(c.sid, {d:true, min: c.sec?Math.round(c.sec/60):''}); }
+      S.cardio.push(c); enqueue('cardio', c.id, c.date, c); ui.prefill = null; toast('Opgeslagen'); rDuur(); return; }
+    case 'x_text': copy(weekText($('x_week').value)); return;
+    case 'x_json': copy(backupCode()); return;
+    case 'r_go': { if(!ui.restoreArmed){ try { parseBackup($('r_in').value); } catch(e){ toast('Ongeldige code'); return; } ui.restoreArmed = true; const v = $('r_in').value; rMeer(); $('r_in').value = v; return; }
+      try { const o = parseBackup($('r_in').value); sessionStorage.setItem('undo', JSON.stringify(S)); S = o; save(); ui.restoreArmed = false; toast('Hersteld'); render(); } catch(e){ toast('Ongeldige code'); } return; }
+    case 's_save': { const n = v => v==='' ? null : Number(v); S.settings.ftp = n($('s_ftp').value); S.settings.lthr = n($('s_lthr').value);
+      const tp = parseTime($('s_tpace').value); S.settings.tpace = isNaN(tp) ? null : tp; S.settings.sheetUrl = $('s_url').value.trim(); save(); toast('Bewaard'); scheduleSync(); return; }
+    case 's_sync': flush().then(()=> toast(S.queue.length ? 'Nog '+S.queue.length+' in wachtrij' : 'Verstuurd')); return;
+  }
+});
+document.addEventListener('change', ev => { const t = ev.target, ds = t.dataset;
+  if(ds.min) setDone(ds.min, {min:t.value});
+  if(ds.note) setDone(ds.note, {note:t.value});
+  if(ds.ct) setAns(ds.ct, t.value);
+  if(ds.av !== undefined || ds.avn){ const wid = weekIdOf(ui.chkWeek); const cur = Object.assign({}, ((S.checkins[wid]||{}).a||{}).besch || {});
+    if(ds.avn) cur.n = t.value; else cur[ds.av] = t.value; setAns('besch', cur); }
+  if(ds.kg) ui['kg_'+ui.sid+ds.kg] = t.value;
+  if(t.id && t.id.startsWith('c_')) updCalc();
+});
+document.addEventListener('input', ev => { if(ev.target.id && ev.target.id.startsWith('c_')) updCalc(); });
+document.addEventListener('keydown', ev => { const t = ev.target; if(ev.key==='Enter' && t.dataset.repx){ logSet(t.dataset.repx, Number(t.value)); } });
+
+/* ---------- start ---------- */
+(async function(){
+  await loadPlan();
+  const te = Number(sessionStorage.getItem('tEnd')); if(te > Date.now()){ tEnd = te; $('timer').classList.add('show'); tInt = setInterval(tick, 250); tick(); }
+  if(PLAN && !weekByStart(ui.week)){ const t = today(); const w = PLAN.weeks.filter(w => w.start<=t).pop() || PLAN.weeks[0]; ui.week = w.start; }
+  render(); scheduleSync();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
