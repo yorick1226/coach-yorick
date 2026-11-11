@@ -236,6 +236,11 @@ def features(pg, shots=True):
     ok("#ib=" not in pg.url and len([x for x in store(pg)["body"] if x.get("src") == "InBody"]) == 2, "importlink: metingen ingelezen zonder dubbelingen, hash gewist")
     tab(pg, "check")
     tab(pg, "week"); pg.click("#next"); ok(pg.locator("#availwarn").count() == 1 and "di 24 nov" in pg.inner_text("#availwarn"), "conflict beschikbaarheid ↔ plan zichtbaar"); pg.click("#prev")
+    # Terug-knop
+    tab(pg, "week"); pg.click('[data-logger="2026-11-24-b"]') if pg.locator('[data-logger="2026-11-24-b"]').count() else pg.locator('[data-logger]').first.click()
+    ok(pg.is_visible("#back"), "terug-knop zichtbaar na openen logger"); pg.click("#back"); pg.wait_for_timeout(300)
+    ok(pg.get_attribute('[data-tab="week"]', "class") and "on" in pg.get_attribute('[data-tab="week"]', "class"), "terug-knop brengt je terug naar Week")
+    tab(pg, "inzicht"); pg.click("#back"); pg.wait_for_timeout(300); ok("on" in (pg.get_attribute('[data-tab="week"]', "class") or ""), "terug werkt ook na wisselen van tabblad")
     # Back-up, herstel, ongedaan maken
     tab(pg, "meer"); pg.click("#x_json"); code = pg.input_value("#x_out"); ok(code.startswith("YC1:"), "back-upcode gemaakt")
     ok(store(pg)["settings"]["lastBackup"], "laatste back-up vastgelegd")
