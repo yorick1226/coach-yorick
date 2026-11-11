@@ -232,6 +232,8 @@ def features(pg, shots=True):
     pg.click("#bodycard summary"); pg.fill("#ib_code", code); pg.click("#ib_import")
     ok(len([x for x in store(pg)["body"] if x.get("src") == "InBody"]) == 2, "InBody-importcode ingelezen")
     tab(pg, "inzicht"); bi = pg.inner_text("#bodyins"); ok("SSM +1" in bi and "benen 100%" in bi, "lichaamstrend + segmenten in inzicht")
+    pg.goto(pg.url.split("#")[0] + "#ib=" + code.replace("YB1:", "YB1%3A")); pg.reload(); pg.wait_for_selector("#bodyins")
+    ok("#ib=" not in pg.url and len([x for x in store(pg)["body"] if x.get("src") == "InBody"]) == 2, "importlink: metingen ingelezen zonder dubbelingen, hash gewist")
     tab(pg, "check")
     tab(pg, "week"); pg.click("#next"); ok(pg.locator("#availwarn").count() == 1 and "di 24 nov" in pg.inner_text("#availwarn"), "conflict beschikbaarheid ↔ plan zichtbaar"); pg.click("#prev")
     # Back-up, herstel, ongedaan maken

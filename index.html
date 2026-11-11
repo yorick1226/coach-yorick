@@ -155,7 +155,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.5.1';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -915,6 +915,7 @@ function bodyCard(){
   return h; }
 function addBody(rec){ rec.ts = Date.now(); rec.id = rec.id || 'b|'+rec.date+'|'+(rec.src||'')+'|'+rec.ts; const i = S.body.findIndex(x => x.date===rec.date && (x.src||'')===(rec.src||''));
   if(i>=0) S.body[i] = Object.assign({}, S.body[i], rec); else S.body.push(rec); enqueue('body', rec.id, rec.date, rec); }
+function importBody(code){ try { let c = String(code).trim(); if(c.startsWith('YB1:')) c = c.slice(4); const arr = JSON.parse(decodeURIComponent(escape(atob(c)))); arr.forEach(addBody); toast(arr.length+' metingen geïmporteerd'); return arr.length; } catch(e){ toast('Ongeldige code'); return 0; } }
 function rCheck(){
   if(!ui.chkWeek){ const t = today(), mon = mondayOf(t), dow = (parseD(t).getDay()+6)%7; const prev = addDays(mon,-7);
     ui.chkWeek = (dow <= 1 && !S.checkins[weekIdOf(prev)]) ? prev : mon; }
@@ -1145,7 +1146,7 @@ document.addEventListener('click', ev => {
     case 'b_save': { const r = {date: today(), src:'weekly'}; for(const [k,id] of [['w','b_w'],['waist','b_waist'],['chest','b_chest'],['arm','b_arm'],['thigh','b_thigh']]){ const v = num($(id).value); if(v!=null) r[k] = v; }
       if(Object.keys(r).length <= 2){ toast('Vul minstens één waarde in'); return; } addBody(r); toast('Meting bewaard'); rerender(); return; }
     case 'ib_save': { const r = {date: $('ib_d').value, src:'InBody', w:num($('ib_w').value), ssm:num($('ib_ssm').value), fatkg:num($('ib_fk').value), fatp:num($('ib_fp').value)}; if(!r.w && !r.ssm){ toast('Vul gewicht of SSM in'); return; } addBody(r); toast('InBody bewaard'); rerender(); return; }
-    case 'ib_import': { try { let c = $('ib_code').value.trim(); if(c.startsWith('YB1:')) c = c.slice(4); const arr = JSON.parse(decodeURIComponent(escape(atob(c)))); arr.forEach(addBody); toast(arr.length+' metingen geïmporteerd'); rerender(); } catch(e){ toast('Ongeldige code'); } return; }
+    case 'ib_import': importBody($('ib_code').value); rerender(); return;
     case 'x_block': copy(blockReport(blocks()[Number(b.dataset.bi)])); return;
     case 'x_text': copy(weekText($('x_week').value)); return;
     case 'x_sunday': copy(weekText(ui.chkWeek||mondayOf(today()))); return;
@@ -1191,6 +1192,8 @@ document.addEventListener('touchend', ev => { if(sx===null) return; const dx = e
   const te = Number(sessionStorage.getItem('tEnd')); if(te > Date.now()){ tEnd = te; tDur = Number(sessionStorage.getItem('tDur')) || 90; $('timer').classList.add('show'); startTicker(); tick(); }
   if(PLAN && !weekByStart(ui.week)){ const t = today(); const w = PLAN.weeks.filter(w => w.start<=t).pop() || PLAN.weeks[0]; ui.week = w.start; }
   if(PLAN && S.settings.seenPlan===null && !S.sets.length && !Object.keys(S.done).length){ S.settings.seenPlan = PLAN.version+'/'+PLAN.updated; save(); }
+  /* #ib=YB1:… : importlink voor lichaamsmetingen. De hash gaat nooit naar de server en wordt direct gewist. */
+  const hm = location.hash.match(/^#ib=(.+)$/); if(hm){ history.replaceState(null, '', location.pathname); if(importBody(decodeURIComponent(hm[1]))){ ui.tab = 'inzicht'; } }
   render(); scheduleSync();
   try { if(navigator.storage && navigator.storage.persist){ ui.persist = await navigator.storage.persisted() || await navigator.storage.persist(); } } catch(e){}
   if('serviceWorker' in navigator){
