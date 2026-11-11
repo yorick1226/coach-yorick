@@ -100,3 +100,12 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 | `tools/build_ics.py` | ICS-generator |
 | `tests/run_tests.py` | Releasetest |
 | `sync/Code.gs` | Google Apps Script voor de sheet |
+
+
+## v2.5 (nov 2026)
+- **Opwarmsets**: `wu:true` op een set. Tellen niet mee in suggesties, ‘vorige keer’, records, volume en weekcijfers (helper `work(x)`). In de export voorafgegaan door `W`.
+- **Lichaam** (`S.body`, kind `body` in de Sheet): weekmeting via Check-in, InBody via formulier of importcode `YB1:` + base64(JSON-array). Echte metingen staan NOOIT in de repo (regel 7); de importcode gaat via de chat.
+- **Blokrapport**: Inzicht → blokken op basis van `phase` (deel vóór ` · `, zonder taper/deload). Kopieerbaar.
+- **Herstel uit Google Sheet**: vereist `doGet` in sync/Code.gs (opnieuw implementeren als nieuwe versie). App vraagt bevestiging, bewaart vorige stand in de undo-sleutel, instellingen blijven lokaal.
+- **Vandaag compact**: ingevulde ochtendcheck = één regel (`#dailysum`, knop `data-dailyedit`); pijnchips achter `data-painopen`; afgeronde sessies ingeklapt.
+- Tests bevatten nu rekenkern-unittests (suggest, altKm, weekIdOf, parseTime, num, advice, easyFlag, matchScore, intervalEval).

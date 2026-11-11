@@ -1,5 +1,6 @@
 /**
- * Coach → Google Sheet. Upsert op id per tabblad (sets, cardio, done, checkin).
+ * Coach → Google Sheet. Upsert op id per tabblad (set, cardio, done, checkin, daily, avail, body, …).
+ * doGet?all=1 geeft alles terug voor 'Herstel uit Google Sheet' in de app.
  * Installeren: zie ONDERHOUD.md, paragraaf "Google Sheet-koppeling".
  */
 const HEAD = ['id', 'date', 'ts', 'json'];
@@ -28,4 +29,16 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const out = {};
+  ss.getSheets().forEach(sh => {
+    const n = sh.getLastRow();
+    if (n < 2 || sh.getRange(1, 1).getValue() !== 'id') return;
+    out[sh.getName()] = sh.getRange(2, 1, n - 1, HEAD.length).getValues()
+      .map(r => ({ id: String(r[0]), date: r[1], data: r[3] }));
+  });
+  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
 }

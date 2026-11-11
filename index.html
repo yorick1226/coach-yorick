@@ -86,6 +86,7 @@ nav.tabs button span{display:block;font-size:20px;line-height:1.2}
 nav.tabs button.on{color:var(--acc)}
 #timer{position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:7;display:none;align-items:center;gap:8px;flex-direction:row-reverse}
 #timer.show{display:flex}
+body.timeron{padding-bottom:calc(240px + env(safe-area-inset-bottom))}
 #ring{width:84px;height:84px;border-radius:50%;background:#0b1a12;border:0;padding:0;position:relative;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 #ring svg{position:absolute;inset:0}
 #ring .t{position:relative;font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--tx)}
@@ -154,7 +155,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.5.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -211,7 +212,7 @@ const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','V
 const RUNS = ['Run','TrailRun','VirtualRun'];
 
 /* ---------- opslag ---------- */
-function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
+function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, body:[], sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
   settings:{ftp:null,lthr:null,tpace:null,sheetUrl:'',lastBackup:null,seenPlan:null}, queue:[]}; }
 function migrate(o){
   const b = blank();
@@ -219,7 +220,7 @@ function migrate(o){
   for(const k of Object.keys(b)) if(o[k] === undefined || o[k] === null) o[k] = b[k];
   if(typeof o.settings!=='object') o.settings = b.settings;
   for(const k of Object.keys(b.settings)) if(o.settings[k] === undefined) o.settings[k] = b.settings[k];
-  for(const k of ['sets','cardio','queue']) if(!Array.isArray(o[k])) o[k] = [];
+  for(const k of ['sets','cardio','queue','body']) if(!Array.isArray(o[k])) o[k] = [];
   o.schema = Math.max(o.schema||1, SCHEMA);
   return o; // onbekende velden blijven bewaard
 }
@@ -246,6 +247,7 @@ function allExercises(){ const all = Object.assign({}, (PLAN&&PLAN.exercises)||{
 function defaultsFor(code){ const u = unitOf(code); return u==='kg' ? {s:3,lo:8,hi:12,rir:2,rest:90} : u==='s' ? {s:3,lo:30,hi:45,rir:0,rest:45} : u==='m' ? {s:3,lo:20,hi:40,rir:0,rest:60} : {s:3,lo:8,hi:12,rir:0,rest:60}; }
 const unitOf = c => EXN(c).u || 'kg';
 const setting = k => S.settings[k] ?? (PLAN && PLAN.athlete[k]);
+const work = x => !x.del && !x.wu; // werksets: niet verwijderd, geen opwarmset
 const num = v => { if(v===null || v===undefined) return null; const s = String(v).trim().replace(',', '.'); if(s==='') return null; const n = Number(s); return isNaN(n) ? null : n; };
 
 /* ---------- datum ---------- */
@@ -342,7 +344,7 @@ function lapsTable(a){
 }
 
 /* ---------- UI-status ---------- */
-const ui = {tab:'vandaag', week:mondayOf(today()), day:null, sid:null, prefill:null, chkWeek:null, restoreArmed:false, open:{}, menu:{}, laps:{}, swap:{}, rir:{}, sw:{}, exFocus:{}, info:{}};
+const ui = {dailyEdit:{}, painOpen:false, wu:{}, tab:'vandaag', week:mondayOf(today()), day:null, sid:null, prefill:null, chkWeek:null, restoreArmed:false, open:{}, menu:{}, laps:{}, swap:{}, rir:{}, sw:{}, exFocus:{}, info:{}};
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(()=> t.style.display='none', 1800); }
@@ -353,7 +355,7 @@ function beep(){ try { actx = actx || new (window.AudioContext||window.webkitAud
   o.frequency.value = 880; o.connect(g); g.connect(actx.destination); g.gain.value = .25; o.start(); o.stop(actx.currentTime + .4); } catch(e){} }
 function unlockAudio(){ try { actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume(); } catch(e){} }
 let tDur = 0;
-function startTimer(sec){ if(!sec) return; tDur = sec; sessionStorage.setItem('tDur', sec); tEnd = Date.now() + sec*1000; sessionStorage.setItem('tEnd', tEnd); $('timer').classList.add('show'); $('timer').classList.remove('end'); tick(); startTicker(); }
+function startTimer(sec){ if(!sec) return; document.body.classList.add('timeron'); tDur = sec; sessionStorage.setItem('tDur', sec); tEnd = Date.now() + sec*1000; sessionStorage.setItem('tEnd', tEnd); $('timer').classList.add('show'); $('timer').classList.remove('end'); tick(); startTicker(); }
 function startTicker(){ clearInterval(tInt); tInt = setInterval(tick, 250); }
 function tick(){
   if(tEnd){ const left = Math.ceil((tEnd - Date.now())/1000);
@@ -364,7 +366,7 @@ function tick(){
     const dur = tDur || Number(sessionStorage.getItem('tDur')) || 90; $('rarc').setAttribute('stroke-dashoffset', String(232.5*(1-Math.max(0,left)/dur))); }
   document.querySelectorAll('[data-swlive]').forEach(el => { const t0 = ui.sw[el.dataset.swlive]; if(t0) el.textContent = '■ Stop · '+fmtSec((Date.now()-t0)/1000); });
 }
-function stopTimer(){ tEnd = 0; sessionStorage.removeItem('tEnd'); $('timer').classList.remove('show','end'); }
+function stopTimer(){ document.body.classList.remove('timeron'); tEnd = 0; sessionStorage.removeItem('tEnd'); $('timer').classList.remove('show','end'); }
 async function keepAwake(on){ try { if(on && 'wakeLock' in navigator && !wake){ wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', ()=> wake = null); }
   else if(!on && wake){ await wake.release(); wake = null; } } catch(e){} }
 document.addEventListener('visibilitychange', ()=> { if(document.visibilityState==='visible' && ui.tab==='log') keepAwake(true); });
@@ -414,10 +416,10 @@ function advice(d){
 
 /* ---------- dubbele progressie met RIR ---------- */
 function prevGroup(code, sid, date){
-  const xs = S.sets.filter(x => x.code===code && x.sid!==sid && x.date<=date && !x.del);
+  const xs = S.sets.filter(x => x.code===code && x.sid!==sid && x.date<=date && work(x));
   if(!xs.length) return null;
   const last = xs.reduce((a,b)=> a.date>b.date || (a.date===b.date && a.ts>b.ts) ? a : b);
-  return S.sets.filter(x => x.code===code && x.sid===last.sid && !x.del).sort((a,b)=>a.ts-b.ts);
+  return S.sets.filter(x => x.code===code && x.sid===last.sid && work(x)).sort((a,b)=>a.ts-b.ts);
 }
 function suggest(e, code, prev){
   const u = unitOf(code), inc = EXN(code).inc, tgt = e.rir ?? 2;
@@ -455,7 +457,7 @@ function weekStats(w){
   for(const x of actsIn(a,b)){ st.secDone += x.sec||0; if(RUNS.includes(x.sport)){ st.runDone += x.km||0; st.vertDone += x.hm||0; } }
   for(const c of manualUnlinked(a,b,m)){ st.secDone += c.sec||0; if(['run','trail'].includes(c.sport)) st.runDone += c.km||0; st.vertDone += c.hm||0;
     if(c.rpe && c.sec && !(c.sid && (S.done[c.sid]||{}).rpe)) st.load += c.rpe*c.sec/60; }
-  for(const x of S.sets) if(!x.del && x.date>=a && x.date<=b && (x.rir==null || x.rir<=4)){ const g = EXN(x.code).g || 'overig'; st.groups[g] = (st.groups[g]||0)+1; }
+  for(const x of S.sets) if(work(x) && x.date>=a && x.date<=b && (x.rir==null || x.rir<=4)){ const g = EXN(x.code).g || 'overig'; st.groups[g] = (st.groups[g]||0)+1; }
   for(let i=0;i<7;i++){ const y = dailyOf(addDays(a,i)); if(y.rd!=null) st.rd.push(y.rd); if(y.sl!=null) st.sl.push(y.sl); }
   st.split = intensitySplit(actsIn(a,b));
   return st;
@@ -545,7 +547,7 @@ function sessCard(it, m, opt){
     if(s.detail) h += '<div class="det">'+esc(s.detail)+'</div>';
     if(s.ex) h += '<div class="det small">'+sessEx(s).filter(e => !S.exskip[s.id+'|'+e.c]).map(e => esc(EXN(S.swaps[s.id+'|'+e.c]||e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>';
     if(!skip && s.t!=='rest'){
-      h += '<div class="small" style="margin-top:10px;display:flex;align-items:center">RPE sessie'+infoBtn('rpe')+'</div>'+infoBox('rpe')+'<div class="chips sm">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip'+(st.rpe===r?' on':'')+'" data-srpe="'+s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
+      if(done) h += '<div class="small" style="margin-top:10px;display:flex;align-items:center">RPE sessie'+infoBtn('rpe')+'</div>'+infoBox('rpe')+'<div class="chips sm">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip'+(st.rpe===r?' on':'')+'" data-srpe="'+s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
       h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="min" data-min="'+s.id+'" value="'+esc(st.min||'')+'">';
       h += '<input type="text" placeholder="Notitie" data-note="'+s.id+'" value="'+esc(st.note||'')+'"></div>'; }
     const btns = [];
@@ -583,23 +585,28 @@ function rToday(){
   if(S.settings.seenPlan !== pv) h += '<div class="banner info"><b>Plan bijgewerkt</b> ('+esc(PLAN.updated)+'). Bekijk je week. <button class="btn sm" data-seen="1" style="margin-left:6px">OK</button></div>';
   const lb = S.settings.lastBackup; if(!lb || (Date.now()-lb) > 7*864e5) h += '<div class="banner oranje">Laatste back-up: '+(lb?fmtDay(iso(new Date(lb))):'nooit')+'. Ga naar Meer → Kopieer back-upcode en bewaar hem (bijv. in Notities).</div>';
   for(const it of fuelTodo()) h += '<div class="banner info">🍌 Voeding loggen voor <b>'+esc(it.s.title)+'</b> ('+fmtDay(it.date)+')? Hoeveel g KH/uur en hoe ging je maag? <button class="btn sm" data-cardio="'+it.s.id+'" style="margin-top:6px">Log voeding</button></div>';
-  const x = dailyOf(d);
+  const x = dailyOf(d); const filled = x.rd!=null || x.sl!=null;
+  if(filled && !ui.dailyEdit[d]){ const ad0 = advice(d);
+    h += '<div class="card" id="dailysum" style="display:flex;align-items:center;gap:8px"><div style="flex:1"><b>Ochtendcheck</b> <span class="small">'+(isT?'':fmtDay(d))+'</span><br>Readiness <b>'+(x.rd??'–')+'</b> · Slaap <b>'+(x.sl??'–')+'</b>'+(x.legs!=null?' · benen '+x.legs:'')+(x.pains?' · pijn: '+esc(Object.keys(x.pains).join(', ')):'')+(ad0?' <span class="pill '+({groen:'g',oranje:'o',rood:'r'})[ad0.lvl]+'" style="background:'+({groen:'#0f2417',oranje:'#2b2108',rood:'#3a1414'})[ad0.lvl]+';color:'+({groen:'#4ade80',oranje:'#f5b942',rood:'#f87171'})[ad0.lvl]+'">'+ad0.lvl+'</span>':'')+'</div><button class="btn sm" data-dailyedit="'+d+'">Wijzig</button></div>';
+    if(ad0 && ad0.lvl!=='groen') h += '<div class="banner '+ad0.lvl+'" id="advice">'+ad0.txt+'</div>'; }
+  else {
   h += '<div class="card"><h3>Ochtendcheck <span class="small">'+(isT?'Oura + gevoel':fmtDay(d))+'</span></h3>';
   h += '<div class="row nw"><div><label class="f">Readiness</label><input type="text" inputmode="numeric" data-dly="rd" value="'+esc(x.rd??'')+'" placeholder="0–100"></div><div><label class="f">Slaapscore</label><input type="text" inputmode="numeric" data-dly="sl" value="'+esc(x.sl??'')+'" placeholder="0–100"></div></div>';
   h += '<div class="row nw"><div><label class="f">HRV (ms)</label><input type="text" inputmode="numeric" data-dly="hrv" value="'+esc(x.hrv??'')+'" placeholder="opt."></div><div><label class="f">Rust-HF</label><input type="text" inputmode="numeric" data-dly="rhr" value="'+esc(x.rhr??'')+'" placeholder="opt."></div></div>';
   h += '<label class="f">Benen (1 kapot – 5 fris)</label><div class="chips sm">'+[1,2,3,4,5].map(v=>'<button class="chip'+(x.legs===v?' on':'')+'" data-dlyc="legs" data-v="'+v+'">'+v+'</button>').join('')+'</div>';
   const pains = x.pains || {};
-  h += '<label class="f">Pijn? Tik de plek</label><div class="chips sm">'+PAIN_LOCS.map(l => '<button class="chip'+(pains[l]!=null?' on':'')+'" style="font-size:14px" data-ploc="'+esc(l)+'">'+esc(l)+'</button>').join('')+'</div>';
+  if(!Object.keys(pains).length && !ui.painOpen) h += '<div class="row"><button class="btn sm" data-painopen="1">Pijn melden</button></div>';
+  else h += '<label class="f">Pijn? Tik de plek</label><div class="chips sm">'+PAIN_LOCS.map(l => '<button class="chip'+(pains[l]!=null?' on':'')+'" style="font-size:14px" data-ploc="'+esc(l)+'">'+esc(l)+'</button>').join('')+'</div>';
   for(const l of Object.keys(pains)) h += '<div style="margin-top:8px"><span class="small">'+esc(l)+' · hoe erg (1–8)?</span><div class="chips sm">'+[1,2,3,4,5,6,7,8].map(v => '<button class="chip'+(pains[l]===v?' on':'')+'" data-pscore="'+esc(l)+'" data-v="'+v+'">'+v+'</button>').join('')+'</div></div>';
   const ad = advice(d);
   if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+'<div class="small" style="color:inherit;opacity:.8">Vuistregel van de app, geen diagnose. Basis: '+esc(ad.basis)+'.</div></div>';
-  h += '</div>';
+  h += '</div>'; }
   const w = weekByStart(mondayOf(d)); const m = matchWeek(w);
   const items = weekItems(w).filter(i => i.date===d);
   h += '<div class="day today"><h2>Training '+(isT?'vandaag':fmtDay(d))+'</h2>';
   if(!w) h += '<div class="card mut">Geen plan voor deze week.</div>';
   else if(!items.length) h += '<div class="card mut">Niets gepland. Rust of mobiliteit.</div>';
-  for(const it of items) h += sessCard(it, m, {open:true});
+  for(const it of items){ const st = S.done[it.s.id]||{}; h += sessCard(it, m, {open: !(st.d || m.by[it.s.id] || st.skip)}); }
   for(const a of m.extra.filter(x => x.date===d)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
   h += '</div>';
   const tm = addDays(d,1); const items2 = weekItems(weekByStart(mondayOf(tm))).filter(i => i.date===tm);
@@ -653,13 +660,14 @@ function rLog(){
     $('view').innerHTML = h; return;
   }
   const {s, date} = f;
-  let h = '<div class="card"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><b>'+esc(s.title)+'</b><div class="mut">'+fmtDay(date)+' · scherm blijft aan</div>';
+  const ss = S.sets.filter(x => x.sid===s.id && !x.del).map(x=>x.ts); const dur = ss.length > 1 ? Math.round((Math.max(...ss)-Math.min(...ss))/60000) : 0;
+  let h = '<div class="card"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><b>'+esc(s.title)+'</b><div class="mut">'+fmtDay(date)+' · scherm blijft aan'+(dur?' · bezig '+dur+' min':'')+'</div>';
   h += '<div class="row"><button class="btn sm" data-pick="1">Andere sessie</button><button class="btn sm '+((S.done[s.id]||{}).d?'pri':'')+'" data-done="'+s.id+'">'+((S.done[s.id]||{}).d?'✓ Afgerond':'Sessie afronden')+'</button></div></div>';
-  const list = sessEx(s); const cnt = e => S.sets.filter(x => x.sid===s.id && x.code===(S.swaps[s.id+'|'+e.c]||e.c) && !x.del).length;
+  const list = sessEx(s); const cnt = e => S.sets.filter(x => x.sid===s.id && x.code===(S.swaps[s.id+'|'+e.c]||e.c) && work(x)).length;
   let focus = ui.exFocus[s.id]; if(!list.some(e => e.c===focus) || S.exskip[s.id+'|'+focus]) focus = (list.find(e => !S.exskip[s.id+'|'+e.c] && cnt(e) < e.s) || {}).c; ui.exFocus[s.id] = focus;
   for(const e of list){
     const code = S.swaps[s.id+'|'+e.c] || e.c, u = unitOf(code), X = EXN(code), timed = !!X.time;
-    if(e.c!==focus && !S.exskip[s.id+'|'+e.c]){ const sets = S.sets.filter(x => x.sid===s.id && x.code===code && !x.del).sort((a,b)=>a.ts-b.ts); const dn = sets.length >= e.s;
+    if(e.c!==focus && !S.exskip[s.id+'|'+e.c]){ const sets = S.sets.filter(x => x.sid===s.id && x.code===code && work(x)).sort((a,b)=>a.ts-b.ts); const dn = sets.length >= e.s;
       h += '<button class="exrow'+(dn?' done':'')+'" id="ex_'+e.c+'" data-exfocus="'+e.c+'"><span><b>'+(dn?'✓ ':'')+esc(X.n)+'</b><br><span class="small">'+(sets.length ? sets.map(x => (x.kg?fmtKg(x.kg)+'×':'')+x.reps).join(', ') : e.s+' × '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u==='s'?'sec':u))+'</span></span><span class="small">'+sets.length+'/'+e.s+' ▾</span></button>'; continue; }
     if(S.exskip[s.id+'|'+e.c]){ h += '<div class="card small" id="ex_'+e.c+'" style="opacity:.6;display:flex;align-items:center;justify-content:space-between;gap:8px"><span><s>'+esc(X.n)+'</s> · overgeslagen</span><button class="btn sm" data-exskip="'+e.c+'">Toch doen</button></div>'; continue; }
     const now = S.sets.filter(x => x.sid===s.id && x.code===code && !x.del).sort((a,b)=>a.ts-b.ts);
@@ -679,11 +687,12 @@ function rLog(){
       h += '<div class="row"><button class="btn '+(run?'warn':'pri')+'" data-sw="'+code+'" '+(run?'data-swlive="'+code+'"':'')+'>'+(run?'■ Stop · 0:00':'▶ Start '+e.lo+' '+u)+'</button></div>';
       h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="m:ss" data-secx="'+code+'"><button class="btn sm" data-secgo="'+code+'">✓ tijd loggen</button></div>';
     } else {
-      if(u==='kg' && e.rir!==0) h += '<div class="small" style="margin-top:8px;display:flex;align-items:center">RIR van deze set'+infoBtn('rir')+'</div>'+infoBox('rir')+'<div class="chips sm">'+[0,1,2,3,4].map(r => '<button class="chip'+(r===rirSel?' on':'')+'" data-rir="'+rk+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
+      if(u==='kg') h += '<div class="row" style="margin-top:6px"><button class="btn sm'+(ui.wu[rk]?' warn':'')+'" data-wu="'+rk+'">'+(ui.wu[rk]?'🔥 Opwarmset: AAN (telt niet mee)':'Opwarmset loggen')+'</button></div>';
+      if(u==='kg' && e.rir!==0 && !ui.wu[rk]) h += '<div class="small" style="margin-top:8px;display:flex;align-items:center">RIR van deze set'+infoBtn('rir')+'</div>'+infoBox('rir')+'<div class="chips sm">'+[0,1,2,3,4].map(r => '<button class="chip'+(r===rirSel?' on':'')+'" data-rir="'+rk+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
       let vals = []; if(e.hi - e.lo <= 8){ for(let r = Math.max(1, e.lo-1); r <= e.hi+2; r++) vals.push(r); } else vals = [e.lo, e.hi];
       h += '<div class="small" style="margin-top:8px">Tik '+(u==='s'?'seconden':u==='kg'||u==='reps'?'reps':u)+' = set loggen</div><div class="chips big">'+vals.map(r => '<button class="chip'+(r>=e.lo&&r<=e.hi?' tgt':'')+'" data-rep="'+code+'" data-r="'+r+'">'+r+'</button>').join('')+'<input class="num" style="flex:0 0 80px" type="text" inputmode="numeric" placeholder="ander" data-repx="'+code+'"><button class="btn sm" data-repgo="'+code+'">✓</button></div>';
     }
-    h += '<div class="sets">'+now.map((x,i) => '<span class="set">'+(i+1)+': '+(x.kg?fmtKg(x.kg)+' × ':'')+x.reps+(u!=='kg'?' '+(u==='s'?'sec':u):'')+(x.rir!=null?' @'+x.rir:'')+(x.sec?' · '+fmtSec(x.sec):'')+'<button data-del="'+x.id+'" aria-label="Verwijder">×</button></span>').join('')+'<span class="small" style="align-self:center">'+(now.length>=e.s?'✓ ':'')+now.length+'/'+e.s+'</span></div>';
+    let wn = 0, kn = 0; h += '<div class="sets">'+now.map((x) => { const i = x.wu ? 'W'+(++wn) : String(++kn); return { x, i }; }).map(({x,i}) => '<span class="set"'+(x.wu?' style="opacity:.6;border-style:dashed"':'')+'>'+i+': '+(x.kg?fmtKg(x.kg)+' × ':'')+x.reps+(u!=='kg'?' '+(u==='s'?'sec':u):'')+(x.rir!=null?' @'+x.rir:'')+(x.sec?' · '+fmtSec(x.sec):'')+'<button data-del="'+x.id+'" aria-label="Verwijder">×</button></span>').join('')+'<span class="small" style="align-self:center">'+(now.filter(work).length>=e.s?'✓ ':'')+now.filter(work).length+'/'+e.s+'</span></div>';
     h += '</div>';
   }
   h += '<div class="row"><button class="btn" data-addopen="1">'+(ui.addOpen?'Toevoegen ▴':'＋ Oefening toevoegen')+'</button></div>';
@@ -710,12 +719,13 @@ function logSet(code, reps, extra){
   const inp = document.querySelector('[data-kg="'+code+'"]'); const kg = inp ? num(inp.value) : null;
   const ts = Date.now(); const id = f.s.id+'|'+code+'|'+ts; const rk = f.s.id+'|'+code;
   const rec = Object.assign({id, date:f.date, sid:f.s.id, code, pc:e.c, kg, reps:Number(reps), ts}, extra||{});
-  if(unitOf(code)==='kg' && !EXN(code).time && e.rir!==0) rec.rir = ui.rir[rk] ?? e.rir;
+  if(ui.wu[rk]) rec.wu = true;
+  else if(unitOf(code)==='kg' && !EXN(code).time && e.rir!==0) rec.rir = ui.rir[rk] ?? e.rir;
   S.sets.push(rec); ui['kg_'+f.s.id+code] = kg ?? '';
-  const n = S.sets.filter(x => x.sid===f.s.id && x.code===code && !x.del).length;
+  const n = S.sets.filter(x => x.sid===f.s.id && x.code===code && work(x)).length;
   if(e.s && n >= e.s){ const nx = sessEx(f.s).find(x => !S.exskip[f.s.id+'|'+x.c] && S.sets.filter(y => y.sid===f.s.id && y.code===(S.swaps[f.s.id+'|'+x.c]||x.c) && !y.del).length < x.s); ui.exFocus[f.s.id] = nx ? nx.c : null; }
   enqueue('set', id, f.date, rec);
-  unlockAudio(); startTimer(e.rest);
+  unlockAudio(); startTimer(rec.wu ? 60 : e.rest);
   const y = window.scrollY; rLog(); window.scrollTo(0, y);
   toast((kg?fmtKg(kg)+' kg × ':'')+reps+(rec.rir!=null?' @RIR '+rec.rir:'')+(rec.sec?' in '+fmtSec(rec.sec):'')+' gelogd');
 }
@@ -815,12 +825,25 @@ function rInsight(){
   const rdp = [], slp = []; for(let i=27;i>=0;i--){ const y = dailyOf(addDays(t,-i)); if(y.rd!=null) rdp.push([28-i, y.rd]); if(y.sl!=null) slp.push([28-i, y.sl]); }
   if(rdp.length + slp.length >= 2) h += '<div class="card"><h3>Oura, 28 dagen</h3>'+lineSvg([{pts:rdp,c:'#22c55e'},{pts:slp,c:'#60a5fa'}])+'<div class="small"><span style="color:#22c55e">■</span> Readiness <span style="color:#60a5fa">■</span> Slaap</div></div>';
   let tr = '';
-  for(const c of MAIN_LIFTS){ const byD = {}; for(const x of S.sets) if(!x.del && x.code===c){ const v = e1(x); if(v) byD[x.date] = Math.max(byD[x.date]||0, v); }
+  for(const c of MAIN_LIFTS){ const byD = {}; for(const x of S.sets) if(work(x) && x.code===c){ const v = e1(x); if(v) byD[x.date] = Math.max(byD[x.date]||0, v); }
     const ds = Object.keys(byD).sort(); if(ds.length >= 2){ const d0 = parseD(ds[0]); tr += '<div style="margin-top:8px"><b>'+esc(EXN(c).n)+'</b>'+lineSvg([{pts:ds.map(d => [(parseD(d)-d0)/864e5, byD[d]]), c:'#f5b942'}])+'</div>'; } }
   h += '<div class="card"><h3>Kracht: geschatte 1RM</h3>'+(tr || '<div class="mut">Verschijnt zodra een hoofdoefening twee keer gelogd is.</div>')+'<div class="small">Schatting (Epley), geen gemeten 1RM.</div></div>';
   const pl = {}; for(let i=27;i>=0;i--){ const d = addDays(t,-i); const y = dailyOf(d); for(const [k,v] of Object.entries(y.pains||{})){ const r = pl[k] || (pl[k] = {n:0, max:0, last:null, lv:0}); r.n++; r.max = Math.max(r.max, v); r.last = d; r.lv = v; } }
   const pk = Object.keys(pl);
   h += '<div class="card"><h3>Pijn per plek, 28 dagen</h3>'+(pk.length ? '<table><tr><th>Plek</th><th class="r">Dagen</th><th class="r">Max</th><th>Laatst</th></tr>'+pk.sort((a,b)=>pl[b].n-pl[a].n).map(k => '<tr><td>'+esc(k)+'</td><td class="r">'+pl[k].n+'</td><td class="r">'+pl[k].max+'</td><td>'+fmtDay(pl[k].last)+' ('+pl[k].lv+')</td></tr>').join('')+'</table><div class="small">Meer dan 3 dagen achter elkaar op dezelfde plek, of een stijgende score: zeg het zondag.</div>' : '<div class="mut">Geen pijn gemeld. Mooi.</div>')+'</div>';
+  const bd = S.body.slice().sort((p,q)=> p.date.localeCompare(q.date));
+  if(bd.length){ const t0 = parseD(bd[0].date); const W = bd.filter(x=>x.w).map(x => [(parseD(x.date)-t0)/864e5, x.w]); const SM = bd.filter(x=>x.ssm).map(x => [(parseD(x.date)-t0)/864e5, x.ssm]);
+    const ib = bd.filter(x=>x.ssm); const f = ib[0], l = ib[ib.length-1]; const seg = bd.filter(x=>x.seg).pop();
+    h += '<div class="card" id="bodyins"><h3>Lichaam</h3>'+lineSvg([{pts:W,c:'#60a5fa'}])+'<div class="small"><span style="color:#60a5fa">■</span> gewicht (kg)'+(PLAN.bodyGoal?' · doel: '+esc(PLAN.bodyGoal):'')+'</div>';
+    if(SM.length > 1) h += lineSvg([{pts:SM,c:'#a78bfa'}])+'<div class="small"><span style="color:#a78bfa">■</span> skeletspiermassa (InBody, kg)</div>';
+    if(f && l && f!==l) h += '<div class="kv"><span>InBody '+fmtDay(f.date)+' → '+fmtDay(l.date)+'</span><span>SSM '+(l.ssm-f.ssm>=0?'+':'')+fmtN(l.ssm-f.ssm)+' kg · vet '+(l.fatp-f.fatp>=0?'+':'')+fmtN(l.fatp-f.fatp)+'%-punt</span></div>';
+    if(seg) h += '<div class="kv"><span>Segmenten ('+fmtDay(seg.date)+')</span><span class="small">armen '+seg.seg.arm+'% · romp '+seg.seg.trunk+'% · benen '+seg.seg.leg+'% van InBody-norm</span></div>';
+    const mz = bd.filter(x => x.waist || x.arm || x.thigh || x.chest).pop(); if(mz) h += '<div class="kv"><span>Maten ('+fmtDay(mz.date)+')</span><span>'+[['taille','waist'],['borst','chest'],['arm','arm'],['bovenbeen','thigh']].filter(([,k])=>mz[k]).map(([n,k])=>n+' '+fmtN(mz[k])).join(' · ')+' cm</span></div>';
+    h += '<div class="small">InBody-sprongen van dag tot dag zijn vaak vocht/glycogeen; kijk naar de trend over maanden. Meet onder gelijke omstandigheden (ochtend, nuchter).</div></div>'; }
+  const vol = weeks.map(a => { const b2 = addDays(a,6); return S.sets.filter(x => work(x) && x.date>=a && x.date<=b2 && (x.rir==null||x.rir<=4) && !['plyo','hyrox'].includes(EXN(x.code).g)).length; });
+  if(vol.some(Boolean)){ const tg = PLAN.setTargets||{}; const last4 = weeks.slice(-4); const per = {}; for(const x of S.sets) if(work(x) && x.date>=last4[0] && (x.rir==null||x.rir<=4)){ const g = EXN(x.code).g; if(g && !['plyo','hyrox'].includes(g)) per[g] = (per[g]||0)+1; }
+    h += '<div class="card" id="volins"><h3>Krachtvolume: harde sets/week</h3>'+barSvg(vol, lab)+'<table><tr><th>Spiergroep</th><th class="r">gem./wk (4 wk)</th><th class="r">doel</th></tr>'+Object.keys(Object.assign({}, tg, per)).map(g => '<tr><td>'+g+'</td><td class="r">'+fmtN((per[g]||0)/4)+'</td><td class="r">'+(tg[g]||'–')+'</td></tr>').join('')+'</table></div>'; }
+  h += blockHtml();
   h += recordsHtml();
   const fl = S.cardio.filter(c => !c.del && (c.kh || c.wat)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,10);
   h += '<div class="card"><h3>Voedingslog</h3>'+(fl.length ? '<table><tr><th>Datum</th><th>Duur</th><th class="r">g/u</th><th class="r">Maag</th></tr>'+fl.map(c => '<tr><td>'+fmtDay(c.date)+'<div class="small">'+esc(c.wat||'')+'</div></td><td>'+(c.sec?fmtSec(c.sec):'')+'</td><td class="r">'+(c.kh||'')+'</td><td class="r">'+(c.maag||'')+'</td></tr>').join('')+'</table>' : '<div class="mut">Log voeding via “Log duur” bij lange sessies.</div>')+'</div>';
@@ -828,6 +851,27 @@ function rInsight(){
   $('view').innerHTML = h;
 }
 const STD = [['1 km',1],['1 mijl',1.609],['5 km',5],['10 km',10],['15 km',15],['21,1 km',21.0975],['30 km',30],['42,2 km',42.195],['50 km',50]];
+function blocks(){ const bl = []; for(const w of PLAN.weeks){ const n = w.phase.split(' · ')[0].replace(/ (taper|deload).*$/,'').trim(); let b = bl.find(x => x.n===n); if(!b){ b = {n, weeks:[]}; bl.push(b); } b.weeks.push(w); } return bl.filter(b => b.weeks[0].start <= today()); }
+function blockReport(b){
+  const a = b.weeks[0].start, z = addDays(b.weeks[b.weeks.length-1].start, 6); const L = []; let sp=0, sd=0, km=0, hm=0, sec=0, flags=0, skips=0; const rd=[], sl=[]; const pains = {};
+  for(const w of b.weeks){ if(w.start > today()) continue; const st = weekStats(w); sp += st.sessPlan; sd += st.sessDone; km += st.runDone; hm += st.vertDone; sec += st.secDone; flags += st.easyFlags.length; skips += st.skipped||0; rd.push(...st.rd); sl.push(...st.sl);
+    for(let i=0;i<7;i++){ const y = dailyOf(addDays(w.start,i)); for(const [k,v] of Object.entries(y.pains||{})) pains[k] = Math.max(pains[k]||0, v); } }
+  const split = intensitySplit(actsIn(a, z)); const nW = b.weeks.filter(w => w.start <= today()).length;
+  L.push('BLOKRAPPORT '+b.n+' ('+fmtDay(a)+' – '+fmtDay(z)+', '+nW+' wk)');
+  L.push('- Naleving: '+sd+'/'+sp+' sessies'+(skips?' ('+skips+' vervallen)':'')+' · lopen '+fmtN(km)+' km ('+fmtN(km/Math.max(1,nW))+'/wk) · '+Math.round(hm)+' hm · '+fmtH(sec));
+  if(split.tot) L.push('- Looptijd rustig/matig/hard: '+['rustig','matig','hard'].map(k=>Math.round(split.t[k]/split.tot*100)).join('/')+' % · rustige runs te hard: '+flags+'×');
+  const lifts = []; for(const c of MAIN_LIFTS){ const xs = S.sets.filter(x => work(x) && x.code===c && x.date>=a && x.date<=z && e1(x)); if(xs.length < 2) continue; const ds = [...new Set(xs.map(x=>x.date))].sort();
+    const best = d => Math.max(...xs.filter(x=>x.date===d).map(e1)); lifts.push(EXN(c).n+' '+fmtN(best(ds[0]))+' → '+fmtN(best(ds[ds.length-1]))+' kg e1RM'); }
+  L.push('- Kracht: '+(lifts.length ? lifts.join('; ') : 'te weinig gelogd voor een trend'));
+  const sets = S.sets.filter(x => work(x) && x.date>=a && x.date<=z && (x.rir==null||x.rir<=4)); const per = {}; for(const x of sets){ const g = EXN(x.code).g; if(g && !['plyo','hyrox'].includes(g)) per[g] = (per[g]||0)+1; }
+  if(Object.keys(per).length) L.push('- Harde sets/week: '+Object.entries(per).map(([g,n]) => g+' '+fmtN(n/Math.max(1,nW))).join(', '));
+  const bd = S.body.filter(x => x.w && x.date>=addDays(a,-7) && x.date<=z).sort((p,q)=>p.date.localeCompare(q.date)); if(bd.length > 1) L.push('- Gewicht: '+fmtN(bd[0].w)+' → '+fmtN(bd[bd.length-1].w)+' kg');
+  if(rd.length||sl.length) L.push('- Oura gem.: readiness '+(avg(rd)??'–')+', slaap '+(avg(sl)??'–'));
+  L.push('- Pijn: '+(Object.keys(pains).length ? Object.entries(pains).map(([k,v])=>k+' max '+v).join(', ') : 'geen gemeld'));
+  const races = (STRAVA.activities||[]).filter(x => x.race && x.date>=a && x.date<=z); if(races.length) L.push('- Wedstrijden: '+races.map(x => x.name+' '+fmtSec(x.el||x.sec)).join('; '));
+  return L.join('\n'); }
+function blockHtml(){ const bl = blocks(); if(!bl.length) return ''; const sel = ui.block ?? bl.length-1; const b = bl[Math.min(sel, bl.length-1)];
+  return '<div class="card" id="blockrep"><h3>Blokrapport</h3><div class="chips sm">'+bl.map((x,i) => '<button class="chip'+(x===b?' on':'')+'" style="font-size:14px" data-block="'+i+'">'+esc(x.n)+'</button>').join('')+'</div><div class="det" style="font-size:14px">'+esc(blockReport(b))+'</div><div class="row"><button class="btn" id="x_block" data-bi="'+bl.indexOf(b)+'">Kopieer blokrapport</button></div><textarea id="x_out" readonly style="display:none"></textarea></div>'; }
 function recordsHtml(){
   let h = '<div class="card"><h3>Records afstanden</h3><table><tr><th>Afstand</th><th>Tijd</th><th>Bron</th></tr>';
   for(const [lab, km] of STD){
@@ -842,7 +886,7 @@ function recordsHtml(){
   const races = (STRAVA.activities||[]).filter(a => a.race && RUNS.includes(a.sport)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,8);
   if(races.length) h += '<div class="card"><h3>Wedstrijden</h3><table><tr><th>Datum</th><th>Wedstrijd</th><th class="r">Tijd</th></tr>'+races.map(a => '<tr><td>'+fmtDay(a.date)+' '+a.date.slice(2,4)+'</td><td>'+esc(a.name)+'<div class="small">'+(a.km?fmtN(a.km)+' km':'')+(a.hm?' · '+a.hm+' hm':'')+'</div></td><td class="r">'+fmtSec(a.el||a.sec)+'</td></tr>').join('')+'</table></div>';
   const by = {};
-  for(const x of S.sets) if(!x.del && x.kg && unitOf(x.code)==='kg' && !EXN(x.code).time){
+  for(const x of S.sets) if(work(x) && x.kg && unitOf(x.code)==='kg' && !EXN(x.code).time){
     const v = e1(x); const r = by[x.code] || (by[x.code] = {max:null, e1:null});
     if(!r.max || x.kg>r.max.kg || (x.kg===r.max.kg && x.reps>r.max.reps)) r.max = x;
     if(v && (!r.e1 || v>r.e1)) r.e1 = v; }
@@ -857,6 +901,20 @@ function recordsHtml(){
 }
 
 /* ---------- check-in + beschikbaarheid ---------- */
+function bodyCard(){
+  const b = S.body.slice().sort((p,q)=> p.date.localeCompare(q.date)); const last = b.filter(x=>x.w).pop(); const ib = b.filter(x=>x.ssm).pop();
+  let h = '<div class="card" id="bodycard"><b>Lichaam</b> <span class="small">gewicht wekelijks (ochtend, nuchter), maten maandelijks</span>';
+  h += '<div class="row nw"><div><label class="f">Gewicht (kg)</label><input type="text" inputmode="decimal" id="b_w" placeholder="'+(last?fmtN(last.w):'77,0')+'"></div><div><label class="f">Taille (cm)</label><input type="text" inputmode="decimal" id="b_waist" placeholder="opt."></div></div>';
+  h += '<div class="row nw"><div><label class="f">Borst</label><input type="text" inputmode="decimal" id="b_chest" placeholder="opt."></div><div><label class="f">Arm</label><input type="text" inputmode="decimal" id="b_arm" placeholder="opt."></div><div><label class="f">Bovenbeen</label><input type="text" inputmode="decimal" id="b_thigh" placeholder="opt."></div></div>';
+  h += '<div class="row"><button class="btn pri" id="b_save">Bewaar meting</button></div>';
+  h += '<div class="small" style="margin-top:6px">'+(last?'Laatste: '+fmtN(last.w)+' kg ('+fmtDay(last.date)+')':'Nog geen gewicht')+(ib?' · InBody '+fmtDay(ib.date)+': SSM '+fmtN(ib.ssm)+' kg, vet '+fmtN(ib.fatp)+'%':'')+'</div>';
+  h += '<details style="margin-top:8px"><summary class="small">InBody-meting toevoegen of importcode plakken</summary>';
+  h += '<div class="row nw"><div><label class="f">Datum</label><input type="date" id="ib_d" value="'+today()+'"></div><div><label class="f">Gewicht</label><input type="text" inputmode="decimal" id="ib_w"></div></div>';
+  h += '<div class="row nw"><div><label class="f">SSM (kg)</label><input type="text" inputmode="decimal" id="ib_ssm"></div><div><label class="f">Vet (kg)</label><input type="text" inputmode="decimal" id="ib_fk"></div><div><label class="f">Vet %</label><input type="text" inputmode="decimal" id="ib_fp"></div></div>';
+  h += '<div class="row"><button class="btn" id="ib_save">Bewaar InBody</button></div><label class="f">Importcode (begint met YB1:)</label><textarea id="ib_code"></textarea><div class="row"><button class="btn" id="ib_import">Importeer</button></div></details></div>';
+  return h; }
+function addBody(rec){ rec.ts = Date.now(); rec.id = rec.id || 'b|'+rec.date+'|'+(rec.src||'')+'|'+rec.ts; const i = S.body.findIndex(x => x.date===rec.date && (x.src||'')===(rec.src||''));
+  if(i>=0) S.body[i] = Object.assign({}, S.body[i], rec); else S.body.push(rec); enqueue('body', rec.id, rec.date, rec); }
 function rCheck(){
   if(!ui.chkWeek){ const t = today(), mon = mondayOf(t), dow = (parseD(t).getDay()+6)%7; const prev = addDays(mon,-7);
     ui.chkWeek = (dow <= 1 && !S.checkins[weekIdOf(prev)]) ? prev : mon; }
@@ -873,6 +931,7 @@ function rCheck(){
     h += '</div>';
   }
   h += availHtml(addDays(ui.chkWeek,7));
+  h += bodyCard();
   const w = weekByStart(ui.chkWeek); const st = w && w.days.length ? weekStats(w) : null;
   if(st) h += '<div class="card small">Automatisch: sessies '+st.sessDone+'/'+st.sessPlan+' · '+fmtN(st.runDone)+' km · '+Math.round(st.vertDone)+' hm · belasting '+Math.round(st.load)+(st.rd.length?' · Oura readiness gem. '+avg(st.rd):'')+(st.sl.length?' · slaap '+avg(st.sl):'')+'</div>';
   h += '<div class="row"><button class="btn pri" id="x_sunday">📋 Kopieer zondag-export</button></div><textarea id="x_out" readonly style="margin-top:10px;min-height:90px" placeholder="Export verschijnt hier; plak hem in de chat."></textarea>';
@@ -926,7 +985,7 @@ function weekText(start){
       const efx = easyFlag(s, a), ivx = intervalEval(s, a); if(efx) L.push('    ⚠ '+efx); if(ivx) L.push('    Interval: '+ivx.txt);
       if(a){ L.push('    Strava: '+actLine(a)); if(a.laps) L.push('    Ronden: '+a.laps.map(l => l.m+'m '+fmtSec(l.sec)+(l.hr?'@'+l.hr:'')).join(', ')); }
       const sets = S.sets.filter(x => x.sid===s.id && !x.del).sort((a,b)=>a.ts-b.ts);
-      if(sets.length){ const g = {}; for(const x of sets) (g[x.code] = g[x.code] || []).push((x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':''));
+      if(sets.length){ const g = {}; for(const x of sets) (g[x.code] = g[x.code] || []).push((x.wu?'W ':'')+(x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':''));
         for(const c in g){ const pc = sets.find(x=>x.code===c).pc; const added = (S.extra[s.id]||[]).some(x=>x.c===pc); L.push('    '+EXN(c).n+(added?' (toegevoegd)':'')+(pc && pc!==c?' (i.p.v. '+EXN(pc).n+')':'')+': '+g[c].join(', ')); } }
       const skipped = sessEx(s).filter(e => S.exskip[s.id+'|'+e.c]).map(e => EXN(e.c).n); if(skipped.length) L.push('    Overgeslagen oefeningen: '+skipped.join(', '));
       if(st.d && s.ex && !sets.length) L.push('    (afgevinkt zonder te loggen)'); }
@@ -949,6 +1008,15 @@ function weekText(start){
   else L.push('- niet ingevuld');
   return L.join('\n');
 }
+/* Bouw de app-stand opnieuw op uit Sheet-rijen: {kind: [data, …]} (zie sync/Code.gs doGet). */
+function fromSheet(d){ const o = blank(); const R = k => (d[k]||[]).map(r => ({id: r.id, x: typeof r.data==='string' ? JSON.parse(r.data) : r.data})).filter(r => r.id && r.x);
+  for(const r of R('set')) o.sets.push(r.x);
+  for(const r of R('cardio')) o.cardio.push(r.x);
+  for(const r of R('body')) o.body.push(r.x);
+  for(const [k, dst] of [['done','done'],['checkin','checkins'],['avail','avail'],['daily','daily'],['custom','custom']]) for(const r of R(k)) o[dst][r.id] = r.x;
+  for(const r of R('move')) if(r.x.to) o.moves[r.id] = r.x.to;
+  for(const r of R('sessmod')){ Object.assign(o.swaps, r.x.swaps||{}); if(r.x.extra && r.x.extra.length) o.extra[r.id] = r.x.extra; Object.assign(o.exskip, r.x.exskip||{}); }
+  return migrate(o); }
 function backupCode(){ const j = JSON.stringify(S); return 'YC1:'+btoa(unescape(encodeURIComponent(j))); }
 function parseBackup(code){ code = code.trim(); if(code.startsWith('YC1:')) code = code.slice(4);
   const j = code.startsWith('{') ? code : decodeURIComponent(escape(atob(code))); const o = JSON.parse(j);
@@ -967,6 +1035,7 @@ function rMeer(){
   h += '<div class="row"><a class="btn pri" id="ics_sub" style="display:flex;align-items:center;justify-content:center;text-decoration:none" href="'+base.replace(/^https?:/,'webcal:')+'ics/all.ics">📆 Abonneer op trainingsagenda</a></div><div class="small" style="word-break:break-all">'+esc(base)+'ics/all.ics</div></div>';
   h += '<div class="card"><h3>Herstellen</h3><div class="mut">Plak een back-upcode (begint met YC1:).</div><textarea id="r_in" style="margin-top:8px"></textarea>';
   h += '<div class="row"><button class="btn '+(ui.restoreArmed?'bad':'warn')+'" id="r_go">'+(ui.restoreArmed?'Bevestig: alles vervangen':'Herstel back-up')+'</button></div>';
+  if(st.sheetUrl) h += '<div class="row"><button class="btn" id="r_sheet">'+(ui.sheetArmed?'Bevestig: vervangen door Sheet-data':'Herstel uit Google Sheet')+'</button></div>';
   if(localStorage.getItem(KEY+'.undo')) h += '<div class="row"><button class="btn" id="r_undo">↶ Laatste herstel ongedaan maken</button></div>';
   h += '</div>';
   h += '<div class="card"><h3>Instellingen</h3><div class="small">Leeg = waarde uit het plan.</div>';
@@ -1010,18 +1079,22 @@ function applyPick(code, mode, forC){
 document.addEventListener('click', ev => {
   const b = ev.target.closest('button'); if(!b) return; const ds = b.dataset;
   if(ds.tab){ ui.tab = ds.tab; if(ds.tab==='vandaag') ui.day = null; if(ds.tab==='log' && !ui.sid){ const it = weekItems(weekByStart(mondayOf(today()))).find(i => i.date===today() && i.s.ex && !isSkipped(i.s.id)); if(it) ui.sid = it.s.id; } window.scrollTo(0,0); render(); return; }
-  if(ds.done){ const cur = (S.done[ds.done]||{}).d; const f = sessById(ds.done); const auto = f && matchWeek(f.w).by[ds.done];
+  if(ds.done){ const cur = (S.done[ds.done]||{}).d;
+    if(!cur && !(S.done[ds.done]||{}).min){ const ss = S.sets.filter(x => x.sid===ds.done && !x.del).map(x=>x.ts); if(ss.length > 1) setDone(ds.done, {min: String(Math.round((Math.max(...ss)-Math.min(...ss))/60000) + 5)}); } const f = sessById(ds.done); const auto = f && matchWeek(f.w).by[ds.done];
     if(auto && !cur){ toast('Al gedaan volgens Strava'); return; } setDone(ds.done, {d:!cur}); rerender(); return; }
   if(ds.srpe){ const cur = (S.done[ds.srpe]||{}).rpe, v = Number(ds.v); setDone(ds.srpe, {rpe: cur===v ? null : v}); rerender(); return; }
-  if(ds.open){ const it = ui.tab==='vandaag'; ui.open[ds.open] = !(ui.open[ds.open] ?? it); rerender(); return; }
+  if(ds.open){ ui.open[ds.open] = !b.textContent.includes('Inklappen'); rerender(); return; }
   if(b.id==='ring'){ $('timer').classList.toggle('ctl'); return; }
   if(ds.strip){ if(ds.mode==='day'){ ui.day = ds.strip===today() ? null : ds.strip; ui.tab = 'vandaag'; render(); window.scrollTo(0,0); }
     else { const el = document.getElementById('d_'+ds.strip); if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); } return; }
   if(ds.info){ ui.info[ds.info] = !ui.info[ds.info]; rerender(); return; }
   if(ds.exfocus){ ui.exFocus[ui.sid] = ds.exfocus; rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+ds.exfocus); if(el) el.scrollIntoView({block:'start'}); }, 20); return; }
+  if(ds.dailyedit){ ui.dailyEdit[ds.dailyedit] = true; rerender(); return; }
+  if(ds.painopen){ ui.painOpen = true; rerender(); return; }
   if(ds.ploc){ const d = ui.day || today(); const x = S.daily[d] || (S.daily[d] = {}); const p = Object.assign({}, x.pains||{}); if(p[ds.ploc]!=null) delete p[ds.ploc]; else p[ds.ploc] = 2; setPains(d, p); rerender(); return; }
   if(ds.pscore){ const d = ui.day || today(); const p = Object.assign({}, (dailyOf(d).pains)||{}); p[ds.pscore] = Number(ds.v); setPains(d, p); rerender(); return; }
   if(ds.stats){ ui.stats = !ui.stats; rerender(); return; }
+  if(ds.block){ ui.block = Number(ds.block); rerender(); return; }
   if(ds.range){ ui.range = Number(ds.range); rerender(); return; }
   if(ds.laps){ ui.laps[ds.laps] = !ui.laps[ds.laps]; rerender(); return; }
   if(ds.menu){ ui.menu[ds.menu] = !ui.menu[ds.menu]; rerender(); return; }
@@ -1036,6 +1109,7 @@ document.addEventListener('click', ev => {
   if(ds.seen){ S.settings.seenPlan = PLAN.version+'/'+PLAN.updated; save(); rerender(); return; }
   if(ds.kgd){ const inp = document.querySelector('[data-kg="'+ds.kgd+'"]'); const inc = EXN(ds.kgd).inc || 1; const v = (num(inp.value)||0) + inc*Number(ds.dir);
     inp.value = String(Math.max(0, +v.toFixed(2))).replace('.', ','); ui['kg_'+ui.sid+ds.kgd] = inp.value; return; }
+  if(ds.wu){ ui.wu[ds.wu] = !ui.wu[ds.wu]; rerender(); return; }
   if(ds.rir){ ui.rir[ds.rir] = Number(ds.v); document.querySelectorAll('[data-rir="'+ds.rir+'"]').forEach(c => c.classList.toggle('on', c===b)); return; }
   if(ds.rep){ logSet(ds.rep, Number(ds.r)); return; }
   if(ds.repgo){ const i = document.querySelector('[data-repx="'+ds.repgo+'"]'); const v = num(i && i.value); if(v!=null) logSet(ds.repgo, v); return; }
@@ -1043,15 +1117,15 @@ document.addEventListener('click', ev => {
   if(ds.pickex){ applyPick(ds.pickex, ds.mode, ds.for); return; }
   if(ds.newex){ const box = b.closest('.picker'); const n = box.querySelector('[data-newname]').value.trim(); if(!n){ toast('Geef een naam'); return; }
     const u = box.querySelector('[data-newunit]').value, g = box.querySelector('[data-newgroup]').value;
-    const code = 'U_'+Date.now().toString(36); S.custom[code] = Object.assign({n, g, inc: u==='kg' ? 2.5 : 0}, u==='kg' ? {} : {u}); save(); applyPick(code, ds.mode, ds.for); return; }
+    const code = 'U_'+Date.now().toString(36); S.custom[code] = Object.assign({n, g, inc: u==='kg' ? 2.5 : 0}, u==='kg' ? {} : {u}); enqueue('custom', code, today(), S.custom[code]); applyPick(code, ds.mode, ds.for); return; }
   if(ds.addopen){ ui.addOpen = !ui.addOpen; rerender(); return; }
   if(ds.exskip){ const k = ui.sid+'|'+ds.exskip; if(S.exskip[k]) delete S.exskip[k]; else S.exskip[k] = true; applyPickNoop(); rerender(); return; }
   if(ds.exdel){ const list = S.extra[ui.sid]||[]; const has = S.sets.some(x => x.sid===ui.sid && x.code===(S.swaps[ui.sid+'|'+ds.exdel]||ds.exdel) && !x.del);
     if(has){ toast('Heeft al sets; verwijder die eerst of laat hem staan'); return; } S.extra[ui.sid] = list.filter(x => x.c!==ds.exdel); applyPickNoop(); rerender(); return; }
   if(ds.swap){ const k = ui.sid+'|'+ds.swap; if(ds.to===ds.swap) delete S.swaps[k]; else S.swaps[k] = ds.to; save(); ui.swap[ds.swap] = false; rerender(); toast('Oefening: '+EXN(ds.to).n); return; }
   if(ds.sw){ const c = ds.sw; const e = exFor(c);
-    if(!ui.sw[c]){ ui.sw[c] = Date.now(); unlockAudio(); stopTimer(); startTicker(); rerender(); }
-    else { const sec = Math.round((Date.now()-ui.sw[c])/1000); ui.sw[c] = null; logSet(c, e.lo, {sec}); } return; }
+    if(!ui.sw[c]){ ui.sw[c] = Date.now(); sessionStorage.setItem('sw', JSON.stringify(ui.sw)); unlockAudio(); stopTimer(); startTicker(); rerender(); }
+    else { const sec = Math.round((Date.now()-ui.sw[c])/1000); ui.sw[c] = null; sessionStorage.setItem('sw', JSON.stringify(ui.sw)); logSet(c, e.lo, {sec}); } return; }
   if(ds.secgo){ const i = document.querySelector('[data-secx="'+ds.secgo+'"]'); const sec = parseTime(i && i.value); const e = exFor(ds.secgo); if(!isNaN(sec) && e) logSet(ds.secgo, e.lo, {sec}); return; }
   if(ds.del){ const x = S.sets.find(s => s.id===ds.del); if(x){ x.del = true; x.ts2 = Date.now(); enqueue('set', x.id, x.date, x); } rerender(); return; }
   if(ds.rpe){ ui.rpe = Number(ds.rpe); document.querySelectorAll('[data-rpe]').forEach(c => c.classList.toggle('on', c===b)); updCalc(); return; }
@@ -1068,11 +1142,18 @@ document.addEventListener('click', ev => {
       c.ts = Date.now(); c.id = 'c|'+c.date+'|'+c.ts;
       if(ui.prefill && ui.prefill.sid){ c.sid = ui.prefill.sid; const cur = S.done[c.sid]||{}; const patch = {}; if(!cur.d) patch.d = true; if(c.sec && !cur.min) patch.min = String(Math.round(c.sec/60)); if(c.rpe && !cur.rpe) patch.rpe = c.rpe; if(Object.keys(patch).length) setDone(c.sid, patch); }
       S.cardio.push(c); enqueue('cardio', c.id, c.date, c); ui.prefill = null; toast('Opgeslagen'); rDuur(); return; }
+    case 'b_save': { const r = {date: today(), src:'weekly'}; for(const [k,id] of [['w','b_w'],['waist','b_waist'],['chest','b_chest'],['arm','b_arm'],['thigh','b_thigh']]){ const v = num($(id).value); if(v!=null) r[k] = v; }
+      if(Object.keys(r).length <= 2){ toast('Vul minstens één waarde in'); return; } addBody(r); toast('Meting bewaard'); rerender(); return; }
+    case 'ib_save': { const r = {date: $('ib_d').value, src:'InBody', w:num($('ib_w').value), ssm:num($('ib_ssm').value), fatkg:num($('ib_fk').value), fatp:num($('ib_fp').value)}; if(!r.w && !r.ssm){ toast('Vul gewicht of SSM in'); return; } addBody(r); toast('InBody bewaard'); rerender(); return; }
+    case 'ib_import': { try { let c = $('ib_code').value.trim(); if(c.startsWith('YB1:')) c = c.slice(4); const arr = JSON.parse(decodeURIComponent(escape(atob(c)))); arr.forEach(addBody); toast(arr.length+' metingen geïmporteerd'); rerender(); } catch(e){ toast('Ongeldige code'); } return; }
+    case 'x_block': copy(blockReport(blocks()[Number(b.dataset.bi)])); return;
     case 'x_text': copy(weekText($('x_week').value)); return;
     case 'x_sunday': copy(weekText(ui.chkWeek||mondayOf(today()))); return;
     case 'x_json': S.settings.lastBackup = Date.now(); save(); copy(backupCode()); return;
     case 'r_go': { if(!ui.restoreArmed){ try { parseBackup($('r_in').value); } catch(e){ toast('Ongeldige code'); return; } ui.restoreArmed = true; const v = $('r_in').value; rMeer(); $('r_in').value = v; return; }
       try { const o = parseBackup($('r_in').value); try { localStorage.setItem(KEY+'.undo', JSON.stringify(S)); } catch(_){} S = o; save(); ui.restoreArmed = false; toast('Hersteld'); render(); } catch(e){ toast('Ongeldige code'); } return; }
+    case 'r_sheet': { if(!ui.sheetArmed){ ui.sheetArmed = true; rMeer(); return; } ui.sheetArmed = false;
+      fetch(S.settings.sheetUrl+(S.settings.sheetUrl.includes('?')?'&':'?')+'all=1').then(r => r.json()).then(d => { const o = fromSheet(d); try { localStorage.setItem(KEY+'.undo', JSON.stringify(S)); } catch(_){} o.settings = S.settings; S = o; save(); toast('Hersteld uit Sheet'); render(); }).catch(e => toast('Sheet niet bereikbaar: '+e.message)); return; }
     case 'r_undo': { try { S = migrate(JSON.parse(localStorage.getItem(KEY+'.undo'))); save(); localStorage.removeItem(KEY+'.undo'); toast('Herstel ongedaan gemaakt'); render(); } catch(e){ toast('Niets om terug te zetten'); } return; }
     case 's_save': { S.settings.ftp = num($('s_ftp').value); S.settings.lthr = num($('s_lthr').value); S.settings.easyHr = num($('s_easy').value);
       const tp = parseTime($('s_tpace').value); S.settings.tpace = isNaN(tp) ? null : tp; S.settings.sheetUrl = $('s_url').value.trim(); save(); toast('Bewaard'); scheduleSync(); return; }
@@ -1083,7 +1164,7 @@ document.addEventListener('change', ev => { const t = ev.target, ds = t.dataset;
   if(ds.min) setDone(ds.min, {min:t.value});
   if(ds.note) setDone(ds.note, {note:t.value});
   if(ds.ct) setAns(ds.ct, t.value);
-  if(ds.dly){ setDaily(ui.day || today(), ds.dly, num(t.value)); if(['rd','sl'].includes(ds.dly)) rerender(); }
+  if(ds.dly){ ui.dailyEdit[ui.day || today()] = true; setDaily(ui.day || today(), ds.dly, num(t.value)); if(['rd','sl'].includes(ds.dly)) rerender(); }
   if(ds.avmin) setAvail(ds.avmin, ds.i, {min:t.value});
   if(ds.avnote) setAvail(ds.avnote, ds.i, {note:t.value});
   if(ds.avn) setAvail(ds.avn, null, {n:t.value});
@@ -1106,6 +1187,7 @@ document.addEventListener('touchend', ev => { if(sx===null) return; const dx = e
 /* ---------- start ---------- */
 (async function(){
   await loadData();
+  try { Object.assign(ui.sw, JSON.parse(sessionStorage.getItem('sw')||'{}')); if(Object.values(ui.sw).some(Boolean)) startTicker(); } catch(e){}
   const te = Number(sessionStorage.getItem('tEnd')); if(te > Date.now()){ tEnd = te; tDur = Number(sessionStorage.getItem('tDur')) || 90; $('timer').classList.add('show'); startTicker(); tick(); }
   if(PLAN && !weekByStart(ui.week)){ const t = today(); const w = PLAN.weeks.filter(w => w.start<=t).pop() || PLAN.weeks[0]; ui.week = w.start; }
   if(PLAN && S.settings.seenPlan===null && !S.sets.length && !Object.keys(S.done).length){ S.settings.seenPlan = PLAN.version+'/'+PLAN.updated; save(); }
