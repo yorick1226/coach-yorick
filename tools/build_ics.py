@@ -17,11 +17,11 @@ def fold(line):
 
 def main():
     plan = json.loads((ROOT/"plan.json").read_text())
-    ex = plan["exercises"]; stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    ex = plan["exercises"]; allev = []; stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     (ROOT/"ics").mkdir(exist_ok=True); n = 0
     for w in plan["weeks"]:
         if not w["days"]: continue
-        L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//coach//NL","CALSCALE:GREGORIAN","METHOD:PUBLISH",f"X-WR-CALNAME:Training {w['id']}"]
+        L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//coach//NL","CALSCALE:GREGORIAN","METHOD:PUBLISH",f"X-WR-CALNAME:Training {w['id']}"]; n0 = len(L)
         for d in w["days"]:
             day = dt.date.fromisoformat(d["date"])
             for s in d["s"]:
@@ -33,8 +33,12 @@ def main():
                 L += ["BEGIN:VEVENT", f"UID:{s['id']}@coach", f"DTSTAMP:{stamp}",
                       f"DTSTART;VALUE=DATE:{day:%Y%m%d}", f"DTEND;VALUE=DATE:{day+dt.timedelta(days=1):%Y%m%d}",
                       f"SUMMARY:{esc(title)}", f"DESCRIPTION:{esc(desc)}", "TRANSP:TRANSPARENT", "END:VEVENT"]
+        allev += L[n0:]
         L.append("END:VCALENDAR")
         (ROOT/"ics"/f"{w['id']}.ics").write_text("\r\n".join(fold(l) for l in L) + "\r\n", encoding="utf-8"); n += 1
-    print(f"{n} ics-bestanden geschreven")
+    A = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//coach//NL","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Training (Coach)",
+         "REFRESH-INTERVAL;VALUE=DURATION:PT6H","X-PUBLISHED-TTL:PT6H"] + allev + ["END:VCALENDAR"]
+    (ROOT/"ics"/"all.ics").write_text("\r\n".join(fold(l) for l in A) + "\r\n", encoding="utf-8")
+    print(f"{n} week-ics + all.ics geschreven")
 
 if __name__ == "__main__": main()

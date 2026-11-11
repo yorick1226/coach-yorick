@@ -1,6 +1,16 @@
 {
- "version": 1,
+ "version": 2,
  "updated": "2026-11-11",
+ "mozart": {
+  "date": "2027-06-05",
+  "longRunKm": 50,
+  "timeOnFeetH": 8,
+  "weekVert": 4000,
+  "sessionVert": 2500,
+  "b2bKm": 60,
+  "fuelGph": 80,
+  "fuelH": 4
+ },
  "athlete": {
   "lthr": 173,
   "tpace": 263,
@@ -59,215 +69,403 @@
  "exercises": {
   "BP": {
    "n": "Bankdrukken (barbell)",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "borst",
+   "alt": [
+    "DBB",
+    "MCP"
+   ]
   },
   "IDB": {
    "n": "Incline dumbbell press",
-   "inc": 2
+   "inc": 2,
+   "g": "borst",
+   "alt": [
+    "IBB",
+    "MCP"
+   ]
   },
   "OHP": {
    "n": "Shoulder press (staand/zittend)",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "schouders",
+   "alt": [
+    "DBS"
+   ]
   },
   "FLY": {
    "n": "Cable/machine fly",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "borst",
+   "alt": [
+    "PDK"
+   ]
   },
   "LAT": {
    "n": "Lateral raise",
-   "inc": 1
+   "inc": 1,
+   "g": "schouders"
   },
   "TPD": {
    "n": "Triceps pushdown",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "triceps"
   },
   "OTE": {
    "n": "Overhead triceps extension",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "triceps"
   },
   "PU": {
    "n": "Pull-up (+ extra kg)",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "rug",
+   "alt": [
+    "LPD"
+   ]
   },
   "LPD": {
    "n": "Lat pulldown",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "rug",
+   "alt": [
+    "PU"
+   ]
   },
   "CSR": {
    "n": "Chest-supported row",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "rug",
+   "alt": [
+    "SRW",
+    "DBR"
+   ]
   },
   "SAR": {
    "n": "Single-arm cable row (per kant)",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "rug",
+   "alt": [
+    "SRW",
+    "DBR"
+   ]
   },
   "RDF": {
    "n": "Rear delt fly",
-   "inc": 1
+   "inc": 1,
+   "g": "schouders"
   },
   "FP": {
    "n": "Face pull",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "schouders"
   },
   "IDC": {
    "n": "Incline dumbbell curl",
-   "inc": 1
+   "inc": 1,
+   "g": "biceps"
   },
   "HAM": {
    "n": "Hammer curl",
-   "inc": 1
+   "inc": 1,
+   "g": "biceps"
   },
   "SQ": {
    "n": "Back squat",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "quads",
+   "alt": [
+    "LP",
+    "HSQ",
+    "GSQ"
+   ]
   },
   "LP": {
    "n": "Leg press",
-   "inc": 5
+   "inc": 5,
+   "g": "quads",
+   "alt": [
+    "HSQ",
+    "SQ"
+   ]
   },
   "RDL": {
    "n": "Romanian deadlift",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "hamstrings",
+   "alt": [
+    "HT",
+    "BEX",
+    "HC"
+   ]
   },
   "HT": {
    "n": "Hip thrust",
-   "inc": 5
+   "inc": 5,
+   "g": "bilspieren",
+   "alt": [
+    "RDL",
+    "BEX"
+   ]
   },
   "BSS": {
    "n": "Bulgarian split squat (per been, dumbbells totaal)",
-   "inc": 2
+   "inc": 2,
+   "g": "quads",
+   "alt": [
+    "SU",
+    "LUN"
+   ]
   },
   "SU": {
    "n": "Step-up (per been, dumbbells totaal)",
-   "inc": 2
+   "inc": 2,
+   "g": "quads",
+   "alt": [
+    "BSS",
+    "LUN"
+   ]
   },
   "HC": {
    "n": "Hamstring curl",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "hamstrings",
+   "alt": [
+    "NH",
+    "RDL"
+   ]
   },
   "NH": {
    "n": "Nordic hamstring (excentrisch)",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "g": "hamstrings",
+   "alt": [
+    "HC"
+   ]
   },
   "CR": {
    "n": "Staande calf raise",
-   "inc": 5
+   "inc": 5,
+   "g": "kuiten",
+   "alt": [
+    "SCR",
+    "LPC"
+   ]
   },
   "SCR": {
    "n": "Zittende calf raise (soleus)",
-   "inc": 5
+   "inc": 5,
+   "g": "kuiten",
+   "alt": [
+    "CR",
+    "LPC"
+   ]
   },
   "TIB": {
    "n": "Tibialis raise",
-   "inc": 1
+   "inc": 1,
+   "g": "scheen"
   },
   "ADD": {
    "n": "Hip adduction (machine)",
-   "inc": 5
+   "inc": 5,
+   "g": "adductoren"
   },
   "ABD": {
    "n": "Hip abduction (machine)",
-   "inc": 5
+   "inc": 5,
+   "g": "bilspieren"
   },
   "SPS": {
    "n": "Spanish squat iso (sec)",
    "inc": 0,
-   "u": "s"
+   "u": "s",
+   "g": "quads"
   },
   "CPL": {
    "n": "Copenhagen plank (sec per kant)",
    "inc": 0,
-   "u": "s"
+   "u": "s",
+   "g": "core"
   },
   "PAL": {
    "n": "Pallof press (per kant)",
-   "inc": 2.5
+   "inc": 2.5,
+   "g": "core"
   },
   "DBG": {
    "n": "Dead bug (per kant)",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "g": "core"
   },
   "SC": {
    "n": "Suitcase carry (meter per kant)",
    "inc": 2,
-   "u": "m"
+   "u": "m",
+   "g": "core"
   },
   "HKR": {
    "n": "Hanging knee raise",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "g": "core"
   },
   "POGO": {
    "n": "Pogo jumps",
    "inc": 0,
-   "u": "contacten"
+   "u": "contacten",
+   "g": "plyo"
   },
   "LPOG": {
    "n": "Laterale pogo's (per kant)",
    "inc": 0,
-   "u": "contacten"
+   "u": "contacten",
+   "g": "plyo"
   },
   "SNAP": {
    "n": "Snap-down → verticale sprong",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "g": "plyo"
   },
   "BOX": {
    "n": "Box jump (stap eraf)",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "alt": [
+    "SNAP"
+   ],
+   "g": "plyo"
   },
   "BND": {
    "n": "Bounds (20 m)",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "g": "plyo"
   },
   "SLH": {
    "n": "Single-leg hop vooruit (per been)",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "g": "plyo"
   },
   "SKI": {
    "n": "SkiErg (meter)",
    "inc": 0,
-   "u": "m"
+   "u": "m",
+   "time": true,
+   "g": "hyrox"
   },
   "ROW": {
    "n": "RowErg (meter)",
    "inc": 0,
-   "u": "m"
+   "u": "m",
+   "time": true,
+   "g": "hyrox"
   },
   "FC": {
    "n": "Farmers carry (meter, kg per hand)",
    "inc": 2,
-   "u": "m"
+   "u": "m",
+   "time": true,
+   "g": "hyrox"
   },
   "WB": {
    "n": "Wall balls",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "time": true,
+   "g": "hyrox"
   },
   "BBJ": {
    "n": "Burpee broad jumps",
    "inc": 0,
-   "u": "reps"
+   "u": "reps",
+   "time": true,
+   "g": "hyrox"
   },
   "SLP": {
    "n": "Sled push (meter)",
    "inc": 10,
-   "u": "m"
+   "u": "m",
+   "time": true,
+   "g": "hyrox"
   },
   "SLL": {
    "n": "Sled pull (meter)",
    "inc": 10,
-   "u": "m"
+   "u": "m",
+   "time": true,
+   "g": "hyrox"
   },
   "SBL": {
    "n": "Sandbag lunges (meter)",
    "inc": 0,
-   "u": "m"
+   "u": "m",
+   "time": true,
+   "g": "hyrox"
+  },
+  "HSQ": {
+   "n": "Hack squat",
+   "inc": 5,
+   "g": "quads"
+  },
+  "GSQ": {
+   "n": "Goblet squat",
+   "inc": 2,
+   "g": "quads"
+  },
+  "BEX": {
+   "n": "Back extension (+ kg)",
+   "inc": 2.5,
+   "g": "hamstrings"
+  },
+  "LUN": {
+   "n": "Walking lunge (dumbbells totaal)",
+   "inc": 2,
+   "g": "quads"
+  },
+  "LPC": {
+   "n": "Calf raise op leg press",
+   "inc": 5,
+   "g": "kuiten"
+  },
+  "DBB": {
+   "n": "Dumbbell bench press",
+   "inc": 2,
+   "g": "borst"
+  },
+  "MCP": {
+   "n": "Machine chest press",
+   "inc": 2.5,
+   "g": "borst"
+  },
+  "IBB": {
+   "n": "Incline barbell press",
+   "inc": 2.5,
+   "g": "borst"
+  },
+  "DBS": {
+   "n": "Dumbbell shoulder press",
+   "inc": 2,
+   "g": "schouders"
+  },
+  "SRW": {
+   "n": "Seated cable row",
+   "inc": 2.5,
+   "g": "rug"
+  },
+  "DBR": {
+   "n": "Dumbbell row (per kant)",
+   "inc": 2,
+   "g": "rug"
+  },
+  "PDK": {
+   "n": "Pec deck",
+   "inc": 2.5,
+   "g": "borst"
   }
  },
  "weeks": [
@@ -297,7 +495,8 @@
        "t": "run",
        "title": "3 × 2 km @ 4:40–4:45",
        "detail": "WU 2 km easy + 4 strides\n3 × 2 km @ 4:40–4:45, 2 min jog\nCD 2 km\nTotaal ~10 km · RPE 6",
-       "min": 55
+       "min": 55,
+       "km": 10
       },
       {
        "id": "2026-11-10-b",
@@ -492,7 +691,8 @@
        "t": "run",
        "title": "Easy 7–8 km + 6 strides",
        "detail": "HF ≤ 145 · ~5:40–6:00/km · RPE 2–3\n6 × 20 s strides, 80 s wandel/jog",
-       "min": 50
+       "min": 50,
+       "km": 7.5
       }
      ]
     },
@@ -583,7 +783,8 @@
        "t": "run",
        "title": "Shake-out 4–5 km + 4 strides",
        "detail": "Heel rustig, HF ≤ 140.",
-       "min": 30
+       "min": 30,
+       "km": 4.5
       }
      ]
     },
@@ -595,7 +796,8 @@
        "t": "race",
        "title": "Zevenheuvelenloop 15 km",
        "detail": "Km 1–3 @ 4:50–4:55 · heuvels op gevoel, HF < 170 · laatste 4–5 km evt. 4:35–4:40.\nNa afloop: noteer gemiddelde HF bij ~4:45 en hoe je rug voelt.",
-       "min": 75
+       "min": 75,
+       "km": 15
       }
      ]
     }
@@ -693,7 +895,8 @@
        "t": "run",
        "title": "Easy 8 km + 6 strides",
        "detail": "HF ≤ 145 · 5:40–6:00/km · RPE 2–3\nStrides 6 × 20 s @ ~3:45/km-gevoel, 80 s herstel. Alleen als de benen soepel zijn.",
-       "min": 50
+       "min": 50,
+       "km": 8
       },
       {
        "id": "2026-11-17-b",
@@ -817,7 +1020,8 @@
        "t": "run",
        "title": "5 × 5 min @ drempel",
        "detail": "WU 2,5 km + loopscholing (A-skip, B-skip, skippings 2×20 m) + 3 strides\n5 × 5 min @ 4:22–4:28/km · 90 s jog\nHF loopt op tot 165–172 in de laatste minuten · RPE 7, níét 9\nCD 2 km · totaal ~11–12 km\nEerste blok NIET sneller dan 4:22.",
-       "min": 60
+       "min": 60,
+       "km": 11.5
       },
       {
        "id": "2026-11-19-b",
@@ -966,7 +1170,8 @@
        "t": "run",
        "title": "Lange duur 20–22 km",
        "detail": "Eerste 16 km @ 5:40–5:55 (HF ≤ 145)\nLaatste 4–5 km @ 5:00–5:10 (steady, HF ≤ 158)\nVoeding: 1 gel per 30 min vanaf 45 min → noteer gram/uur + maag.",
-       "min": 125
+       "min": 125,
+       "km": 21
       }
      ]
     },
@@ -1049,7 +1254,8 @@
       }
      ]
     }
-   ]
+   ],
+   "vert": 0
   },
   {
    "id": "2026-W48",
@@ -1066,7 +1272,8 @@
        "t": "run",
        "title": "Easy 8 km + 6 strides",
        "detail": "HF ≤ 145 · RPE 2–3",
-       "min": 50
+       "min": 50,
+       "km": 8
       },
       {
        "id": "2026-11-23-b",
@@ -1142,7 +1349,8 @@
        "t": "run",
        "title": "5 × 1200 m @ 4:08–4:14",
        "detail": "WU 2,5 km + loopscholing + 3 strides\nPlyo in de warming-up: pogo 2×15, snap-down 3×3\n5 × 1200 m @ 4:08–4:14/km · 2 min jog\nCD 2 km · totaal ~12 km · RPE 8 in de laatste herhaling",
-       "min": 60
+       "min": 60,
+       "km": 12
       },
       {
        "id": "2026-11-24-b",
@@ -1231,7 +1439,8 @@
        "t": "run",
        "title": "2 × 15 min @ 4:25–4:32",
        "detail": "WU 2,5 km\n2 × 15 min @ 4:25–4:32 · 3 min jog · HF ≤ 170\nCD 2 km · totaal ~13 km · RPE 7",
-       "min": 65
+       "min": 65,
+       "km": 13
       },
       {
        "id": "2026-11-26-b",
@@ -1364,7 +1573,8 @@
        "t": "run",
        "title": "Lange duur 22–24 km",
        "detail": "Easy @ 5:40–5:55 · HF ≤ 145\nVoeding 60–70 g/u (gels/drink) → noteren",
-       "min": 135
+       "min": 135,
+       "km": 23
       }
      ]
     },
@@ -1376,7 +1586,9 @@
        "t": "run",
        "title": "Incline loopband 40 min (powerhike)",
        "detail": "10 min easy op 1%\n4 × 5 min powerhike @ 12–15% helling, 5,0–5,5 km/u, 2 min op 1%\nHF 135–155 · stokken-arminzet nadoen\nDit is je eerste vertical-blok: rustig, geen spierpijn opzoeken.",
-       "min": 40
+       "min": 40,
+       "km": 4,
+       "hm": 230
       },
       {
        "id": "2026-11-29-b",
@@ -1446,7 +1658,8 @@
       }
      ]
     }
-   ]
+   ],
+   "vert": 250
   },
   {
    "id": "2026-W49",
@@ -1463,7 +1676,8 @@
        "t": "run",
        "title": "Easy 9 km + 6 strides",
        "detail": "HF ≤ 145",
-       "min": 55
+       "min": 55,
+       "km": 9
       },
       {
        "id": "2026-11-30-b",
@@ -1539,7 +1753,8 @@
        "t": "run",
        "title": "8 × 800 m @ 3:58–4:05",
        "detail": "WU 2,5 km + loopscholing\nPlyo in warming-up: zie plyo-sessie Wo (licht)\n8 × 800 m @ 3:58–4:05/km · 400 m jog (2:30)\nCD 2 km · totaal ~12,5 km · RPE 8",
-       "min": 60
+       "min": 60,
+       "km": 12.5
       },
       {
        "id": "2026-12-01-b",
@@ -1663,7 +1878,8 @@
        "t": "run",
        "title": "3 × 12 min @ 4:25–4:30",
        "detail": "WU 2,5 km\n3 × 12 min @ 4:25–4:30 · 2 min jog\nCD 2 km · totaal ~14 km · RPE 7",
-       "min": 70
+       "min": 70,
+       "km": 14
       },
       {
        "id": "2026-12-03-b",
@@ -1797,7 +2013,8 @@
        "t": "run",
        "title": "Lange duur 26 km",
        "detail": "Easy @ 5:40–5:55, HF ≤ 145 · laatste 5 km @ 5:00–5:10\nVoeding 70 g/u → noteren",
-       "min": 150
+       "min": 150,
+       "km": 26
       }
      ]
     },
@@ -1816,11 +2033,14 @@
        "t": "run",
        "title": "Incline loopband 30 min",
        "detail": "3 × 6 min powerhike @ 15% · 2 min vlak",
-       "min": 30
+       "min": 30,
+       "km": 3,
+       "hm": 240
       }
      ]
     }
-   ]
+   ],
+   "vert": 300
   },
   {
    "id": "2026-W50",

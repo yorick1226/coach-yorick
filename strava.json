@@ -1,0 +1,555 @@
+{
+"updated": "2026-11-11",
+"source": "Strava (opgehaald door coach)",
+"activities": [
+{
+"id": "20936678110",
+"date": "2026-11-10",
+"sport": "WeightTraining",
+"name": "Push day",
+"sec": 3658
+},
+{
+"id": "20930811055",
+"date": "2026-11-10",
+"sport": "Run",
+"name": "Ochtendloop · 3×2 km",
+"sec": 3021,
+"km": 10.01,
+"hm": 18,
+"hr": 133,
+"laps": [
+{
+"m": 1000,
+"sec": 322,
+"hr": 131
+},
+{
+"m": 1000,
+"sec": 330,
+"hr": 111
+},
+{
+"m": 1000,
+"sec": 278,
+"hr": 119
+},
+{
+"m": 1000,
+"sec": 281,
+"hr": 120
+},
+{
+"m": 1000,
+"sec": 285,
+"hr": 136
+},
+{
+"m": 1000,
+"sec": 283,
+"hr": 143
+},
+{
+"m": 1000,
+"sec": 285,
+"hr": 142
+},
+{
+"m": 1000,
+"sec": 286,
+"hr": 147
+},
+{
+"m": 1000,
+"sec": 336,
+"hr": 126
+},
+{
+"m": 1000,
+"sec": 330,
+"hr": 153
+}
+]
+},
+{
+"id": "20912349655",
+"date": "2026-11-08",
+"sport": "Ride",
+"name": "Namiddagrit",
+"sec": 8931,
+"km": 67.38,
+"hm": 55,
+"hr": 130,
+"w": 157
+},
+{
+"id": "20893972229",
+"date": "2026-11-07",
+"sport": "Run",
+"name": "Intervals",
+"sec": 2545,
+"km": 8.0,
+"hm": 1,
+"hr": 152,
+"laps": [
+{
+"m": 1000,
+"sec": 361,
+"hr": 144
+},
+{
+"m": 644,
+"sec": 241,
+"hr": 155
+},
+{
+"m": 950,
+"sec": 241,
+"hr": 167
+},
+{
+"m": 442,
+"sec": 186,
+"hr": 143
+},
+{
+"m": 957,
+"sec": 240,
+"hr": 170
+},
+{
+"m": 301,
+"sec": 130,
+"hr": 142
+},
+{
+"m": 957,
+"sec": 242,
+"hr": 169
+},
+{
+"m": 223,
+"sec": 87,
+"hr": 130
+},
+{
+"m": 959,
+"sec": 240,
+"hr": 169
+},
+{
+"m": 1000,
+"sec": 371,
+"hr": 138
+},
+{
+"m": 571,
+"sec": 205,
+"hr": 140
+}
+]
+},
+{
+"id": "20883273612",
+"date": "2026-11-06",
+"sport": "Workout",
+"name": "Namiddagtraining",
+"sec": 5277
+},
+{
+"id": "20872906303",
+"date": "2026-11-05",
+"sport": "Run",
+"name": "Benen loslopen",
+"sec": 2257,
+"km": 7.01,
+"hm": 12
+},
+{
+"id": "20853006799",
+"date": "2026-11-04",
+"sport": "WeightTraining",
+"name": "Ochtendsessie krachttraining",
+"sec": 3695
+},
+{
+"id": "20846280710",
+"date": "2026-11-03",
+"sport": "WeightTraining",
+"name": "Avondsessie krachttraining",
+"sec": 3969
+},
+{
+"id": "20840840392",
+"date": "2026-11-03",
+"sport": "WeightTraining",
+"name": "Middagsessie krachttraining",
+"sec": 1882
+},
+{
+"id": "20832651427",
+"date": "2026-11-02",
+"sport": "Run",
+"name": "Recovery run",
+"sec": 2158,
+"km": 6.13,
+"hm": 13
+},
+{
+"id": "20825955327",
+"date": "2026-11-02",
+"sport": "WeightTraining",
+"name": "Ochtendsessie krachttraining",
+"sec": 3127
+},
+{
+"id": "20803668817",
+"date": "2026-10-31",
+"sport": "Run",
+"name": "Cauberg trail 2026",
+"sec": 16990,
+"km": 44.62,
+"hm": 891,
+"hr": 150
+},
+{
+"id": "20782339088",
+"date": "2026-10-29",
+"sport": "Run",
+"name": "Avondloop",
+"sec": 2065,
+"km": 5.39,
+"hm": 12
+},
+{
+"id": "20755438973",
+"date": "2026-10-27",
+"sport": "WeightTraining",
+"name": "Avondsessie krachttraining",
+"sec": 4587
+},
+{
+"id": "20748641791",
+"date": "2026-10-27",
+"sport": "Run",
+"name": "Ochtendloop",
+"sec": 2701,
+"km": 7.81,
+"hm": 18
+},
+{
+"id": "20742025315",
+"date": "2026-10-26",
+"sport": "Swim",
+"name": "Avondzwemsessie",
+"sec": 1832,
+"km": 1.575
+},
+{
+"id": "20723513700",
+"date": "2026-10-25",
+"sport": "WeightTraining",
+"name": "Ochtendsessie krachttraining",
+"sec": 4051
+},
+{
+"id": "20711934543",
+"date": "2026-10-24",
+"sport": "TrailRun",
+"name": "Middagsessie trailrunning",
+"sec": 7636,
+"km": 19.48,
+"hm": 572
+},
+{
+"id": "20691682978",
+"date": "2026-10-22",
+"sport": "WeightTraining",
+"name": "Avondsessie krachttraining",
+"sec": 5074
+},
+{
+"id": "20684555093",
+"date": "2026-10-22",
+"sport": "Run",
+"name": "Ochtendloop",
+"sec": 2423,
+"km": 7.9,
+"hm": 19
+},
+{
+"id": "20679236251",
+"date": "2026-10-21",
+"sport": "WeightTraining",
+"name": "Mobility work",
+"sec": 2397
+},
+{
+"id": "20674732744",
+"date": "2026-10-21",
+"sport": "Run",
+"name": "Namiddagloop",
+"sec": 2135,
+"km": 6.15,
+"hm": 15
+},
+{
+"id": "20664768283",
+"date": "2026-10-20",
+"sport": "Workout",
+"name": "HRX",
+"sec": 3456
+},
+{
+"id": "20659349331",
+"date": "2026-10-20",
+"sport": "Run",
+"name": "Middagloop",
+"sec": 2345,
+"km": 6.75,
+"hm": 23
+},
+{
+"id": "20624772562",
+"date": "2026-10-17",
+"sport": "TrailRun",
+"name": "Namiddagsessie trailrunning",
+"sec": 8116,
+"km": 23.05,
+"hm": 309,
+"hr": 149
+},
+{
+"id": "20606428561",
+"date": "2026-10-16",
+"sport": "Run",
+"name": "Lunch run",
+"sec": 2701,
+"km": 7.72,
+"hm": 13,
+"hr": 134
+},
+{
+"id": "20600607694",
+"date": "2026-10-15",
+"sport": "WeightTraining",
+"name": "Nachtsessie krachttraining",
+"sec": 3601
+},
+{
+"id": "20585776595",
+"date": "2026-10-14",
+"sport": "HighIntensityIntervalTraining",
+"name": "Hrx engine class",
+"sec": 3056,
+"hr": 156
+},
+{
+"id": "20581645478",
+"date": "2026-10-14",
+"sport": "Run",
+"name": "Recovery run",
+"sec": 3810,
+"km": 10.97,
+"hm": 15,
+"hr": 149
+},
+{
+"id": "20540736914",
+"date": "2026-10-11",
+"sport": "Run",
+"name": "Lunch Run",
+"sec": 7606,
+"km": 22.36,
+"hm": 87,
+"hr": 144
+},
+{
+"id": "20516416892",
+"date": "2026-10-09",
+"sport": "Run",
+"name": "Afternoon Run",
+"sec": 3791,
+"km": 11.01,
+"hm": 31,
+"hr": 146
+},
+{
+"id": "20499231610",
+"date": "2026-10-08",
+"sport": "WeightTraining",
+"name": "Morning Weight Training",
+"sec": 3712
+},
+{
+"id": "20488053854",
+"date": "2026-10-07",
+"sport": "Run",
+"name": "Afternoon Run",
+"sec": 2747,
+"km": 8.46,
+"hm": 18,
+"hr": 148
+},
+{
+"id": "20478504677",
+"date": "2026-10-06",
+"sport": "Run",
+"name": "Avondloop",
+"sec": 2489,
+"km": 8.5,
+"hm": 9,
+"hr": 159
+},
+{
+"id": "20463564341",
+"date": "2026-10-05",
+"sport": "WeightTraining",
+"name": "Avondsessie krachttraining",
+"sec": 4374
+},
+{
+"id": "20451221955",
+"date": "2026-10-04",
+"sport": "Run",
+"name": "Afternoon Run",
+"sec": 8357,
+"km": 20.01,
+"hm": 38
+},
+{
+"id": "20416744112",
+"date": "2026-10-02",
+"sport": "WeightTraining",
+"name": "Ochtendsessie krachttraining",
+"sec": 4411
+},
+{
+"id": "20411681813",
+"date": "2026-10-01",
+"sport": "WeightTraining",
+"name": "Evening Weight Training",
+"sec": 4824
+},
+{
+"id": "20403100168",
+"date": "2026-10-01",
+"sport": "Run",
+"name": "Morning Run",
+"sec": 1944,
+"km": 6.28,
+"hm": 9
+},
+{
+"id": "20398527768",
+"date": "2026-09-30",
+"sport": "Run",
+"name": "Avondloop",
+"sec": 1627,
+"km": 5.71,
+"hm": 11
+},
+{
+"id": "20378335193",
+"date": "2026-09-29",
+"sport": "Run",
+"name": "Namiddagloop",
+"sec": 1778,
+"km": 5.18,
+"hm": 12
+},
+{
+"id": "20369327796",
+"date": "2026-09-28",
+"sport": "WeightTraining",
+"name": "Night Weight Training",
+"sec": 3411
+},
+{
+"id": "20351608754",
+"date": "2026-09-27",
+"sport": "Run",
+"name": "Namiddagloop",
+"sec": 6748,
+"km": 21.21,
+"hm": 45
+},
+{
+"id": "20327823301",
+"date": "2026-09-25",
+"sport": "Ride",
+"name": "Evening Ride",
+"sec": 7479,
+"km": 66.68,
+"hm": 52
+},
+{
+"id": "20312833902",
+"date": "2026-09-24",
+"sport": "Run",
+"name": "Namiddagloop",
+"sec": 2924,
+"km": 9.01,
+"hm": 14
+},
+{
+"id": "20286881331",
+"date": "2026-09-22",
+"sport": "Ride",
+"name": "Avondrit",
+"sec": 6936,
+"km": 66.69,
+"hm": 69
+},
+{
+"id": "20254434401",
+"date": "2026-09-20",
+"sport": "Run",
+"name": "Dam tot Damloop 2026",
+"sec": 4778,
+"km": 16.27,
+"hm": 78
+},
+{
+"id": "20240622870",
+"date": "2026-09-19",
+"sport": "WeightTraining",
+"name": "Namiddagsessie krachttraining",
+"sec": 3382
+},
+{
+"id": "20228660281",
+"date": "2026-09-18",
+"sport": "Run",
+"name": "Namiddagloop",
+"sec": 1697,
+"km": 5.01,
+"hm": 11
+},
+{
+"id": "20204386354",
+"date": "2026-09-16",
+"sport": "Ride",
+"name": "Evening Ride",
+"sec": 6266,
+"km": 55.31,
+"hm": 115
+},
+{
+"id": "20197385298",
+"date": "2026-09-16",
+"sport": "Run",
+"name": "Ochtendloop",
+"sec": 2400,
+"km": 6.44,
+"hm": 15
+},
+{
+"id": "20188464917",
+"date": "2026-09-15",
+"sport": "WeightTraining",
+"name": "Avondsessie krachttraining",
+"sec": 3348
+}
+]
+}
