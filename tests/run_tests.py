@@ -48,7 +48,7 @@ def static_checks(cur: pathlib.Path, prev: pathlib.Path):
     ok(all(cq.get(v) == body for v, body in pq), "bestaande check-in-vragensets ongewijzigd")
     cache = lambda d: re.search(r"const CACHE = '([^']+)'", (d/"sw.js").read_text()).group(1)
     if cur != prev: ok(cache(cur) != cache(prev), f"cachenummer opgehoogd ({cache(prev)} → {cache(cur)})")
-    for f in ["manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "ONDERHOUD.md", "ics/all.ics"]:
+    for f in ["manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "ONDERHOUD.md", "ics/all.ics", "splash-1179x2556.png", "splash-1290x2796.png", "splash-1170x2532.png", "splash-1125x2436.png"]:
         ok((cur/f).exists(), f"{f} aanwezig")
     for w in plan["weeks"]:
         if w["days"]: ok((cur/"ics"/f"{w['id']}.ics").exists(), f"ics/{w['id']}.ics aanwezig")
@@ -69,6 +69,9 @@ class Srv:
 
 def store(pg): return json.loads(pg.evaluate("localStorage.getItem('yorick-coach')") or "{}")
 def tab(pg, t): pg.click(f'[data-tab="{t}"]')
+def focus(pg, c):
+    """Oefening in de logger openklappen (focusmodus vanaf v2.3)."""
+    if pg.locator(f'[data-exfocus="{c}"]').count(): pg.click(f'[data-exfocus="{c}"]')
 def ensure_open(pg, sid):
     """Kaart uitklappen als de invulvelden ingeklapt zijn (vanaf v2.1)."""
     if pg.locator(f'[data-min="{sid}"]').count() == 0 and pg.locator(f'[data-open="{sid}"]').count():
@@ -107,10 +110,18 @@ def features(pg, shots=True):
     pg.fill('[data-dly="rd"]', "55"); pg.dispatch_event('[data-dly="rd"]', "change"); pg.fill('[data-dly="sl"]', "72"); pg.dispatch_event('[data-dly="sl"]', "change")
     pg.click('[data-dlyc="legs"][data-v="3"]')
     ok("ROOD" in pg.inner_text("#advice"), "ochtendcheck: readiness 55 → advies ROOD")
+    pg.click('[data-ploc="Kuit L"]'); pg.click('[data-pscore="Kuit L"][data-v="5"]')
+    ok(store(pg)["daily"]["2026-11-17"]["pains"] == {"Kuit L": 5} and "Kuit L" in pg.inner_text("#advice"), "pijn per plek vastgelegd en in advies")
+    ok(pg.locator(".strip button").count() == 7, "weekstrip zichtbaar")
+    pg.click('[data-strip="2026-11-18"]'); ok("wo 18 nov" in pg.inner_text("#htitle"), "weekstrip: tik naar andere dag")
+    pg.click('[data-strip="2026-11-17"]'); ok("Vandaag" in pg.inner_text("#htitle"), "terug naar vandaag")
+    pg.click('[data-info="rpe"]'); ok(pg.locator(".info").count() >= 1, "uitleg RPE via ⓘ")
     if shots: pg.screenshot(path=str(OUT/"vandaag.png"))
     # sessie-RPE + verplaatsen + overslaan
     tab(pg, "week"); pg.wait_for_selector("#stats")
     for sid in ("2026-11-17-a", "2026-11-19-a", "2026-11-18-b", "2026-11-21-a"): ensure_open(pg, sid)
+    ok(pg.locator("#loadwarn").count() == 1, "waarschuwing bij snelle opbouw (W47 na rustige weken)")
+    pg.fill('[data-min="2026-11-17-a"]', "90"); pg.press('[data-min="2026-11-17-a"]', "Tab")
     pg.click('[data-srpe="2026-11-17-a"][data-v="4"]')
     pg.click('[data-done="2026-11-16-a"]')
     pg.click('[data-menu="2026-11-19-a"]'); pg.click('[data-move="2026-11-19-a"][data-to="2026-11-20"]')
@@ -122,11 +133,16 @@ def features(pg, shots=True):
     ok("Alternatief: Ingekort" in pg.inner_text("#s_2026-11-21-a"), "alternatief zichtbaar op de kaart")
     pg.click('[data-logger="2026-11-18-a"]'); pg.wait_for_selector('[data-rep="POGO"]')
     ok(pg.locator('[data-kg="POGO"]').count() == 0 and pg.locator('[data-kg="BOX"]').count() == 0, "geen kg-veld bij plyo")
-    pg.click('[data-rep="BOX"][data-r="3"]'); bx = [x for x in store(pg)["sets"] if x["code"] == "BOX"][-1]
+    focus(pg, "BOX"); pg.click('[data-rep="BOX"][data-r="3"]'); bx = [x for x in store(pg)["sets"] if x["code"] == "BOX"][-1]
     ok(bx.get("kg") is None and bx["reps"] == 3, "box jump gelogd zonder kg")
     tab(pg, "week")
     ok("sessies" in pg.inner_text("#stats"), "compacte weekcijfers zichtbaar")
-    pg.click('[data-stats="1"]'); ok("Belasting" in pg.inner_text("#stats"), "weekcijfers uitklapbaar")
+    pg.click('[data-stats="1"]'); ok("Belasting" in pg.inner_text("#stats") and "Harde sets per spiergroep" in pg.inner_text("#stats"), "weekcijfers uitklapbaar, met sets per spiergroep vs doel")
+    tab(pg, "vandaag"); ok("Voeding loggen" in pg.inner_text("#view"), "voedingsherinnering bij sessie > 75 min")
+    if shots:
+        pg.evaluate("""()=>{const m=document.querySelector('#view');const T=x=>new Touch({identifier:1,target:m,clientX:x,clientY:400});m.dispatchEvent(new TouchEvent('touchstart',{touches:[T(320)],bubbles:true}));m.dispatchEvent(new TouchEvent('touchend',{changedTouches:[T(80)],bubbles:true}));}""")
+        ok("wo 18 nov" in pg.inner_text("#htitle"), "vegen naar volgende dag")
+    tab(pg, "week")
     if shots: pg.screenshot(path=str(OUT/"week.png"), full_page=False)
     # Strava-koppeling vorige week
     pg.click("#prev"); pg.wait_for_selector("#s_2026-11-10-a")
@@ -141,12 +157,12 @@ def features(pg, shots=True):
     pg.click('[data-rir="2026-11-24-b|SQ"][data-v="1"]'); pg.click('[data-rep="SQ"][data-r="5"]')
     last = [s for s in store(pg)["sets"] if s["sid"] == "2026-11-24-b"][-1]
     ok(last["kg"] == 62.5 and last["rir"] == 1, f"komma-invoer 62,5 en RIR 1 opgeslagen ({last.get('kg')}, {last.get('rir')})")
-    pg.click('[data-swapopen="RDL"]'); pg.locator('[data-pickex="HT"][data-mode="swap"]').first.click()
+    focus(pg, "RDL"); pg.click('[data-swapopen="RDL"]'); pg.locator('[data-pickex="HT"][data-mode="swap"]').first.click()
     ok("Hip thrust" in pg.inner_text("#ex_RDL"), "oefening gewisseld (RDL → hip thrust)")
     pg.fill('[data-kg="HT"]', "80"); pg.dispatch_event('[data-kg="HT"]', "change"); pg.click('[data-rep="HT"][data-r="8"]')
     ht = [s for s in store(pg)["sets"] if s["code"] == "HT"][-1]; ok(ht["pc"] == "RDL", "set gelogd onder vervangende code, met verwijzing naar origineel")
     # vrij wisselen via zoeken, toevoegen, eigen oefening, overslaan
-    pg.click('[data-swapopen="BSS"]'); pg.fill('[data-exsearch]', "leg pr")
+    focus(pg, "BSS"); pg.click('[data-swapopen="BSS"]'); pg.fill('[data-exsearch]', "leg pr")
     vis = pg.locator('.exlist [data-pickex]:visible'); ok(vis.count() >= 1 and vis.count() < 6, f"zoeken filtert de lijst ({vis.count()} treffers)")
     pg.locator('.exlist [data-pickex="LP"]').click(); ok("Leg press" in pg.inner_text("#ex_BSS"), "wissel naar willekeurige oefening via zoeken")
     pg.click('[data-addopen="1"]'); pg.fill('[data-exsearch]', "face"); pg.locator('.exlist [data-pickex="FP"]').click()
@@ -156,7 +172,7 @@ def features(pg, shots=True):
     pg.click('[data-addopen="1"]'); pg.fill('[data-newname]', "Sled drag"); pg.select_option('[data-newunit]', "m"); pg.click('[data-newex="1"]')
     cust = store(pg)["custom"]; code = next((k for k, v in cust.items() if v["n"] == "Sled drag"), None)
     ok(code and code.startswith("U_") and pg.locator(f"#ex_{code}").count() == 1 and pg.locator(f'[data-kg="{code}"]').count() == 0, "eigen oefening aangemaakt (zonder kg bij meters)")
-    pg.click('[data-exskip="CR"]'); ok(store(pg)["exskip"].get("2026-11-24-b|CR") is True and "overgeslagen" in pg.inner_text("#ex_CR"), "oefening overgeslagen")
+    focus(pg, "CR"); pg.click('[data-exskip="CR"]'); ok(store(pg)["exskip"].get("2026-11-24-b|CR") is True and "overgeslagen" in pg.inner_text("#ex_CR"), "oefening overgeslagen")
     if shots: pg.screenshot(path=str(OUT/"logger.png"))
     # Hyrox tijd
     tab(pg, "week"); pg.click("#prev"); pg.click('[data-logger="2026-11-20-a"]'); pg.wait_for_selector('[data-secx="SKI"]')
@@ -179,7 +195,7 @@ def features(pg, shots=True):
     if not good: print(txt[:2500])
     ok(good, "export bevat sets en check-in")
     ok("niet uitgevoerd: Agenda" in txt and "ALTERNATIEF: Ingekort" in txt and "verplaatst van" in txt and "RPE 4" in txt, "export bevat niet-uitvoeren, alternatief, verplaatsen en RPE")
-    ok("Oura readiness 55" in txt, "export bevat Oura-ochtendcheck")
+    ok("Oura readiness 55" in txt and "pijn Kuit L 5" in txt, "export bevat Oura-ochtendcheck en pijn per plek")
     ok("(afgevinkt zonder te loggen)" in txt, "afvinken zonder loggen is prima en staat in de export")
     if shots: pg.screenshot(path=str(OUT/"checkin.png"))
     # Back-up, herstel, ongedaan maken

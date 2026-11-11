@@ -11,6 +11,10 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="splash-1125x2436.png">
 <title>Coach</title>
 <style>
 :root{--bg:#0d0f12;--card:#171a1f;--card2:#1f232a;--line:#2a2f37;--tx:#eef1f5;--mut:#9aa3ae;--acc:#4ade80;--acc2:#22c55e;--warn:#f5b942;--bad:#f87171;--blue:#60a5fa;--str:#fc6a2c}
@@ -66,7 +70,9 @@ label.f{display:block;font-size:14px;color:var(--mut);margin:10px 2px 4px}
 .chip.tgt{border-color:var(--acc)}
 .chips.sm .chip{min-width:44px;min-height:44px;font-size:15px}
 .kg{display:flex;align-items:center;gap:8px;margin-top:10px}
-.kg input{flex:1;text-align:center;font-size:22px;font-weight:700}
+.kg input{flex:1;text-align:center;font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;min-height:60px}
+.kg .btn{min-height:60px;min-width:60px;font-size:26px}
+.chips.big .chip{min-width:58px;min-height:58px;font-size:22px}
 .sets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .set{background:#0f2417;border:1px solid #1f5134;border-radius:10px;padding:6px 8px;font-size:15px;display:flex;align-items:center;gap:6px}
 .set button{background:none;border:0;color:var(--bad);font-size:20px;min-width:36px;min-height:36px}
@@ -78,10 +84,14 @@ nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:6;display:grid;grid-temp
 nav.tabs button{background:none;border:0;color:var(--mut);font:inherit;font-size:12px;font-weight:600;min-height:58px;padding:4px 0}
 nav.tabs button span{display:block;font-size:20px;line-height:1.2}
 nav.tabs button.on{color:var(--acc)}
-#timer{position:fixed;left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom));z-index:7;background:#11331f;border:1px solid var(--acc2);border-radius:14px;padding:8px 10px;display:none;align-items:center;gap:8px;max-width:624px;margin:0 auto}
+#timer{position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:7;display:none;align-items:center;gap:8px;flex-direction:row-reverse}
 #timer.show{display:flex}
-#timer.end{background:#3a2a0b;border-color:var(--warn)}
-#timer .t{flex:1;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+#ring{width:84px;height:84px;border-radius:50%;background:#0b1a12;border:0;padding:0;position:relative;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+#ring svg{position:absolute;inset:0}
+#ring .t{position:relative;font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--tx)}
+#timer.end #ring{background:#3a2a0b}
+#tctl{display:none;gap:6px;background:#0b0d10;border:1px solid var(--line);border-radius:14px;padding:6px}
+#timer.ctl #tctl{display:flex}
 #flash{position:fixed;inset:0;z-index:20;background:var(--acc2);display:none;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#04140a;pointer-events:none}
 #flash.show{display:flex;animation:fl 1.6s ease-out forwards}
 @keyframes fl{0%{opacity:1}70%{opacity:.9}100%{opacity:0}}
@@ -101,6 +111,22 @@ h3{margin:4px 0 6px;font-size:17px}
 svg text{fill:var(--mut);font-size:10px}
 .pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700;margin-left:4px}
 .pill.o{background:#2b2108;color:var(--warn)}
+.sess{border-left:5px solid var(--tc,var(--line))}
+.tag.c{background:color-mix(in srgb, var(--tc) 18%, transparent);color:var(--tc)}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px}
+.strip button{background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--mut);font:inherit;font-size:12px;padding:6px 0 8px;min-height:62px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.strip button b{font-size:17px;color:var(--tx)}
+.strip button.sel{border-color:var(--acc);background:#0f2417}
+.strip button.td b{color:var(--acc)}
+.dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line)}
+.dot.ok{background:var(--acc2);border-color:var(--acc2)}.dot.part{background:var(--warn);border-color:var(--warn)}.dot.miss{background:var(--bad);border-color:var(--bad)}
+.dot.alt{background:var(--blue);border-color:var(--blue)}.dot.rest{border-style:dashed}
+.exrow{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--tx);font:inherit;min-height:56px;padding:8px 12px;margin-bottom:8px}
+.exrow.done{border-color:#1f5134;background:#132018}
+.exfocus{border:2px solid var(--acc)}
+.info{background:#0f1a2a;border:1px solid #23406a;border-radius:10px;padding:8px 10px;font-size:14px;margin-top:6px;color:#cfe0ff}
+.ib{background:none;border:1px solid #23406a;color:#9cc2ff;border-radius:50%;width:26px;height:26px;min-width:26px;font-size:13px;font-weight:700;margin-left:6px;padding:0}
+.race{display:inline-block;background:#2b2108;color:var(--warn);border-radius:99px;padding:4px 10px;font-size:14px;font-weight:600;margin:0 6px 8px 0}
 </style>
 </head>
 <body>
@@ -112,8 +138,8 @@ svg text{fill:var(--mut);font-size:10px}
   </div>
 </header>
 <main id="view"><p class="mut">Laden…</p></main>
-<div id="timer"><div class="t" id="tval">0:00</div>
-  <button class="btn sm" data-tadd="-15">−15</button><button class="btn sm" data-tadd="15">+15</button><button class="btn sm" id="tstop">Stop</button></div>
+<div id="timer"><button id="ring" aria-label="Rusttimer"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="37" fill="none" stroke="#1f2a24" stroke-width="6"/><circle id="rarc" cx="42" cy="42" r="37" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" transform="rotate(-90 42 42)" stroke-dasharray="232.5" stroke-dashoffset="0"/></svg><span class="t" id="tval">0:00</span></button>
+  <div id="tctl"><button class="btn sm" data-tadd="-15">−15</button><button class="btn sm" data-tadd="15">+15</button><button class="btn sm" id="tstop">Stop</button></div></div>
 <div id="flash">RUST VOORBIJ</div>
 <div class="toast" id="toast"></div>
 <nav class="tabs" id="tabs">
@@ -128,7 +154,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '2.3.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -156,6 +182,13 @@ const TYPE_LABEL = {run:'Lopen',bike:'Fiets',swim:'Zwem',strength:'Kracht',plyo:
 const DAYS = ['ma','di','wo','do','vr','za','zo'];
 const SLOTS = ['Niet','1×','2×','Alleen ochtend','Alleen avond','Lang'];
 const SKIPS = ['Ziek','Agenda','Vermoeid','Pijn','Weer','Anders'];
+const TYPE_ICON = {run:'🏃',bike:'🚴',swim:'🏊',strength:'🏋️',plyo:'⚡',hyrox:'🔥',mobility:'🧘',rest:'😴',race:'🏁'};
+const TYPE_COLOR = {run:'#4ade80',bike:'#60a5fa',swim:'#22d3ee',strength:'#a78bfa',plyo:'#f472b6',hyrox:'#fb923c',mobility:'#2dd4bf',rest:'#6b7280',race:'#f5b942'};
+const PAIN_LOCS = ['Kuit L','Kuit R','Scheen L','Scheen R','Achilles/hiel L','Achilles/hiel R','Knie L','Knie R','Heup/lies','Onderrug','Voet','Schouder','Anders'];
+const INFO = {
+  rpe:'Sessie-RPE (schaal 0–10), ± 30 min na afloop: hoe zwaar was de héle training? 1–2 heel licht · 3–4 rustig, praten gaat · 5–6 stevig · 7–8 zwaar · 9 bijna maximaal · 10 maximaal. RPE × minuten = belasting.',
+  rir:'RIR = reps in reserve: hoeveel nette herhalingen had je nog gekund? 0 = falen · 1 = nog één · 2 = nog twee · 3–4 = ruim over. Doel staat bij de oefening; eerlijk inschatten is belangrijker dan zwaar.'
+};
 /* Standaard-alternatieven per sessietype. Het plan kan per sessie eigen 'alts' meegeven. */
 function altOptions(s){
   if(Array.isArray(s.alts) && s.alts.length) return s.alts;
@@ -271,7 +304,7 @@ function lapsTable(a){
 }
 
 /* ---------- UI-status ---------- */
-const ui = {tab:'vandaag', week:mondayOf(today()), sid:null, prefill:null, chkWeek:null, restoreArmed:false, open:{}, menu:{}, laps:{}, swap:{}, rir:{}, sw:{}};
+const ui = {tab:'vandaag', week:mondayOf(today()), day:null, sid:null, prefill:null, chkWeek:null, restoreArmed:false, open:{}, menu:{}, laps:{}, swap:{}, rir:{}, sw:{}, exFocus:{}, info:{}};
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(()=> t.style.display='none', 1800); }
@@ -281,13 +314,16 @@ let tEnd = 0, tInt = null, actx = null, wake = null;
 function beep(){ try { actx = actx || new (window.AudioContext||window.webkitAudioContext)(); const o = actx.createOscillator(), g = actx.createGain();
   o.frequency.value = 880; o.connect(g); g.connect(actx.destination); g.gain.value = .25; o.start(); o.stop(actx.currentTime + .4); } catch(e){} }
 function unlockAudio(){ try { actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume(); } catch(e){} }
-function startTimer(sec){ if(!sec) return; tEnd = Date.now() + sec*1000; sessionStorage.setItem('tEnd', tEnd); $('timer').classList.add('show'); $('timer').classList.remove('end'); tick(); startTicker(); }
+let tDur = 0;
+function startTimer(sec){ if(!sec) return; tDur = sec; sessionStorage.setItem('tDur', sec); tEnd = Date.now() + sec*1000; sessionStorage.setItem('tEnd', tEnd); $('timer').classList.add('show'); $('timer').classList.remove('end'); tick(); startTicker(); }
 function startTicker(){ clearInterval(tInt); tInt = setInterval(tick, 250); }
 function tick(){
   if(tEnd){ const left = Math.ceil((tEnd - Date.now())/1000);
-    if(left <= 0){ $('tval').textContent = 'Rust voorbij'; if(!$('timer').classList.contains('end')){ $('timer').classList.add('end'); beep(); if(navigator.vibrate) navigator.vibrate([200,100,200]);
-      const f = $('flash'); f.classList.remove('show'); void f.offsetWidth; f.classList.add('show'); setTimeout(()=> f.classList.remove('show'), 1700); } }
-    else $('tval').textContent = fmtSec(left); }
+    if(left <= 0){ $('tval').textContent = 'Go!'; if(!$('timer').classList.contains('end')){ $('timer').classList.add('end'); beep(); if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      const f = $('flash'); f.classList.remove('show'); void f.offsetWidth; f.classList.add('show'); setTimeout(()=> f.classList.remove('show'), 1700); }
+      if(left <= -10) stopTimer(); }
+    else $('tval').textContent = fmtSec(left);
+    const dur = tDur || Number(sessionStorage.getItem('tDur')) || 90; $('rarc').setAttribute('stroke-dashoffset', String(232.5*(1-Math.max(0,left)/dur))); }
   document.querySelectorAll('[data-swlive]').forEach(el => { const t0 = ui.sw[el.dataset.swlive]; if(t0) el.textContent = '■ Stop · '+fmtSec((Date.now()-t0)/1000); });
 }
 function stopTimer(){ tEnd = 0; sessionStorage.removeItem('tEnd'); $('timer').classList.remove('show','end'); }
@@ -317,21 +353,25 @@ function calcCardio(c){
 
 /* ---------- ochtendcheck (Oura) ---------- */
 const dailyOf = d => S.daily[d] || {};
+function baseline(d, k){ const v = []; for(let i=1;i<=60;i++){ const y = dailyOf(addDays(d,-i)); if(y[k]!=null) v.push(y[k]); }
+  if(v.length < 21) return null; const m = v.reduce((a,b)=>a+b,0)/v.length; const sd = Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/(v.length-1)); return {m, sd:Math.max(sd, 3), n:v.length}; }
 function advice(d){
   const x = dailyOf(d); if(x.rd==null && x.sl==null && x.legs==null && x.pain==null) return null;
   const prev = []; for(let i=1;i<=7;i++){ const y = dailyOf(addDays(d,-i)); if(y.rd!=null) prev.push(y.rd); }
   const av = prev.length ? prev.reduce((a,b)=>a+b,0)/prev.length : null; const why = [];
   let lvl = 'groen'; const up = l => { if(l==='rood' || (l==='oranje' && lvl==='groen')) lvl = l; };
-  if(x.pain!=null && x.pain>=4){ up('rood'); why.push('pijn '+x.pain+'/10'); }
-  if(x.rd!=null && x.rd<60){ up('rood'); why.push('readiness '+x.rd); }
-  else if(x.rd!=null && x.rd<70){ up('oranje'); why.push('readiness '+x.rd); }
-  if(x.sl!=null && x.sl<60){ up('oranje'); why.push('slaap '+x.sl); }
+  const bR = baseline(d,'rd'), bS = baseline(d,'sl'); let basis = 'vaste grenzen (60/70) tot er 21 ochtendchecks zijn';
+  if(x.pain!=null && x.pain>=4){ up('rood'); why.push('pijn '+x.pain+'/10'+(x.pains?' ('+Object.entries(x.pains).filter(([,v])=>v>=4).map(([k])=>k).join(', ')+')':'')); }
+  if(x.rd!=null){ if(bR){ basis = 'jouw baseline: readiness '+Math.round(bR.m)+' ± '+Math.round(bR.sd)+' ('+bR.n+' dagen)';
+      if(x.rd < bR.m-2*bR.sd || x.rd<55){ up('rood'); why.push('readiness '+x.rd+' (ver onder jouw normaal)'); } else if(x.rd < bR.m-bR.sd){ up('oranje'); why.push('readiness '+x.rd+' (onder jouw normaal)'); } }
+    else if(x.rd<60){ up('rood'); why.push('readiness '+x.rd); } else if(x.rd<70){ up('oranje'); why.push('readiness '+x.rd); } }
+  if(x.sl!=null){ if(bS ? x.sl < bS.m-1.5*bS.sd : x.sl<60){ up('oranje'); why.push('slaap '+x.sl); } }
   if(x.legs!=null && x.legs<=2){ up('oranje'); why.push('benen '+x.legs+'/5'); }
   if(av!=null && x.rd!=null && x.rd <= av-10){ up('oranje'); why.push('readiness '+Math.round(av-x.rd)+' onder je 7-daags gemiddelde'); }
   const txt = {groen:'Plan uitvoeren zoals geschreven.',
     oranje:'Plan uitvoeren, maar kwaliteit op de onderkant van de tempo’s en RPE max. 1 lager. Voelt de warming-up zwaar: kwaliteit vervangen door easy.',
     rood:'Kwaliteit vandaag schrappen: 30–45 min easy (fiets/zwem) of rust. Bij pijn ≥ 4: niet belasten op die plek en melden in de notitie.'}[lvl];
-  return {lvl, txt, why};
+  return {lvl, txt, why, basis};
 }
 
 /* ---------- dubbele progressie met RIR ---------- */
@@ -386,21 +426,63 @@ function statsCard(w){
   h += kv('Hoogtemeters', st.vertPlan+' m', Math.round(st.vertDone)+' m'); if(st.vertPlan) h += '<div class="bar"><i style="width:'+pct(st.vertDone,st.vertPlan)+'%"></i></div>';
   h += kv('Tijd', fmtH(st.minPlan*60), fmtH(st.secDone));
   h += '<div class="kv"><span>Belasting (sRPE)</span><span><b>'+Math.round(st.load)+'</b></span></div>';
-  const gs = Object.entries(st.groups).sort((a,b)=>b[1]-a[1]);
-  h += '<div class="kv"><span>Krachtsets</span><span class="small" style="text-align:right">'+(gs.length?gs.map(([g,n])=>g+' '+n).join(' · '):'–')+'</span></div>';
+  const tg = PLAN.setTargets || {}; const gk = Object.keys(tg).concat(Object.keys(st.groups).filter(g => !(g in tg) && !['plyo','hyrox'].includes(g)));
+  h += '<div style="margin-top:8px"><b style="font-size:15px">Harde sets per spiergroep</b> <span class="small">gedaan / doel</span>';
+  for(const g of gk){ const n = st.groups[g]||0, t = tg[g]||0; h += '<div class="kv" style="padding:3px 0;border:0"><span>'+g+'</span><span>'+n+(t?' / '+t:'')+'</span></div>'+(t?'<div class="bar" style="height:6px;margin-top:0"><i style="width:'+Math.min(100,Math.round(n/t*100))+'%;background:'+(n>=t?'#22c55e':'#f5b942')+'"></i></div>':''); }
+  h += '<div class="small">Richtlijn ≥ 10 harde sets/spiergroep/week voor spiergroei (Schoenfeld e.a. 2017); benen lager omdat lopen al belast. Alleen gelogde sets tellen.</div></div>';
   if(st.rd.length || st.sl.length) h += '<div class="kv"><span>Oura gem.</span><span>Readiness <b>'+(avg(st.rd)??'–')+'</b> · Slaap <b>'+(avg(st.sl)??'–')+'</b></span></div>';
   h += '<div class="small" style="margin-top:6px">Gedaan = Strava (bijgewerkt '+esc(STRAVA.updated||'–')+') + handmatige logs die niet aan een Strava-sessie gekoppeld zijn.</div></div>';
   return h;
 }
+
+/* ---------- weekstrip ---------- */
+function dayStatus(date){
+  const w = weekByStart(mondayOf(date)); if(!w) return 'rest'; const m = matchWeek(w);
+  const its = weekItems(w).filter(i => i.date===date && !['rest','mobility'].includes(i.s.t)); if(!its.length) return 'rest';
+  let done = 0, alt = 0, skip = 0; for(const i of its){ const st = S.done[i.s.id]||{}; if(st.skip) skip++; else if(st.d || m.by[i.s.id]) done++; else if(st.alt) alt++; }
+  if(done === its.length) return 'ok'; if(skip === its.length) return 'miss';
+  if(date < today()){ return done+alt ? 'part' : 'miss'; } if(alt && !done) return 'alt'; return done ? 'part' : 'todo';
+}
+function weekStrip(start, sel, mode){
+  const t = today(); let h = '<div class="strip">';
+  for(let i=0;i<7;i++){ const d = addDays(start,i); const st = dayStatus(d);
+    h += '<button data-strip="'+d+'" data-mode="'+mode+'" class="'+(d===sel?'sel ':'')+(d===t?'td':'')+'">'+DAYS[i]+'<b>'+parseD(d).getDate()+'</b><span class="dot '+st+'"></span></button>'; }
+  return h+'</div>';
+}
+function nextRace(){ const t = today(); const r = (PLAN.races||[]).filter(x => x.date>=t).sort((a,b)=>a.date.localeCompare(b.date))[0]; if(!r) return '';
+  const n = Math.round((parseD(r.date)-parseD(t))/864e5); return '<span class="race">🏁 '+esc(r.name)+' · '+(n===0?'vandaag':n===1?'morgen':'over '+n+' dagen')+'</span>'; }
+function infoBtn(k){ return '<button class="ib" data-info="'+k+'" aria-label="Uitleg">i</button>'; }
+function infoBox(k){ return ui.info[k] ? '<div class="info">'+INFO[k]+'</div>' : ''; }
+/* Voedingsherinnering: lange sessies (> 75 min) zonder gelogde koolhydraten, vandaag of gisteren. */
+function fuelTodo(){ const out = []; const t = today();
+  for(const d of [addDays(t,-1), t]){ const w = weekByStart(mondayOf(d)); if(!w) continue; const m = matchWeek(w);
+    for(const it of weekItems(w).filter(i => i.date===d && ['run','bike','race'].includes(i.s.t))){ const st = S.done[it.s.id]||{}; const a = m.by[it.s.id];
+      const mins = a ? a.sec/60 : (num(st.min) || 0); if(!(st.d || a) || st.skip || mins <= 75) continue;
+      if(S.cardio.some(c => !c.del && c.sid===it.s.id && (c.kh || c.wat))) continue; out.push(it); } }
+  return out; }
+/* Belastingwaarschuwing (vuistregels): weekkm, langste duurloop en hoogtemeters t.o.v. de weken ervoor. */
+function weekDone(a){ const b = addDays(a,6); const pw = weekByStart(a); const m = matchWeek(pw); let km = 0, hm = 0, long = 0;
+  for(const x of actsIn(a,b)) if(RUNS.includes(x.sport)){ km += x.km||0; hm += x.hm||0; long = Math.max(long, x.km||0); }
+  for(const c of manualUnlinked(a,b,m)) if(['run','trail'].includes(c.sport)){ km += c.km||0; hm += c.hm||0; long = Math.max(long, c.km||0); }
+  return {km, hm, long}; }
+function loadWarnings(w){
+  const st = weekStats(w); const prev = [1,2,3,4].map(i => weekDone(addDays(w.start, -7*i))); const out = [];
+  const avg3 = (prev[0].km + prev[1].km + prev[2].km)/3; const base = Math.max(st.runPlan, st.runDone);
+  if(avg3 > 0 && base > avg3*1.2 && base - avg3 > 5) out.push('Lopen: '+fmtN(base)+' km deze week tegen gem. '+fmtN(avg3)+' km in de 3 weken ervoor (+'+Math.round((base/avg3-1)*100)+'%).');
+  const longPlan = Math.max(0, ...weekItems(w).filter(i => ['run','race'].includes(i.s.t)).map(i => i.s.km||0)); const longPrev = Math.max(...prev.map(x=>x.long));
+  if(longPlan > 15 && longPrev > 0 && longPlan > longPrev*1.25) out.push('Langste loop '+fmtN(longPlan)+' km tegen max. '+fmtN(longPrev)+' km in de 4 weken ervoor.');
+  const vb = Math.max(st.vertPlan, st.vertDone), vp = Math.max(...prev.map(x=>x.hm));
+  if(vb > 400 && vb > vp*1.5) out.push('Hoogtemeters '+Math.round(vb)+' m tegen max. '+Math.round(vp)+' m per week in de 4 weken ervoor.');
+  return out; }
 
 /* ---------- sessiekaart ---------- */
 function planLine(s){ const p = []; if(s.km) p.push(fmtN(s.km)+' km'); if(s.min) p.push('~'+s.min+' min'); if(s.hm) p.push(s.hm+' hm'); return p.join(' · '); }
 function sessCard(it, m, opt){
   const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id], skip = st.skip, done = !skip && (st.d || !!a);
   const open = ui.open[s.id] ?? !!opt.open;
-  let h = '<div class="card sess'+(done?' done':'')+(skip?' skip':'')+'" id="s_'+s.id+'"><div class="st">';
+  let h = '<div class="card sess'+(done?' done':'')+(skip?' skip':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
   h += '<button class="chk'+(done?' on':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
-  h += '<div class="tt"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><span class="small">'+planLine(s)+'</span><b>'+esc(s.title)+'</b>';
+  h += '<div class="tt"><span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span><span class="small">'+planLine(s)+'</span><b>'+esc(s.title)+'</b>';
   if(it.date!==it.orig) h += '<div class="small">↪ verplaatst van '+fmtDay(it.orig)+'</div>';
   if(skip) h += '<div class="small" style="color:var(--warn)">Niet uitgevoerd: '+esc(skip)+'</div>';
   if(st.alt) h += '<div class="small" style="color:var(--blue)">Alternatief: '+esc(st.alt)+'</div>';
@@ -414,7 +496,7 @@ function sessCard(it, m, opt){
     if(s.detail) h += '<div class="det">'+esc(s.detail)+'</div>';
     if(s.ex) h += '<div class="det small">'+sessEx(s).filter(e => !S.exskip[s.id+'|'+e.c]).map(e => esc(EXN(S.swaps[s.id+'|'+e.c]||e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>';
     if(!skip && s.t!=='rest'){
-      h += '<div class="small" style="margin-top:10px">RPE sessie</div><div class="chips sm">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip'+(st.rpe===r?' on':'')+'" data-srpe="'+s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
+      h += '<div class="small" style="margin-top:10px;display:flex;align-items:center">RPE sessie'+infoBtn('rpe')+'</div>'+infoBox('rpe')+'<div class="chips sm">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip'+(st.rpe===r?' on':'')+'" data-srpe="'+s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
       h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="min" data-min="'+s.id+'" value="'+esc(st.min||'')+'">';
       h += '<input type="text" placeholder="Notitie" data-note="'+s.id+'" value="'+esc(st.note||'')+'"></div>'; }
     const btns = [];
@@ -444,30 +526,36 @@ function render(){
 }
 
 function rToday(){
-  const t = today(); $('htitle').textContent = 'Vandaag · '+fmtDay(t);
-  let h = '';
+  const t = today(); const d = ui.day || t; const isT = d===t;
+  $('htitle').textContent = (isT ? 'Vandaag · ' : '')+fmtDay(d);
+  let h = weekStrip(mondayOf(d), d, 'day');
+  h += nextRace();
   const pv = PLAN.version+'/'+PLAN.updated;
   if(S.settings.seenPlan !== pv) h += '<div class="banner info"><b>Plan bijgewerkt</b> ('+esc(PLAN.updated)+'). Bekijk je week. <button class="btn sm" data-seen="1" style="margin-left:6px">OK</button></div>';
   const lb = S.settings.lastBackup; if(!lb || (Date.now()-lb) > 7*864e5) h += '<div class="banner oranje">Laatste back-up: '+(lb?fmtDay(iso(new Date(lb))):'nooit')+'. Ga naar Meer → Kopieer back-upcode en bewaar hem (bijv. in Notities).</div>';
-  const x = dailyOf(t);
-  h += '<div class="card"><h3>Ochtendcheck <span class="small">Oura + gevoel</span></h3>';
+  for(const it of fuelTodo()) h += '<div class="banner info">🍌 Voeding loggen voor <b>'+esc(it.s.title)+'</b> ('+fmtDay(it.date)+')? Hoeveel g KH/uur en hoe ging je maag? <button class="btn sm" data-cardio="'+it.s.id+'" style="margin-top:6px">Log voeding</button></div>';
+  const x = dailyOf(d);
+  h += '<div class="card"><h3>Ochtendcheck <span class="small">'+(isT?'Oura + gevoel':fmtDay(d))+'</span></h3>';
   h += '<div class="row nw"><div><label class="f">Readiness</label><input type="text" inputmode="numeric" data-dly="rd" value="'+esc(x.rd??'')+'" placeholder="0–100"></div><div><label class="f">Slaapscore</label><input type="text" inputmode="numeric" data-dly="sl" value="'+esc(x.sl??'')+'" placeholder="0–100"></div></div>';
   h += '<div class="row nw"><div><label class="f">HRV (ms)</label><input type="text" inputmode="numeric" data-dly="hrv" value="'+esc(x.hrv??'')+'" placeholder="opt."></div><div><label class="f">Rust-HF</label><input type="text" inputmode="numeric" data-dly="rhr" value="'+esc(x.rhr??'')+'" placeholder="opt."></div></div>';
   h += '<label class="f">Benen (1 kapot – 5 fris)</label><div class="chips sm">'+[1,2,3,4,5].map(v=>'<button class="chip'+(x.legs===v?' on':'')+'" data-dlyc="legs" data-v="'+v+'">'+v+'</button>').join('')+'</div>';
-  h += '<label class="f">Pijn (0 geen – 10)</label><div class="chips sm">'+[0,1,2,3,4,5,6,7,8].map(v=>'<button class="chip'+(x.pain===v?' on':'')+'" data-dlyc="pain" data-v="'+v+'">'+v+'</button>').join('')+'</div>';
-  const ad = advice(t);
-  if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+'<div class="small" style="color:inherit;opacity:.8">Vuistregel van de app, geen diagnose.</div></div>';
+  const pains = x.pains || {};
+  h += '<label class="f">Pijn? Tik de plek</label><div class="chips sm">'+PAIN_LOCS.map(l => '<button class="chip'+(pains[l]!=null?' on':'')+'" style="font-size:14px" data-ploc="'+esc(l)+'">'+esc(l)+'</button>').join('')+'</div>';
+  for(const l of Object.keys(pains)) h += '<div style="margin-top:8px"><span class="small">'+esc(l)+' · hoe erg (1–8)?</span><div class="chips sm">'+[1,2,3,4,5,6,7,8].map(v => '<button class="chip'+(pains[l]===v?' on':'')+'" data-pscore="'+esc(l)+'" data-v="'+v+'">'+v+'</button>').join('')+'</div></div>';
+  const ad = advice(d);
+  if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+'<div class="small" style="color:inherit;opacity:.8">Vuistregel van de app, geen diagnose. Basis: '+esc(ad.basis)+'.</div></div>';
   h += '</div>';
-  const w = weekByStart(mondayOf(t)); const m = matchWeek(w);
-  const items = weekItems(w).filter(i => i.date===t);
-  h += '<div class="day today"><h2>Training vandaag</h2>';
+  const w = weekByStart(mondayOf(d)); const m = matchWeek(w);
+  const items = weekItems(w).filter(i => i.date===d);
+  h += '<div class="day today"><h2>Training '+(isT?'vandaag':fmtDay(d))+'</h2>';
   if(!w) h += '<div class="card mut">Geen plan voor deze week.</div>';
   else if(!items.length) h += '<div class="card mut">Niets gepland. Rust of mobiliteit.</div>';
   for(const it of items) h += sessCard(it, m, {open:true});
-  for(const a of m.extra.filter(x => x.date===t)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
+  for(const a of m.extra.filter(x => x.date===d)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
   h += '</div>';
-  const tm = addDays(t,1); const items2 = weekItems(weekByStart(mondayOf(tm))).filter(i => i.date===tm);
-  if(items2.length) h += '<div class="card"><div class="small">Morgen</div>'+items2.map(i => '<div>'+(TYPE_LABEL[i.s.t]||'')+': <b>'+esc(i.s.title)+'</b></div>').join('')+'</div>';
+  const tm = addDays(d,1); const items2 = weekItems(weekByStart(mondayOf(tm))).filter(i => i.date===tm);
+  if(items2.length) h += '<div class="card"><div class="small">'+(isT?'Morgen':fmtDay(tm))+'</div>'+items2.map(i => '<div>'+(TYPE_ICON[i.s.t]||'')+' <b>'+esc(i.s.title)+'</b></div>').join('')+'</div>';
+  if(!isT) h += '<div class="row"><button class="btn" data-strip="'+t+'" data-mode="day">↩ Terug naar vandaag</button></div>';
   $('view').innerHTML = h;
 }
 
@@ -477,12 +565,13 @@ function rWeek(){
   if(!w){ $('view').innerHTML = '<div class="card">Geen plan voor deze week.</div>'; return; }
   const t = today(); const m = matchWeek(w); let h = '';
   h += w.status==='concept' ? '<div class="banner concept"><b>Concept</b> — nog niet afgestemd. Wordt definitief na je zondag-check-in.</div>' : '<div class="banner def"><b>Definitief</b></div>';
+  h += weekStrip(w.start, null, 'week');
   h += '<div class="card"><b>'+esc(w.phase)+'</b><div class="mut">'+esc(w.focus)+'</div></div>';
-  if(w.days.length) h += statsCard(w);
+  if(w.days.length){ h += statsCard(w); const wn = loadWarnings(w); if(wn.length) h += '<div class="banner oranje" id="loadwarn"><b>Let op opbouw</b><br>'+wn.map(esc).join('<br>')+'<div class="small" style="color:inherit;opacity:.8">Vuistregel (± 20% per week, langste loop ± 25%), geen harde grens. Bespreek het zondag als het bewust is.</div></div>'; }
   else h += '<div class="card mut">Nog niet uitgewerkt. Volgt na de check-in van de week ervoor.</div>';
   const items = weekItems(w);
   if(w.days.length) for(let i=0;i<7;i++){ const dd = addDays(w.start,i); const di = items.filter(x => x.date===dd);
-    h += '<div class="day'+(dd===t?' today':'')+'"><h2>'+fmtDay(dd)+(dd===t?' · vandaag':'')+'</h2>';
+    h += '<div class="day'+(dd===t?' today':'')+'" id="d_'+dd+'"><h2>'+fmtDay(dd)+(dd===t?' · vandaag':'')+'</h2>';
     if(!di.length) h += '<div class="card small">Geen sessie.</div>';
     for(const it of di) h += sessCard(it, m, {});
     for(const a of m.extra.filter(x => x.date===dd)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
@@ -510,14 +599,18 @@ function rLog(){
   const {s, date} = f;
   let h = '<div class="card"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><b>'+esc(s.title)+'</b><div class="mut">'+fmtDay(date)+' · scherm blijft aan</div>';
   h += '<div class="row"><button class="btn sm" data-pick="1">Andere sessie</button><button class="btn sm '+((S.done[s.id]||{}).d?'pri':'')+'" data-done="'+s.id+'">'+((S.done[s.id]||{}).d?'✓ Afgerond':'Sessie afronden')+'</button></div></div>';
-  for(const e of sessEx(s)){
+  const list = sessEx(s); const cnt = e => S.sets.filter(x => x.sid===s.id && x.code===(S.swaps[s.id+'|'+e.c]||e.c) && !x.del).length;
+  let focus = ui.exFocus[s.id]; if(!list.some(e => e.c===focus) || S.exskip[s.id+'|'+focus]) focus = (list.find(e => !S.exskip[s.id+'|'+e.c] && cnt(e) < e.s) || {}).c; ui.exFocus[s.id] = focus;
+  for(const e of list){
     const code = S.swaps[s.id+'|'+e.c] || e.c, u = unitOf(code), X = EXN(code), timed = !!X.time;
+    if(e.c!==focus && !S.exskip[s.id+'|'+e.c]){ const sets = S.sets.filter(x => x.sid===s.id && x.code===code && !x.del).sort((a,b)=>a.ts-b.ts); const dn = sets.length >= e.s;
+      h += '<button class="exrow'+(dn?' done':'')+'" id="ex_'+e.c+'" data-exfocus="'+e.c+'"><span><b>'+(dn?'✓ ':'')+esc(X.n)+'</b><br><span class="small">'+(sets.length ? sets.map(x => (x.kg?fmtKg(x.kg)+'×':'')+x.reps).join(', ') : e.s+' × '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u==='s'?'sec':u))+'</span></span><span class="small">'+sets.length+'/'+e.s+' ▾</span></button>'; continue; }
     if(S.exskip[s.id+'|'+e.c]){ h += '<div class="card small" id="ex_'+e.c+'" style="opacity:.6;display:flex;align-items:center;justify-content:space-between;gap:8px"><span><s>'+esc(X.n)+'</s> · overgeslagen</span><button class="btn sm" data-exskip="'+e.c+'">Toch doen</button></div>'; continue; }
     const now = S.sets.filter(x => x.sid===s.id && x.code===code && !x.del).sort((a,b)=>a.ts-b.ts);
     const prev = prevGroup(code, s.id, date); const sug = suggest(e, code, prev);
     const kk = 'kg_'+s.id+code; const kgVal = ui[kk] ?? (now.length ? (now[now.length-1].kg ?? '') : (sug.kg ?? ''));
     const rk = s.id+'|'+code; const rirSel = ui.rir[rk] ?? e.rir;
-    h += '<div class="card" id="ex_'+e.c+'"><b>'+esc(X.n)+'</b>'+(code!==e.c?' <span class="pill o">i.p.v. '+esc(EXN(e.c).n)+'</span>':'')+(e.add?' <span class="pill o">toegevoegd</span>':'');
+    h += '<div class="card exfocus" id="ex_'+e.c+'"><b style="font-size:19px">'+esc(X.n)+'</b>'+(code!==e.c?' <span class="pill o">i.p.v. '+esc(EXN(e.c).n)+'</span>':'')+(e.add?' <span class="pill o">toegevoegd</span>':'');
     h += '<div class="mut">'+e.s+' × '+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+' '+(u==='kg'?'reps':u==='s'?'sec':u)+(e.rir?' · RIR '+e.rir:'')+(e.rest?' · rust '+fmtSec(e.rest):'')+' <span class="small">['+code+']</span></div>';
     if(e.note) h += '<div class="hint mut">'+esc(e.note)+'</div>';
     if(prev) h += '<div class="hint mut">Vorige keer ('+fmtDay(prev[0].date)+'): '+prev.map(x => (x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':'')).join(', ')+'</div>';
@@ -530,9 +623,9 @@ function rLog(){
       h += '<div class="row"><button class="btn '+(run?'warn':'pri')+'" data-sw="'+code+'" '+(run?'data-swlive="'+code+'"':'')+'>'+(run?'■ Stop · 0:00':'▶ Start '+e.lo+' '+u)+'</button></div>';
       h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="m:ss" data-secx="'+code+'"><button class="btn sm" data-secgo="'+code+'">✓ tijd loggen</button></div>';
     } else {
-      if(u==='kg' && e.rir!==0) h += '<div class="small" style="margin-top:8px">RIR van deze set</div><div class="chips sm">'+[0,1,2,3,4].map(r => '<button class="chip'+(r===rirSel?' on':'')+'" data-rir="'+rk+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
+      if(u==='kg' && e.rir!==0) h += '<div class="small" style="margin-top:8px;display:flex;align-items:center">RIR van deze set'+infoBtn('rir')+'</div>'+infoBox('rir')+'<div class="chips sm">'+[0,1,2,3,4].map(r => '<button class="chip'+(r===rirSel?' on':'')+'" data-rir="'+rk+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
       let vals = []; if(e.hi - e.lo <= 8){ for(let r = Math.max(1, e.lo-1); r <= e.hi+2; r++) vals.push(r); } else vals = [e.lo, e.hi];
-      h += '<div class="small" style="margin-top:8px">Tik '+(u==='s'?'seconden':u==='kg'||u==='reps'?'reps':u)+' = set loggen</div><div class="chips">'+vals.map(r => '<button class="chip'+(r>=e.lo&&r<=e.hi?' tgt':'')+'" data-rep="'+code+'" data-r="'+r+'">'+r+'</button>').join('')+'<input class="num" style="flex:0 0 80px" type="text" inputmode="numeric" placeholder="ander" data-repx="'+code+'"><button class="btn sm" data-repgo="'+code+'">✓</button></div>';
+      h += '<div class="small" style="margin-top:8px">Tik '+(u==='s'?'seconden':u==='kg'||u==='reps'?'reps':u)+' = set loggen</div><div class="chips big">'+vals.map(r => '<button class="chip'+(r>=e.lo&&r<=e.hi?' tgt':'')+'" data-rep="'+code+'" data-r="'+r+'">'+r+'</button>').join('')+'<input class="num" style="flex:0 0 80px" type="text" inputmode="numeric" placeholder="ander" data-repx="'+code+'"><button class="btn sm" data-repgo="'+code+'">✓</button></div>';
     }
     h += '<div class="sets">'+now.map((x,i) => '<span class="set">'+(i+1)+': '+(x.kg?fmtKg(x.kg)+' × ':'')+x.reps+(u!=='kg'?' '+(u==='s'?'sec':u):'')+(x.rir!=null?' @'+x.rir:'')+(x.sec?' · '+fmtSec(x.sec):'')+'<button data-del="'+x.id+'" aria-label="Verwijder">×</button></span>').join('')+'<span class="small" style="align-self:center">'+(now.length>=e.s?'✓ ':'')+now.length+'/'+e.s+'</span></div>';
     h += '</div>';
@@ -563,6 +656,8 @@ function logSet(code, reps, extra){
   const rec = Object.assign({id, date:f.date, sid:f.s.id, code, pc:e.c, kg, reps:Number(reps), ts}, extra||{});
   if(unitOf(code)==='kg' && !EXN(code).time && e.rir!==0) rec.rir = ui.rir[rk] ?? e.rir;
   S.sets.push(rec); ui['kg_'+f.s.id+code] = kg ?? '';
+  const n = S.sets.filter(x => x.sid===f.s.id && x.code===code && !x.del).length;
+  if(e.s && n >= e.s){ const nx = sessEx(f.s).find(x => !S.exskip[f.s.id+'|'+x.c] && S.sets.filter(y => y.sid===f.s.id && y.code===(S.swaps[f.s.id+'|'+x.c]||x.c) && !y.del).length < x.s); ui.exFocus[f.s.id] = nx ? nx.c : null; }
   enqueue('set', id, f.date, rec);
   unlockAudio(); startTimer(e.rest);
   const y = window.scrollY; rLog(); window.scrollTo(0, y);
@@ -654,6 +749,9 @@ function rInsight(){
   for(const c of MAIN_LIFTS){ const byD = {}; for(const x of S.sets) if(!x.del && x.code===c){ const v = e1(x); if(v) byD[x.date] = Math.max(byD[x.date]||0, v); }
     const ds = Object.keys(byD).sort(); if(ds.length >= 2){ const d0 = parseD(ds[0]); tr += '<div style="margin-top:8px"><b>'+esc(EXN(c).n)+'</b>'+lineSvg([{pts:ds.map(d => [(parseD(d)-d0)/864e5, byD[d]]), c:'#f5b942'}])+'</div>'; } }
   h += '<div class="card"><h3>Kracht: geschatte 1RM</h3>'+(tr || '<div class="mut">Verschijnt zodra een hoofdoefening twee keer gelogd is.</div>')+'<div class="small">Schatting (Epley), geen gemeten 1RM.</div></div>';
+  const pl = {}; for(let i=27;i>=0;i--){ const d = addDays(t,-i); const y = dailyOf(d); for(const [k,v] of Object.entries(y.pains||{})){ const r = pl[k] || (pl[k] = {n:0, max:0, last:null, lv:0}); r.n++; r.max = Math.max(r.max, v); r.last = d; r.lv = v; } }
+  const pk = Object.keys(pl);
+  h += '<div class="card"><h3>Pijn per plek, 28 dagen</h3>'+(pk.length ? '<table><tr><th>Plek</th><th class="r">Dagen</th><th class="r">Max</th><th>Laatst</th></tr>'+pk.sort((a,b)=>pl[b].n-pl[a].n).map(k => '<tr><td>'+esc(k)+'</td><td class="r">'+pl[k].n+'</td><td class="r">'+pl[k].max+'</td><td>'+fmtDay(pl[k].last)+' ('+pl[k].lv+')</td></tr>').join('')+'</table><div class="small">Meer dan 3 dagen achter elkaar op dezelfde plek, of een stijgende score: zeg het zondag.</div>' : '<div class="mut">Geen pijn gemeld. Mooi.</div>')+'</div>';
   h += recordsHtml();
   const fl = S.cardio.filter(c => !c.del && (c.kh || c.wat)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,10);
   h += '<div class="card"><h3>Voedingslog</h3>'+(fl.length ? '<table><tr><th>Datum</th><th>Duur</th><th class="r">g/u</th><th class="r">Maag</th></tr>'+fl.map(c => '<tr><td>'+fmtDay(c.date)+'<div class="small">'+esc(c.wat||'')+'</div></td><td>'+(c.sec?fmtSec(c.sec):'')+'</td><td class="r">'+(c.kh||'')+'</td><td class="r">'+(c.maag||'')+'</td></tr>').join('')+'</table>' : '<div class="mut">Log voeding via “Log duur” bij lange sessies.</div>')+'</div>';
@@ -720,6 +818,7 @@ function availHtml(nextMon){
 function setAvail(nid, i, patch){ const av = S.avail[nid] || (S.avail[nid] = {d:{}, n:''}); if(i==null) Object.assign(av, patch); else av.d[i] = Object.assign({}, av.d[i]||{}, patch); av.ts = Date.now(); enqueue('avail', nid, nid, av); }
 function setAns(k, v){ const wid = weekIdOf(ui.chkWeek); const ci = S.checkins[wid] || (S.checkins[wid] = {qv:QV_CURRENT, a:{}});
   ci.a[k] = v; ci.ts = Date.now(); enqueue('checkin', wid, ui.chkWeek, ci); }
+function setPains(d, p){ const x = S.daily[d] || (S.daily[d] = {}); if(Object.keys(p).length){ x.pains = p; x.pain = Math.max(...Object.values(p)); } else { delete x.pains; delete x.pain; } x.ts = Date.now(); enqueue('daily', d, d, x); }
 function setDaily(d, k, v){ const x = S.daily[d] || (S.daily[d] = {}); if(v===null) delete x[k]; else x[k] = v; x.ts = Date.now(); enqueue('daily', d, d, x); }
 
 /* ---------- export ---------- */
@@ -730,7 +829,7 @@ function weekText(start){
   for(let i=0;i<7;i++){ const dd = addDays(start,i); const its = weekItems(w).filter(x => x.date===dd); const y = dailyOf(dd);
     const ex = m.extra.filter(x => x.date===dd); const hasD = y.rd!=null||y.sl!=null||y.legs!=null||y.pain!=null;
     if(!its.length && !ex.length && !hasD) continue;
-    L.push(''); L.push(fmtDay(dd).toUpperCase()+(hasD ? '  [Oura readiness '+(y.rd??'–')+', slaap '+(y.sl??'–')+(y.hrv!=null?', HRV '+y.hrv:'')+(y.rhr!=null?', rust-HF '+y.rhr:'')+(y.legs!=null?', benen '+y.legs+'/5':'')+(y.pain!=null?', pijn '+y.pain+'/10':'')+']' : ''));
+    L.push(''); L.push(fmtDay(dd).toUpperCase()+(hasD ? '  [Oura readiness '+(y.rd??'–')+', slaap '+(y.sl??'–')+(y.hrv!=null?', HRV '+y.hrv:'')+(y.rhr!=null?', rust-HF '+y.rhr:'')+(y.legs!=null?', benen '+y.legs+'/5':'')+(y.pains?', pijn '+Object.entries(y.pains).map(([k,v])=>k+' '+v).join(', '):(y.pain!=null?', pijn '+y.pain+'/10':''))+']' : ''));
     for(const it of its){ const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id];
       const mark = st.skip ? '[–]' : st.d ? '[x]' : a ? '[S]' : st.alt ? '[A]' : '[ ]';
       L.push(mark+' '+s.title+(s.km?' (gepland '+s.km+' km)':'')+(it.date!==it.orig?' · verplaatst van '+fmtDay(it.orig):'')+(st.skip?' · niet uitgevoerd: '+st.skip:'')+(st.alt?' · ALTERNATIEF: '+st.alt:'')+(st.rpe?' · RPE '+st.rpe:'')+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
@@ -812,17 +911,24 @@ function applyPick(code, mode, forC){
   const sid = ui.sid;
   if(mode==='swap'){ const k = sid+'|'+forC; if(code===forC) delete S.swaps[k]; else S.swaps[k] = code; ui.swap[forC] = false; toast('Gewisseld: '+EXN(code).n); }
   else { const list = S.extra[sid] || (S.extra[sid] = []); if(list.some(x => x.c===code) || (sessById(sid).s.ex||[]).some(x => (S.swaps[sid+'|'+x.c]||x.c)===code)){ toast('Staat al in deze sessie'); return; }
-    list.push(Object.assign({c:code, add:true}, defaultsFor(code))); ui.addOpen = false; toast('Toegevoegd: '+EXN(code).n); }
+    list.push(Object.assign({c:code, add:true}, defaultsFor(code))); ui.addOpen = false; ui.exFocus[sid] = code; toast('Toegevoegd: '+EXN(code).n); }
   enqueue('sessmod', sid, (sessById(sid)||{}).date||'', {swaps:Object.fromEntries(Object.entries(S.swaps).filter(([k])=>k.startsWith(sid+'|'))), extra:S.extra[sid]||[], exskip:Object.fromEntries(Object.entries(S.exskip).filter(([k])=>k.startsWith(sid+'|')))});
   rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+(mode==='swap'?forC:code)); if(el) el.scrollIntoView({block:'center'}); }, 30);
 }
 document.addEventListener('click', ev => {
   const b = ev.target.closest('button'); if(!b) return; const ds = b.dataset;
-  if(ds.tab){ ui.tab = ds.tab; if(ds.tab==='log' && !ui.sid){ const it = weekItems(weekByStart(mondayOf(today()))).find(i => i.date===today() && i.s.ex && !isSkipped(i.s.id)); if(it) ui.sid = it.s.id; } window.scrollTo(0,0); render(); return; }
+  if(ds.tab){ ui.tab = ds.tab; if(ds.tab==='vandaag') ui.day = null; if(ds.tab==='log' && !ui.sid){ const it = weekItems(weekByStart(mondayOf(today()))).find(i => i.date===today() && i.s.ex && !isSkipped(i.s.id)); if(it) ui.sid = it.s.id; } window.scrollTo(0,0); render(); return; }
   if(ds.done){ const cur = (S.done[ds.done]||{}).d; const f = sessById(ds.done); const auto = f && matchWeek(f.w).by[ds.done];
     if(auto && !cur){ toast('Al gedaan volgens Strava'); return; } setDone(ds.done, {d:!cur}); rerender(); return; }
   if(ds.srpe){ const cur = (S.done[ds.srpe]||{}).rpe, v = Number(ds.v); setDone(ds.srpe, {rpe: cur===v ? null : v}); rerender(); return; }
   if(ds.open){ const it = ui.tab==='vandaag'; ui.open[ds.open] = !(ui.open[ds.open] ?? it); rerender(); return; }
+  if(b.id==='ring'){ $('timer').classList.toggle('ctl'); return; }
+  if(ds.strip){ if(ds.mode==='day'){ ui.day = ds.strip===today() ? null : ds.strip; ui.tab = 'vandaag'; render(); window.scrollTo(0,0); }
+    else { const el = document.getElementById('d_'+ds.strip); if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); } return; }
+  if(ds.info){ ui.info[ds.info] = !ui.info[ds.info]; rerender(); return; }
+  if(ds.exfocus){ ui.exFocus[ui.sid] = ds.exfocus; rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+ds.exfocus); if(el) el.scrollIntoView({block:'start'}); }, 20); return; }
+  if(ds.ploc){ const d = ui.day || today(); const x = S.daily[d] || (S.daily[d] = {}); const p = Object.assign({}, x.pains||{}); if(p[ds.ploc]!=null) delete p[ds.ploc]; else p[ds.ploc] = 2; setPains(d, p); rerender(); return; }
+  if(ds.pscore){ const d = ui.day || today(); const p = Object.assign({}, (dailyOf(d).pains)||{}); p[ds.pscore] = Number(ds.v); setPains(d, p); rerender(); return; }
   if(ds.stats){ ui.stats = !ui.stats; rerender(); return; }
   if(ds.laps){ ui.laps[ds.laps] = !ui.laps[ds.laps]; rerender(); return; }
   if(ds.menu){ ui.menu[ds.menu] = !ui.menu[ds.menu]; rerender(); return; }
@@ -859,7 +965,7 @@ document.addEventListener('click', ev => {
   if(ds.maag){ ui.maag = Number(ds.maag); document.querySelectorAll('[data-maag]').forEach(c => c.classList.toggle('on', c===b)); return; }
   if(ds.cdel){ const c = S.cardio.find(x => x.id===ds.cdel); if(c){ c.del = true; enqueue('cardio', c.id, c.date, c); } rDuur(); return; }
   if(ds.ck){ setAns(ds.ck, ds.cv!==undefined ? Number(ds.cv) : ds.cvs); rerender(); return; }
-  if(ds.dlyc){ const v = Number(ds.v); const cur = dailyOf(today())[ds.dlyc]; setDaily(today(), ds.dlyc, cur===v ? null : v); rerender(); return; }
+  if(ds.dlyc){ const d = ui.day || today(); const v = Number(ds.v); const cur = dailyOf(d)[ds.dlyc]; setDaily(d, ds.dlyc, cur===v ? null : v); rerender(); return; }
   if(ds.slot){ const cur = (((S.avail[ds.av]||{}).d||{})[ds.i]||{}).slot; setAvail(ds.av, ds.i, {slot: cur===ds.slot ? null : ds.slot}); rerender(); return; }
   if(ds.tadd){ if(tEnd){ tEnd += Number(ds.tadd)*1000; $('timer').classList.remove('end'); tick(); } return; }
   switch(b.id){
@@ -884,7 +990,7 @@ document.addEventListener('change', ev => { const t = ev.target, ds = t.dataset;
   if(ds.min) setDone(ds.min, {min:t.value});
   if(ds.note) setDone(ds.note, {note:t.value});
   if(ds.ct) setAns(ds.ct, t.value);
-  if(ds.dly){ setDaily(today(), ds.dly, num(t.value)); if(['rd','sl'].includes(ds.dly)) rerender(); }
+  if(ds.dly){ setDaily(ui.day || today(), ds.dly, num(t.value)); if(['rd','sl'].includes(ds.dly)) rerender(); }
   if(ds.avmin) setAvail(ds.avmin, ds.i, {min:t.value});
   if(ds.avnote) setAvail(ds.avnote, ds.i, {note:t.value});
   if(ds.avn) setAvail(ds.avn, null, {n:t.value});
@@ -895,10 +1001,19 @@ document.addEventListener('input', ev => { const t = ev.target; if(t.id && t.id.
   if(t.dataset && t.dataset.exsearch){ const q = t.value.trim().toLowerCase(); t.closest('.picker').querySelectorAll('.exlist [data-name]').forEach(b => b.style.display = !q || b.dataset.name.includes(q) ? '' : 'none'); } });
 document.addEventListener('keydown', ev => { const t = ev.target; if(ev.key==='Enter' && t.dataset && t.dataset.repx){ const v = num(t.value); if(v!=null) logSet(t.dataset.repx, v); } });
 
+/* ---------- vegen: dagen (Vandaag) en weken (Week/Check-in) ---------- */
+let sx = null, sy = null;
+document.addEventListener('touchstart', ev => { const t = ev.target; if(t.closest('input,textarea,select,.exlist,.chips,svg,table')) { sx = null; return; } sx = ev.touches[0].clientX; sy = ev.touches[0].clientY; }, {passive:true});
+document.addEventListener('touchend', ev => { if(sx===null) return; const dx = ev.changedTouches[0].clientX - sx, dy = ev.changedTouches[0].clientY - sy; sx = null;
+  if(Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy)*1.5) return; const n = dx < 0 ? 1 : -1;
+  if(ui.tab==='vandaag'){ ui.day = addDays(ui.day || today(), n); if(ui.day===today()) ui.day = null; render(); }
+  else if(ui.tab==='week'){ ui.week = addDays(ui.week, 7*n); render(); window.scrollTo(0,0); }
+  else if(ui.tab==='check'){ ui.chkWeek = addDays(ui.chkWeek||mondayOf(today()), 7*n); render(); } }, {passive:true});
+
 /* ---------- start ---------- */
 (async function(){
   await loadData();
-  const te = Number(sessionStorage.getItem('tEnd')); if(te > Date.now()){ tEnd = te; $('timer').classList.add('show'); startTicker(); tick(); }
+  const te = Number(sessionStorage.getItem('tEnd')); if(te > Date.now()){ tEnd = te; tDur = Number(sessionStorage.getItem('tDur')) || 90; $('timer').classList.add('show'); startTicker(); tick(); }
   if(PLAN && !weekByStart(ui.week)){ const t = today(); const w = PLAN.weeks.filter(w => w.start<=t).pop() || PLAN.weeks[0]; ui.week = w.start; }
   render(); scheduleSync();
   try { if(navigator.storage && navigator.storage.persist){ ui.persist = await navigator.storage.persisted() || await navigator.storage.persist(); } } catch(e){}

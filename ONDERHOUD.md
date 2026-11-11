@@ -42,9 +42,16 @@ Toekomstige weken blijven `concept`. Komt er geen update, dan opent de app gewoo
 ```
 `sport` = Strava `sport_type`. `sec` = moving time. `w` alleen bij fietsen. De app koppelt een activiteit aan een geplande sessie op **datum + sporttype** (run/race ↔ Run/TrailRun, bike ↔ Ride, strength ↔ WeightTraining, hyrox ↔ Workout/HIIT/WeightTraining). Niet-gekoppelde activiteiten verschijnen als "niet gepland". Handmatige duurlogs die aan een Strava-gekoppelde sessie hangen, tellen niet dubbel in de weekcijfers.
 
+## Plan-velden die de app gebruikt (v2.3)
+
+- `setTargets`: harde sets per spiergroep per week (doel), getoond in de weekcijfers. Basis: dosis-respons tot ≥ 10 sets/spiergroep/week (Schoenfeld e.a. 2017, meta-analyse); benen bewust lager vanwege loopbelasting. Per blok bijsturen.
+- `races`: de eerstvolgende wedstrijd wordt bovenaan Vandaag afgeteld.
+- `updated` + `version`: wijzigen = banner "Plan bijgewerkt".
+- Belastingwaarschuwing (vuistregel, geen harde grens): weekkm > 120% van het gemiddelde van de 3 weken ervoor, langste loop > 125% van de langste in 4 weken, hoogtemeters > 150% van het weekmaximum van 4 weken.
+
 ## Oura
 
-Er is (nov 2026) geen Oura-connector. Scores worden handmatig ingevuld in de ochtendcheck. Advieslogica (vuistregel, geen diagnose): pijn ≥ 4 of readiness < 60 → rood; readiness < 70, slaap < 60, benen ≤ 2 of readiness ≥ 10 onder 7-daags gemiddelde → oranje.
+Er is (nov 2026) geen Oura-connector. Scores worden handmatig ingevuld in de ochtendcheck. Advieslogica (vuistregel, geen diagnose): tot 21 ochtendchecks vaste grenzen (pijn ≥ 4 of readiness < 60 → rood; readiness < 70, slaap < 60, benen ≤ 2 of ≥ 10 onder 7-daags gemiddelde → oranje). Daarna persoonlijke baseline over 60 dagen: < gemiddelde − 2 sd → rood, < gemiddelde − 1 sd → oranje (slaap: − 1,5 sd). Pijn per plek staat in `daily[d].pains` ({plek: 1–8}); `daily[d].pain` = maximum, voor compatibiliteit.
 
 ## Releasechecklist (verplicht vóór elke push)
 

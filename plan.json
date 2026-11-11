@@ -1,6 +1,6 @@
 {
- "version": 2,
- "updated": "2026-11-11",
+ "version": 3,
+ "updated": "2026-11-11b",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -2250,5 +2250,17 @@
    "focus": "Mozart Ultra za 5 juni 07:30, St. Gilgen.",
    "days": []
   }
- ]
+ ],
+ "setTargets": {
+  "borst": 10,
+  "rug": 10,
+  "schouders": 8,
+  "biceps": 6,
+  "triceps": 6,
+  "quads": 8,
+  "hamstrings": 6,
+  "bilspieren": 6,
+  "kuiten": 8,
+  "core": 6
+ }
 }
