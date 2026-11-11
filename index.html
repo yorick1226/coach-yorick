@@ -154,7 +154,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.4.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -207,7 +207,7 @@ function altOptions(s){
 }
 const MAIN_LIFTS = ['SQ','RDL','BSS','HT','BP','OHP','PU','LP'];
 const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','VirtualRun'], bike:['Ride','VirtualRide','GravelRide','MountainBikeRide'],
-  swim:['Swim'], strength:['WeightTraining'], hyrox:['Workout','HighIntensityIntervalTraining','Crossfit','WeightTraining']};
+  swim:['Swim'], strength:['WeightTraining'], hyrox:['Workout','HighIntensityIntervalTraining','Crossfit','WeightTraining'], mobility:['WeightTraining','Yoga']};
 const RUNS = ['Run','TrailRun','VirtualRun'];
 
 /* ---------- opslag ---------- */
@@ -278,17 +278,55 @@ const isSkipped = sid => !!(S.done[sid]||{}).skip;
 
 /* ---------- Strava-koppeling ---------- */
 function actsIn(a, b){ return (STRAVA.activities||[]).filter(x => x.date>=a && x.date<=b); }
+const KW = ['push','pull','upper','lower','leg','benen','chest','borst','rug','back','hyrox','hrx','interval','drempel','tempo','lange','long','easy','recovery','trail','zwem','swim'];
+function matchScore(s, a){
+  if(!SPORTMAP[s.t] || !SPORTMAP[s.t].includes(a.sport)) return -1;
+  if(a.kind==='mobility' && s.t!=='mobility') return -1;
+  let sc = 1; const tn = s.title.toLowerCase(), an = (a.name||'').toLowerCase();
+  if(s.t==='hyrox' && a.kind==='hyrox') sc += 3; if(s.t==='strength' && a.kind==='hyrox') sc -= 2;
+  if(s.t==='hyrox' && a.sport!=='WeightTraining') sc += 1;
+  for(const k of KW) if(tn.includes(k) && an.includes(k)) sc += 2;
+  if(s.km && a.km) sc += Math.max(0, 2 - Math.abs(a.km - s.km)/Math.max(3, s.km*0.25));
+  return sc;
+}
 function matchWeek(w){
   const res = {by:{}, extra:[]}; if(!w) return res;
-  const acts = actsIn(w.start, addDays(w.start,6)).slice().sort((a,b)=> (b.sec||0)-(a.sec||0)); const used = new Set();
+  const acts = actsIn(w.start, addDays(w.start,6)); const used = new Set();
   const items = weekItems(w).filter(i => SPORTMAP[i.s.t] && !isSkipped(i.s.id));
-  const pri = t => ({race:0, run:1, bike:2, swim:3, hyrox:4, strength:5})[t] ?? 9;
-  for(const it of items.slice().sort((a,b)=> pri(a.s.t)-pri(b.s.t))){
-    const a = acts.find(x => !used.has(x.id) && x.date===it.date && SPORTMAP[it.s.t].includes(x.sport));
-    if(a){ used.add(a.id); res.by[it.s.id] = a; } }
+  const pairs = [];
+  for(const it of items) for(const a of acts) if(a.date===it.date){ const sc = matchScore(it.s, a); if(sc > 0) pairs.push({it, a, sc}); }
+  pairs.sort((x,y)=> y.sc - x.sc);
+  for(const p of pairs) if(!used.has(p.a.id) && !res.by[p.it.s.id]){ used.add(p.a.id); res.by[p.it.s.id] = p.a; }
   res.extra = acts.filter(x => !used.has(x.id)).sort((a,b)=> a.date.localeCompare(b.date));
   return res;
 }
+/* Intensiteit per run (grof: gemiddelde HF per sessie, of tempo als HF ontbreekt). */
+const EASY_RX = /easy|rustig|recovery|herstel|lange duur|shake|loslopen|z2/i;
+function easyHr(){ return Number(S.settings.easyHr) || 145; }
+function runClass(a){ if(!RUNS.includes(a.sport) || !a.sec) return null; const tp = Number(setting('tpace'))||263;
+  if(a.hr) return a.hr <= easyHr() ? 'rustig' : a.hr >= 160 ? 'hard' : 'matig';
+  if(!a.km) return null; const p = a.sec/a.km; return p >= tp*1.17 ? 'rustig' : p <= tp*1.05 ? 'hard' : 'matig'; }
+function easyFlag(s, a){ if(!a || !['run'].includes(s.t) || !EASY_RX.test(s.title)) return null;
+  if(a.hr && a.hr > easyHr()) return 'Te hard voor een rustige run: gem. HF '+Math.round(a.hr)+' (> '+easyHr()+')';
+  if(!a.hr && a.km && a.sec && a.sec/a.km < (Number(setting('tpace'))||263)*1.13) return 'Mogelijk te snel voor rustig: '+fmtSec(a.sec/a.km)+'/km';
+  return null; }
+function lapClass(l, tp){ const p = l.sec/(l.m/1000); if(p <= tp*1.03) return 'hard'; if(p <= tp*1.12) return 'matig'; return (l.hr && l.hr > easyHr()) ? 'matig' : 'rustig'; }
+function intensitySplit(acts){ const t = {rustig:0, matig:0, hard:0}; const tp = Number(setting('tpace'))||263;
+  for(const a of acts){ if(!RUNS.includes(a.sport)) continue;
+    if(a.laps && a.laps.length > 2){ for(const l of a.laps) if(l.m > 50) t[lapClass(l, tp)] += l.sec; }
+    else { const c = runClass(a); if(c) t[c] += a.sec; } }
+  const tot = t.rustig+t.matig+t.hard; return {t, tot}; }
+/* B8: intervalbeoordeling op basis van ronden en doeltempo uit het plan (tgt.pace = [snelst, langzaamst] in s/km). */
+function intervalEval(s, a){ if(!s.tgt || !s.tgt.pace || !a || !a.laps) return null; const [lo, hi] = s.tgt.pace;
+  const reps = a.laps.filter(l => l.m >= 150 && l.sec/(l.m/1000) <= hi*1.06); if(!reps.length) return null;
+  const pc = reps.map(l => l.sec/(l.m/1000)); const fast = [], slow = []; let ok = 0;
+  pc.forEach((v,i) => { if(v < lo-3) fast.push(i+1); else if(v > hi+3) slow.push(i+1); else ok++; });
+  const drift = pc.length>1 ? pc[pc.length-1]-pc[0] : 0;
+  let txt = reps.length+' werkronden · '+ok+' binnen '+fmtSec(lo)+'–'+fmtSec(hi);
+  if(fast.length) txt += ' · te snel: rep '+fast.join(', ')+' ('+fast.map(i=>fmtSec(pc[i-1])).join(', ')+')';
+  if(slow.length) txt += ' · te langzaam: rep '+slow.join(', ');
+  if(Math.abs(drift) >= 5) txt += ' · '+(drift>0?'verval':'versnelling')+' '+Math.round(Math.abs(drift))+' s/km van eerste naar laatste';
+  return {txt, good: !fast.length && !slow.length}; }
 function actLine(a){
   const p = [];
   if(a.km) p.push(fmtN(a.km,2)+' km'); if(a.sec) p.push(fmtSec(a.sec));
@@ -399,29 +437,37 @@ function suggest(e, code, prev){
 }
 
 /* ---------- weekcijfers ---------- */
+function altKm(s, alt){ const km = s.km||0; if(!alt) return km; if(/helft/i.test(alt)) return km*0.5; if(/^Ingekort/i.test(alt)) return km*0.65;
+  const mm = alt.match(/Easy (\d+)–(\d+) min/i); if(mm) return Math.round((+mm[1] + +mm[2])/2/6); return /KICKR|fiets|zwem|Upper|Mobiliteit/i.test(alt) ? 0 : km; }
 function manualUnlinked(a, b, m){ return S.cardio.filter(c => !c.del && c.date>=a && c.date<=b && !(c.sid && m.by[c.sid])); }
 function weekStats(w){
   const a = w.start, b = addDays(w.start,6), m = matchWeek(w), items = weekItems(w);
   const st = {runPlan:0, runDone:0, vertPlan:w.vert||0, vertDone:0, minPlan:0, secDone:0, sessPlan:0, sessDone:0, load:0, groups:{}, rd:[], sl:[]};
-  for(const it of items){ const s = it.s; if(['rest','mobility'].includes(s.t)) continue;
-    st.sessPlan++; if((S.done[s.id]||{}).d || m.by[s.id]) st.sessDone++;
-    if(['run','race'].includes(s.t)) st.runPlan += s.km||0;
+  st.easyFlags = []; st.intv = [];
+  for(const it of items){ const s = it.s; if(['rest','mobility'].includes(s.t)) continue; const dn = S.done[s.id]||{};
+    if(dn.skip){ st.skipped = (st.skipped||0)+1; continue; }
+    st.sessPlan++; if(dn.d || m.by[s.id]) st.sessDone++;
+    if(['run','race'].includes(s.t)) st.runPlan += altKm(s, dn.alt);
     st.minPlan += s.min||0;
+    const ef = easyFlag(s, m.by[s.id]); if(ef) st.easyFlags.push({date:it.date, s, txt:ef});
+    const iv = intervalEval(s, m.by[s.id]); if(iv) st.intv.push({date:it.date, s, iv});
     const d = S.done[s.id]||{}; const mins = num(d.min) || (m.by[s.id] ? m.by[s.id].sec/60 : 0); if(d.rpe && mins) st.load += d.rpe*mins; }
   for(const x of actsIn(a,b)){ st.secDone += x.sec||0; if(RUNS.includes(x.sport)){ st.runDone += x.km||0; st.vertDone += x.hm||0; } }
   for(const c of manualUnlinked(a,b,m)){ st.secDone += c.sec||0; if(['run','trail'].includes(c.sport)) st.runDone += c.km||0; st.vertDone += c.hm||0;
     if(c.rpe && c.sec && !(c.sid && (S.done[c.sid]||{}).rpe)) st.load += c.rpe*c.sec/60; }
   for(const x of S.sets) if(!x.del && x.date>=a && x.date<=b && (x.rir==null || x.rir<=4)){ const g = EXN(x.code).g || 'overig'; st.groups[g] = (st.groups[g]||0)+1; }
   for(let i=0;i<7;i++){ const y = dailyOf(addDays(a,i)); if(y.rd!=null) st.rd.push(y.rd); if(y.sl!=null) st.sl.push(y.sl); }
+  st.split = intensitySplit(actsIn(a,b));
   return st;
 }
 const avg = xs => xs.length ? Math.round(xs.reduce((p,q)=>p+q,0)/xs.length) : null;
 function statsCard(w){
   const st = weekStats(w); const pct = (d,p) => p ? Math.min(100, Math.round(d/p*100)) : (d?100:0);
-  let h = '<div class="card" id="stats"><div class="kv" style="border:0;padding:0;align-items:center"><span><b>Week</b> <span class="small">gedaan / gepland</span><br>'+st.sessDone+'/'+st.sessPlan+' sessies · '+fmtN(st.runDone)+'/'+fmtN(st.runPlan)+' km'+(st.vertPlan?' · '+Math.round(st.vertDone)+'/'+st.vertPlan+' hm':'')+'</span><button class="btn link" data-stats="1">'+(ui.stats?'▴':'Meer ▾')+'</button></div>';
+  let h = '<div class="card" id="stats"><div class="kv" style="border:0;padding:0;align-items:center"><span><b>Week</b> <span class="small">gedaan / gepland (na wijzigingen)</span><br>'+st.sessDone+'/'+st.sessPlan+' sessies · '+fmtN(st.runDone)+'/'+fmtN(st.runPlan)+' km'+(st.vertPlan?' · '+Math.round(st.vertDone)+'/'+st.vertPlan+' hm':'')+'</span><button class="btn link" data-stats="1">'+(ui.stats?'▴':'Meer ▾')+'</button></div>';
   if(!ui.stats) return h+'</div>';
   const kv = (l, p, d) => '<div class="kv"><span>'+l+'</span><span>'+p+' → <b>'+d+'</b></span></div>';
-  h += kv('Sessies', st.sessPlan, st.sessDone);
+  h += kv('Sessies', st.sessPlan+(st.skipped?' <span class="small">(+'+st.skipped+' vervallen)</span>':''), st.sessDone);
+  if(st.split.tot){ const p = k => Math.round(st.split.t[k]/st.split.tot*100); h += '<div class="kv"><span>Looptijd rustig / matig / hard</span><span><b>'+p('rustig')+'</b> / '+p('matig')+' / '+p('hard')+' %</span></div><div class="bar" style="display:flex"><i style="width:'+p('rustig')+'%;background:#22c55e"></i><i style="width:'+p('matig')+'%;background:#f5b942"></i><i style="width:'+p('hard')+'%;background:#f87171"></i></div>'; }
   h += kv('Hardlopen', fmtN(st.runPlan)+' km', fmtN(st.runDone)+' km'); h += '<div class="bar"><i style="width:'+pct(st.runDone,st.runPlan)+'%"></i></div>';
   h += kv('Hoogtemeters', st.vertPlan+' m', Math.round(st.vertDone)+' m'); if(st.vertPlan) h += '<div class="bar"><i style="width:'+pct(st.vertDone,st.vertPlan)+'%"></i></div>';
   h += kv('Tijd', fmtH(st.minPlan*60), fmtH(st.secDone));
@@ -487,6 +533,9 @@ function sessCard(it, m, opt){
   if(skip) h += '<div class="small" style="color:var(--warn)">Niet uitgevoerd: '+esc(skip)+'</div>';
   if(st.alt) h += '<div class="small" style="color:var(--blue)">Alternatief: '+esc(st.alt)+'</div>';
   h += '</div></div>';
+  const ef = easyFlag(s, a), iv = intervalEval(s, a);
+  if(ef) h += '<div class="banner rood" style="margin:8px 0 0;padding:6px 10px;font-size:14px">⚠ '+esc(ef)+'</div>';
+  if(iv) h += '<div class="banner '+(iv.good?'groen':'oranje')+'" style="margin:8px 0 0;padding:6px 10px;font-size:14px">'+(iv.good?'✓ ':'⚠ ')+esc(iv.txt)+'</div>';
   if(a) h += '<div class="strava"><b>✓ Strava</b> '+actLine(a)+(open && a.laps?'<br><button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>'+(ui.laps[s.id]?lapsTable(a):''):'')+'</div>';
   const quick = [];
   if(s.t!=='rest') quick.push('<button class="btn sm'+(open?' warn':'')+'" data-open="'+s.id+'">'+(open?'Inklappen ▴':'Details & invullen ▾')+'</button>');
@@ -562,11 +611,18 @@ function rToday(){
 function rWeek(){
   const w = weekByStart(ui.week); const wid = weekIdOf(ui.week);
   $('htitle').textContent = 'Week '+wid.split('-W')[1]+' · '+fmtDay(ui.week);
-  if(!w){ $('view').innerHTML = '<div class="card">Geen plan voor deze week.</div>'; return; }
+  if(!w){ const acts = actsIn(ui.week, addDays(ui.week,6)); const sp = intensitySplit(acts); const km = acts.filter(a=>RUNS.includes(a.sport)).reduce((p,a)=>p+(a.km||0),0);
+    let h = '<div class="card"><b>Vóór de start van het plan</b><div class="mut">Alleen wat Strava registreerde.</div>'+(acts.length?'<div class="kv"><span>Lopen</span><span><b>'+fmtN(km)+' km</b> · '+acts.length+' activiteiten · '+fmtH(acts.reduce((p,a)=>p+(a.sec||0),0))+'</span></div>':'')+(sp.tot?'<div class="small">Looptijd rustig/matig/hard: '+['rustig','matig','hard'].map(k=>Math.round(sp.t[k]/sp.tot*100)).join(' / ')+' %</div>':'')+'</div>';
+    for(let i=0;i<7;i++){ const dd = addDays(ui.week,i); const da = acts.filter(a => a.date===dd); if(!da.length) continue;
+      h += '<div class="day"><h2>'+fmtDay(dd)+'</h2>'+da.map(a => '<div class="strava"><b>'+esc(a.name)+'</b>'+(a.race?' 🏁':'')+'<div>'+actLine(a)+'</div></div>').join('')+'</div>'; }
+    if(!acts.length) h += '<div class="card mut">Geen activiteiten bekend.</div>';
+    $('view').innerHTML = h; return; }
   const t = today(); const m = matchWeek(w); let h = '';
   h += w.status==='concept' ? '<div class="banner concept"><b>Concept</b> — nog niet afgestemd. Wordt definitief na je zondag-check-in.</div>' : '<div class="banner def"><b>Definitief</b></div>';
   h += weekStrip(w.start, null, 'week');
   h += '<div class="card"><b>'+esc(w.phase)+'</b><div class="mut">'+esc(w.focus)+'</div></div>';
+  if(w.note) h += '<div class="card" id="coachnote" style="border-color:#23406a"><b>🧭 Coach</b><div class="det">'+esc(w.note)+'</div></div>';
+  const cf = availConflicts(w); if(cf.length) h += '<div class="banner oranje" id="availwarn"><b>Past niet in je beschikbaarheid</b><br>'+cf.map(esc).join('<br>')+'<div class="small" style="color:inherit;opacity:.8">Verplaats via “Details → Lukt niet”, of laat het zondag aanpassen.</div></div>';
   if(w.days.length){ h += statsCard(w); const wn = loadWarnings(w); if(wn.length) h += '<div class="banner oranje" id="loadwarn"><b>Let op opbouw</b><br>'+wn.map(esc).join('<br>')+'<div class="small" style="color:inherit;opacity:.8">Vuistregel (± 20% per week, langste loop ± 25%), geen harde grens. Bespreek het zondag als het bewust is.</div></div>'; }
   else h += '<div class="card mut">Nog niet uitgewerkt. Volgt na de check-in van de week ervoor.</div>';
   const items = weekItems(w);
@@ -699,10 +755,15 @@ function barSvg(vals, labels, opt){
   opt = opt||{}; const W = 320, H = 110, pb = 16, max = Math.max(1, ...vals, opt.target||0); const bw = W/vals.length;
   let s = '<svg viewBox="0 0 '+W+' '+(H+pb)+'" width="100%" role="img">';
   vals.forEach((v,i) => { const h = v/max*(H-12); s += '<rect x="'+(i*bw+3)+'" y="'+(H-h)+'" width="'+(bw-6)+'" height="'+h+'" rx="3" fill="'+(i===vals.length-1?'#60a5fa':'#22c55e')+'"/>';
-    if(v) s += '<text x="'+(i*bw+bw/2)+'" y="'+(H-h-3)+'" text-anchor="middle">'+(opt.fmt?opt.fmt(v):Math.round(v))+'</text>';
-    s += '<text x="'+(i*bw+bw/2)+'" y="'+(H+12)+'" text-anchor="middle">'+labels[i]+'</text>'; });
+    if(v && vals.length <= 16) s += '<text x="'+(i*bw+bw/2)+'" y="'+(H-h-3)+'" text-anchor="middle">'+(opt.fmt?opt.fmt(v):Math.round(v))+'</text>';
+    if(vals.length <= 16 || i % Math.ceil(vals.length/13) === 0) s += '<text x="'+(i*bw+bw/2)+'" y="'+(H+12)+'" text-anchor="middle">'+labels[i]+'</text>'; });
   return s+'</svg>';
 }
+function stackSvg(splits, labels){ const W = 320, H = 100, bw = W/splits.length; let s = '<svg viewBox="0 0 '+W+' '+(H+16)+'" width="100%">';
+  splits.forEach((sp,i) => { if(!sp.tot){ s += '<text x="'+(i*bw+bw/2)+'" y="'+(H+12)+'" text-anchor="middle">'+labels[i]+'</text>'; return; } let y = H;
+    for(const [k,c] of [['rustig','#22c55e'],['matig','#f5b942'],['hard','#f87171']]){ const h = sp.t[k]/sp.tot*H; y -= h; s += '<rect x="'+(i*bw+2)+'" y="'+y+'" width="'+(bw-4)+'" height="'+h+'" fill="'+c+'"/>'; }
+    s += '<text x="'+(i*bw+bw/2)+'" y="'+(H+12)+'" text-anchor="middle">'+labels[i]+'</text>'; });
+  return s+'</svg>'; }
 function lineSvg(series){
   const W = 320, H = 110; const all = series.flatMap(x=>x.pts.map(p=>p[1])); if(!all.length) return '';
   const xs = series.flatMap(x=>x.pts.map(p=>p[0])); const x0 = Math.min(...xs), x1 = Math.max(...xs);
@@ -716,7 +777,7 @@ function lineSvg(series){
 const e1 = x => x.reps<=12 && x.kg ? x.kg*(1+x.reps/30) : null;
 function rInsight(){
   $('htitle').textContent = 'Inzicht';
-  const t = today(); const thisMon = mondayOf(t); const weeks = []; for(let i=11;i>=0;i--) weeks.push(addDays(thisMon, -7*i));
+  const t = today(); const thisMon = mondayOf(t); const weeks = []; const NW = ui.range||12; for(let i=NW-1;i>=0;i--) weeks.push(addDays(thisMon, -7*i));
   const lab = weeks.map(w => weekIdOf(w).split('-W')[1]);
   const wk = weeks.map(a => { const b = addDays(a,6); const pw = weekByStart(a); const m = matchWeek(pw);
     let km=0, hm=0, sec=0; for(const x of actsIn(a,b)){ sec += x.sec||0; if(RUNS.includes(x.sport)){ km += x.km||0; hm += x.hm||0; } }
@@ -728,9 +789,11 @@ function rInsight(){
   const longKm = Math.max(0, ...runs.map(r=>r.km)), longH = Math.max(0, ...runs.map(r=>r.sec))/3600, sessHm = Math.max(0, ...runs.map(r=>r.hm));
   const byDay = {}; runs.forEach(r => byDay[r.date] = (byDay[r.date]||0) + r.km); let b2b = 0; for(const d in byDay){ const n = byDay[addDays(d,1)]; if(n) b2b = Math.max(b2b, byDay[d]+n); }
   const maxWkHm = Math.max(0, ...wk.map(x=>x.hm));
+  const splits = weeks.map(a => intensitySplit(actsIn(a, addDays(a,6))));
   const fuel = S.cardio.filter(c => !c.del && c.kh && c.sec >= (MZ.fuelH||4)*3600 && (c.maag||5) >= 3).map(c => c.kh); const fuelBest = fuel.length ? Math.max(...fuel) : 0;
   const days = Math.round((parseD(MZ.date||'2027-06-05') - parseD(t))/864e5);
-  let h = '<div class="card" id="mozart"><h3>Richting Mozart <span class="small">nog '+days+' dagen</span></h3>';
+  let h = '<div class="chips sm" style="margin:0 0 10px">'+[[12,'12 wk'],[26,'½ jaar'],[52,'jaar']].map(([n,l]) => '<button class="chip'+((ui.range||12)===n?' on':'')+'" data-range="'+n+'">'+l+'</button>').join('')+'</div>';
+  h += '<div class="card" id="mozart"><h3>Richting Mozart <span class="small">nog '+days+' dagen</span></h3>';
   const pr = (l, v, tg, u, f) => '<div style="margin:8px 0"><div class="kv" style="border:0;padding:0"><span>'+l+'</span><span><b>'+(f?f(v):Math.round(v))+'</b> / '+tg+' '+u+'</span></div><div class="bar"><i style="width:'+Math.min(100, Math.round(v/tg*100))+'%"></i></div></div>';
   h += pr('Langste duurloop', longKm, MZ.longRunKm||50, 'km', v=>fmtN(v));
   h += pr('Langste tijd op de benen', longH, MZ.timeOnFeetH||8, 'u', v=>fmtN(v));
@@ -738,8 +801,14 @@ function rInsight(){
   h += pr('Meeste hoogtemeters in één sessie', sessHm, MZ.sessionVert||2500, 'm');
   h += pr('Back-to-back (2 dagen)', b2b, MZ.b2bKm||60, 'km', v=>fmtN(v));
   h += pr('Geteste voeding ≥ '+(MZ.fuelH||4)+' u (maag ≥ 3)', fuelBest, MZ.fuelGph||80, 'g/u');
-  h += '<div class="small">Doelen zijn coachrichtlijnen voor juni. Bron: Strava + handmatige logs.</div></div>';
+  h += '<div class="small">Doelen zijn coachrichtlijnen voor juni. Bron: Strava + handmatige logs.</div>';
+  const hilly = (STRAVA.activities||[]).filter(a => RUNS.includes(a.sport) && a.km && a.hm >= 300).map(a => ({a, t:(a.el||a.sec), ek:(a.km + a.hm/100), vph: a.hm/((a.sec)/3600), mpk: a.hm/a.km})).map(x => Object.assign(x, {rate: x.ek/(x.t/3600)})).filter(x => x.rate >= 4.5 && x.vph < 1500).sort((x,y)=> y.a.date.localeCompare(x.a.date));
+  const ref = hilly.find(x => x.t >= 3*3600 && x.mpk >= 25) || null; const MZ_EK = 84 + 48;
+  if(ref){ const prog = MZ_EK/ref.rate; h += '<div class="banner '+(prog > 18 ? 'rood' : prog > 16.5 ? 'oranje' : 'groen')+'" style="margin-top:10px" id="mzprog"><b>Mozart-prognose ± '+fmtN(prog)+' u</b> (limiet 19 u)<div class="small" style="color:inherit">Grove schatting: 132 effort-km (84 km + 4800 hm/100) gedeeld door je tempo in '+esc(ref.a.name)+' ('+fmtN(ref.rate)+' effort-km/u, incl. stops). Wordt beter zodra je recentere lange heuvelsessies loopt.</div></div>'; }
+  if(hilly.length) h += '<div style="margin-top:10px"><b style="font-size:15px">Klimsessies (≥ 300 hm)</b><table><tr><th>Datum</th><th class="r">hm</th><th class="r">hm/u</th><th class="r">effort-km/u</th></tr>'+hilly.slice(0,6).map(x => '<tr><td>'+fmtDay(x.a.date)+' '+x.a.date.slice(2,4)+'<div class="small">'+esc(x.a.name.slice(0,34))+'</div></td><td class="r">'+x.a.hm+'</td><td class="r">'+Math.round(x.vph)+'</td><td class="r">'+fmtN(x.rate)+'</td></tr>').join('')+'</table><div class="small">hm/u = hoogtemeters per bewegend uur over de hele sessie (inclusief vlak/dalen), geen pure klimsnelheid.</div></div>';
+  h += '</div>';
   h += '<div class="card"><h3>Hardlopen km/week</h3>'+barSvg(wk.map(x=>x.km), lab)+'</div>';
+  h += '<div class="card"><h3>Looptijd rustig / matig / hard</h3>'+stackSvg(splits, lab)+'<div class="small">Per ronde ingedeeld waar ronden bekend zijn (tempo t.o.v. drempel), anders per sessie op gemiddelde HF (rustig ≤ '+easyHr()+', hard ≥ 160) of tempo. Grof, maar laat het patroon zien. Richting ≥ 75–80% rustig.</div></div>';
   h += '<div class="card"><h3>Hoogtemeters/week</h3>'+barSvg(wk.map(x=>x.hm), lab)+'</div>';
   h += '<div class="card"><h3>Trainingsuren/week</h3>'+barSvg(wk.map(x=>x.sec/3600), lab, {fmt:v=>fmtN(v)})+'</div>';
   if(wk.some(x=>x.load)) h += '<div class="card"><h3>Belasting (sRPE)/week</h3>'+barSvg(wk.map(x=>x.load), lab)+'<div class="small">Alleen weken waarin je RPE per sessie invult.</div></div>';
@@ -758,17 +827,20 @@ function rInsight(){
   h += '<div class="row"><button class="btn" data-manual="1">＋ Handmatige duursessie</button></div>';
   $('view').innerHTML = h;
 }
-const STD = [['1 km',1],['5 km',5],['10 km',10],['15 km',15],['21,1 km',21.0975],['42,2 km',42.195]];
+const STD = [['1 km',1],['1 mijl',1.609],['5 km',5],['10 km',10],['15 km',15],['21,1 km',21.0975],['30 km',30],['42,2 km',42.195],['50 km',50]];
 function recordsHtml(){
   let h = '<div class="card"><h3>Records afstanden</h3><table><tr><th>Afstand</th><th>Tijd</th><th>Bron</th></tr>';
   for(const [lab, km] of STD){
     const cands = [];
     for(const p of (PLAN.pr||[])) if(p.dist===lab) cands.push({sec:p.sec, src:p.src});
+    for(const p of (STRAVA.best||[])) if(p.dist===lab) cands.push({sec:p.sec, src:'Strava · '+fmtDay(p.date)+' '+p.date.slice(0,4)});
     for(const c of S.cardio) if(!c.del && c.race && c.km && c.sec && ['run','trail'].includes(c.sport) && Math.abs(c.km-km)/km <= 0.02) cands.push({sec:c.sec, src:'App · '+fmtDay(c.date)});
     const b = cands.sort((a,b)=>a.sec-b.sec)[0];
     h += '<tr><td>'+lab+'</td><td><b>'+(b?fmtSec(b.sec):'–')+'</b>'+(b?'<div class="small">'+fmtSec(b.sec/km)+' /km</div>':'')+'</td><td class="small">'+(b?esc(b.src):'')+'</td></tr>';
   }
-  h += '</table><div class="small" style="margin-top:6px">Handmatige sessies met vinkje “Wedstrijd/test” tellen mee.</div></div>';
+  h += '</table><div class="small" style="margin-top:6px">Bron: Strava-beste prestaties (ook delen van langere runs), bijgewerkt '+esc(STRAVA.updated||'–')+', plus handmatige sessies met vinkje “Wedstrijd/test”.</div></div>';
+  const races = (STRAVA.activities||[]).filter(a => a.race && RUNS.includes(a.sport)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,8);
+  if(races.length) h += '<div class="card"><h3>Wedstrijden</h3><table><tr><th>Datum</th><th>Wedstrijd</th><th class="r">Tijd</th></tr>'+races.map(a => '<tr><td>'+fmtDay(a.date)+' '+a.date.slice(2,4)+'</td><td>'+esc(a.name)+'<div class="small">'+(a.km?fmtN(a.km)+' km':'')+(a.hm?' · '+a.hm+' hm':'')+'</div></td><td class="r">'+fmtSec(a.el||a.sec)+'</td></tr>').join('')+'</table></div>';
   const by = {};
   for(const x of S.sets) if(!x.del && x.kg && unitOf(x.code)==='kg' && !EXN(x.code).time){
     const v = e1(x); const r = by[x.code] || (by[x.code] = {max:null, e1:null});
@@ -786,7 +858,8 @@ function recordsHtml(){
 
 /* ---------- check-in + beschikbaarheid ---------- */
 function rCheck(){
-  if(!ui.chkWeek) ui.chkWeek = mondayOf(today());
+  if(!ui.chkWeek){ const t = today(), mon = mondayOf(t), dow = (parseD(t).getDay()+6)%7; const prev = addDays(mon,-7);
+    ui.chkWeek = (dow <= 1 && !S.checkins[weekIdOf(prev)]) ? prev : mon; }
   const wid = weekIdOf(ui.chkWeek); $('htitle').textContent = 'Check-in week '+wid.split('-W')[1];
   const ci = S.checkins[wid]; const qv = ci ? ci.qv : QV_CURRENT; const a = (ci && ci.a) || {};
   let h = '<div class="card"><div class="mut">Week van '+fmtDay(ui.chkWeek)+' t/m '+fmtDay(addDays(ui.chkWeek,6))+'. Alles wordt automatisch bewaard. Zondag: vul in en kopieer de export onderaan.</div></div>';
@@ -815,6 +888,13 @@ function availHtml(nextMon){
   h += '<label class="f">Algemeen (reizen, events, wensen)</label><input type="text" data-avn="'+nid+'" value="'+esc(av.n||'')+'"></div>';
   return h;
 }
+function availConflicts(w){ const av = S.avail[w.id]; if(!av || !av.d) return []; const out = [];
+  for(let i=0;i<7;i++){ const x = av.d[i]; if(!x || (!x.slot && !x.min)) continue; const dd = addDays(w.start,i);
+    const its = weekItems(w).filter(it => it.date===dd && !['rest'].includes(it.s.t) && !isSkipped(it.s.id)); const mins = its.reduce((p,it)=>p+(it.s.min||0),0);
+    if(x.slot==='Niet' && its.length) out.push(fmtDay(dd)+': niet beschikbaar, maar '+its.length+' sessie(s) gepland.');
+    else if(['1×','Alleen ochtend','Alleen avond'].includes(x.slot) && its.filter(it=>it.s.t!=='mobility').length > 1) out.push(fmtDay(dd)+': '+x.slot+', maar '+its.length+' sessies gepland.');
+    if(num(x.min) && mins > num(x.min)) out.push(fmtDay(dd)+': max '+x.min+' min, gepland ± '+mins+' min.'); }
+  return out; }
 function setAvail(nid, i, patch){ const av = S.avail[nid] || (S.avail[nid] = {d:{}, n:''}); if(i==null) Object.assign(av, patch); else av.d[i] = Object.assign({}, av.d[i]||{}, patch); av.ts = Date.now(); enqueue('avail', nid, nid, av); }
 function setAns(k, v){ const wid = weekIdOf(ui.chkWeek); const ci = S.checkins[wid] || (S.checkins[wid] = {qv:QV_CURRENT, a:{}});
   ci.a[k] = v; ci.ts = Date.now(); enqueue('checkin', wid, ui.chkWeek, ci); }
@@ -825,6 +905,16 @@ function setDaily(d, k, v){ const x = S.daily[d] || (S.daily[d] = {}); if(v===nu
 function weekText(start){
   const w = weekByStart(start); const wid = weekIdOf(start); const end = addDays(start, 6); const L = []; const m = matchWeek(w);
   L.push('WEEK '+wid+' ('+fmtDay(start)+' – '+fmtDay(end)+')'+(w?' · '+w.phase+' · '+w.status:'')+' · app '+APP_VERSION);
+  if(w && w.days.length){ const st = weekStats(w); const sp = st.split; const pains = {}; for(let i=0;i<7;i++){ const y = dailyOf(addDays(start,i)); for(const [k,v] of Object.entries(y.pains||{})) pains[k] = Math.max(pains[k]||0, v); }
+    L.push(''); L.push('SAMENVATTING');
+    L.push('- Naleving: '+st.sessDone+'/'+st.sessPlan+' sessies'+(st.skipped?' ('+st.skipped+' vervallen)':'')+' · lopen '+fmtN(st.runDone)+'/'+fmtN(st.runPlan)+' km · '+Math.round(st.vertDone)+' hm · '+fmtH(st.secDone));
+    if(sp.tot) L.push('- Looptijd rustig/matig/hard: '+['rustig','matig','hard'].map(k=>Math.round(sp.t[k]/sp.tot*100)).join('/')+' %');
+    L.push('- Rustige runs te hard: '+(st.easyFlags.length ? st.easyFlags.map(f => fmtDay(f.date)+' ('+f.txt.replace(/^.*?: /,'')+')').join('; ') : 'geen'));
+    if(st.intv.length) L.push('- Intervallen: '+st.intv.map(x => fmtDay(x.date)+': '+x.iv.txt).join(' | '));
+    L.push('- Pijn: '+(Object.keys(pains).length ? Object.entries(pains).map(([k,v])=>k+' max '+v).join(', ') : 'geen gemeld'));
+    if(st.rd.length||st.sl.length) L.push('- Oura gem.: readiness '+(avg(st.rd)??'–')+', slaap '+(avg(st.sl)??'–'));
+    const cf = availConflicts(weekByStart(addDays(start,7))||{id:''}); if(cf.length) L.push('- Conflicten volgende week: '+cf.join(' '));
+    L.push(''); }
   L.push('Legenda: [x] afgevinkt · [S] alleen in Strava · [A] alternatief gekozen, niet afgevinkt · [–] niet uitgevoerd · [ ] niet gedaan');
   for(let i=0;i<7;i++){ const dd = addDays(start,i); const its = weekItems(w).filter(x => x.date===dd); const y = dailyOf(dd);
     const ex = m.extra.filter(x => x.date===dd); const hasD = y.rd!=null||y.sl!=null||y.legs!=null||y.pain!=null;
@@ -832,7 +922,8 @@ function weekText(start){
     L.push(''); L.push(fmtDay(dd).toUpperCase()+(hasD ? '  [Oura readiness '+(y.rd??'–')+', slaap '+(y.sl??'–')+(y.hrv!=null?', HRV '+y.hrv:'')+(y.rhr!=null?', rust-HF '+y.rhr:'')+(y.legs!=null?', benen '+y.legs+'/5':'')+(y.pains?', pijn '+Object.entries(y.pains).map(([k,v])=>k+' '+v).join(', '):(y.pain!=null?', pijn '+y.pain+'/10':''))+']' : ''));
     for(const it of its){ const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id];
       const mark = st.skip ? '[–]' : st.d ? '[x]' : a ? '[S]' : st.alt ? '[A]' : '[ ]';
-      L.push(mark+' '+s.title+(s.km?' (gepland '+s.km+' km)':'')+(it.date!==it.orig?' · verplaatst van '+fmtDay(it.orig):'')+(st.skip?' · niet uitgevoerd: '+st.skip:'')+(st.alt?' · ALTERNATIEF: '+st.alt:'')+(st.rpe?' · RPE '+st.rpe:'')+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
+      L.push(mark+' '+s.title+(s.km?' (gepland '+fmtN(s.km)+' km)':'')+(it.date!==it.orig?' · verplaatst van '+fmtDay(it.orig):'')+(st.skip?' · niet uitgevoerd: '+st.skip:'')+(st.alt?' · ALTERNATIEF: '+st.alt:'')+(st.rpe?' · RPE '+st.rpe:'')+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
+      const efx = easyFlag(s, a), ivx = intervalEval(s, a); if(efx) L.push('    ⚠ '+efx); if(ivx) L.push('    Interval: '+ivx.txt);
       if(a){ L.push('    Strava: '+actLine(a)); if(a.laps) L.push('    Ronden: '+a.laps.map(l => l.m+'m '+fmtSec(l.sec)+(l.hr?'@'+l.hr:'')).join(', ')); }
       const sets = S.sets.filter(x => x.sid===s.id && !x.del).sort((a,b)=>a.ts-b.ts);
       if(sets.length){ const g = {}; for(const x of sets) (g[x.code] = g[x.code] || []).push((x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':''));
@@ -880,6 +971,7 @@ function rMeer(){
   h += '</div>';
   h += '<div class="card"><h3>Instellingen</h3><div class="small">Leeg = waarde uit het plan.</div>';
   h += '<div class="row"><div><label class="f">FTP (W)</label><input id="s_ftp" type="text" inputmode="numeric" placeholder="'+(PLAN?PLAN.athlete.ftp:'')+'" value="'+esc(st.ftp??'')+'"></div><div><label class="f">LTHR (bpm)</label><input id="s_lthr" type="text" inputmode="numeric" placeholder="'+(PLAN?PLAN.athlete.lthr:'')+'" value="'+esc(st.lthr??'')+'"></div></div>';
+  h += '<label class="f">Grens rustige run: max gem. HF</label><input id="s_easy" type="text" inputmode="numeric" placeholder="145" value="'+esc(st.easyHr??'')+'">';
   h += '<label class="f">Drempeltempo (m:ss /km)</label><input id="s_tpace" type="text" inputmode="numeric" placeholder="'+(PLAN?fmtSec(PLAN.athlete.tpace):'')+'" value="'+(st.tpace?fmtSec(st.tpace):'')+'">';
   h += '<label class="f">Google Sheet web-app-URL (optioneel)</label><input id="s_url" type="url" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(st.sheetUrl||'')+'">';
   h += '<div class="row"><button class="btn pri" id="s_save">Bewaar instellingen</button><button class="btn" id="s_sync">Sync nu ('+S.queue.length+')</button></div>';
@@ -930,6 +1022,7 @@ document.addEventListener('click', ev => {
   if(ds.ploc){ const d = ui.day || today(); const x = S.daily[d] || (S.daily[d] = {}); const p = Object.assign({}, x.pains||{}); if(p[ds.ploc]!=null) delete p[ds.ploc]; else p[ds.ploc] = 2; setPains(d, p); rerender(); return; }
   if(ds.pscore){ const d = ui.day || today(); const p = Object.assign({}, (dailyOf(d).pains)||{}); p[ds.pscore] = Number(ds.v); setPains(d, p); rerender(); return; }
   if(ds.stats){ ui.stats = !ui.stats; rerender(); return; }
+  if(ds.range){ ui.range = Number(ds.range); rerender(); return; }
   if(ds.laps){ ui.laps[ds.laps] = !ui.laps[ds.laps]; rerender(); return; }
   if(ds.menu){ ui.menu[ds.menu] = !ui.menu[ds.menu]; rerender(); return; }
   if(ds.move){ const f = sessById(ds.move); if(ds.to===f.d.date) delete S.moves[ds.move]; else S.moves[ds.move] = ds.to; enqueue('move', ds.move, ds.to, {to:ds.to, from:f.d.date}); rerender(); toast('Verplaatst naar '+fmtDay(ds.to)); return; }
@@ -981,7 +1074,7 @@ document.addEventListener('click', ev => {
     case 'r_go': { if(!ui.restoreArmed){ try { parseBackup($('r_in').value); } catch(e){ toast('Ongeldige code'); return; } ui.restoreArmed = true; const v = $('r_in').value; rMeer(); $('r_in').value = v; return; }
       try { const o = parseBackup($('r_in').value); try { localStorage.setItem(KEY+'.undo', JSON.stringify(S)); } catch(_){} S = o; save(); ui.restoreArmed = false; toast('Hersteld'); render(); } catch(e){ toast('Ongeldige code'); } return; }
     case 'r_undo': { try { S = migrate(JSON.parse(localStorage.getItem(KEY+'.undo'))); save(); localStorage.removeItem(KEY+'.undo'); toast('Herstel ongedaan gemaakt'); render(); } catch(e){ toast('Niets om terug te zetten'); } return; }
-    case 's_save': { S.settings.ftp = num($('s_ftp').value); S.settings.lthr = num($('s_lthr').value);
+    case 's_save': { S.settings.ftp = num($('s_ftp').value); S.settings.lthr = num($('s_lthr').value); S.settings.easyHr = num($('s_easy').value);
       const tp = parseTime($('s_tpace').value); S.settings.tpace = isNaN(tp) ? null : tp; S.settings.sheetUrl = $('s_url').value.trim(); save(); toast('Bewaard'); scheduleSync(); return; }
     case 's_sync': flush().then(()=> toast(S.queue.length ? 'Nog '+S.queue.length+' in wachtrij' : 'Verstuurd')); return;
   }
@@ -1015,6 +1108,7 @@ document.addEventListener('touchend', ev => { if(sx===null) return; const dx = e
   await loadData();
   const te = Number(sessionStorage.getItem('tEnd')); if(te > Date.now()){ tEnd = te; tDur = Number(sessionStorage.getItem('tDur')) || 90; $('timer').classList.add('show'); startTicker(); tick(); }
   if(PLAN && !weekByStart(ui.week)){ const t = today(); const w = PLAN.weeks.filter(w => w.start<=t).pop() || PLAN.weeks[0]; ui.week = w.start; }
+  if(PLAN && S.settings.seenPlan===null && !S.sets.length && !Object.keys(S.done).length){ S.settings.seenPlan = PLAN.version+'/'+PLAN.updated; save(); }
   render(); scheduleSync();
   try { if(navigator.storage && navigator.storage.persist){ ui.persist = await navigator.storage.persisted() || await navigator.storage.persist(); } } catch(e){}
   if('serviceWorker' in navigator){

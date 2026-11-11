@@ -1,6 +1,6 @@
 {
- "version": 4,
- "updated": "2026-11-11c",
+ "version": 5,
+ "updated": "2026-11-11d",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -496,7 +496,13 @@
        "title": "3 × 2 km @ 4:40–4:45",
        "detail": "WU 2 km easy + 4 strides\n3 × 2 km @ 4:40–4:45, 2 min jog\nCD 2 km\nTotaal ~10 km · RPE 6",
        "min": 55,
-       "km": 10
+       "km": 10,
+       "tgt": {
+        "pace": [
+         280,
+         285
+        ]
+       }
       },
       {
        "id": "2026-11-10-b",
@@ -801,7 +807,8 @@
       }
      ]
     }
-   ]
+   ],
+   "note": "Tussenstand (wo 11 nov): di 3 × 2 km netjes op 4:38–4:46 met lage HF. Goed gedoseerd.\nLet op: je 'Benen loslopen' van do 5 nov had gem. HF 152 — dat is geen rustige run. Houd do 12 nov echt onder 145.\nZondag Zevenheuvelenloop: eerste 3 km 4:50–4:55, heuvels op gevoel, niet op tempo."
   },
   {
    "id": "2026-W47",
@@ -1021,7 +1028,13 @@
        "title": "5 × 5 min @ drempel",
        "detail": "WU 2,5 km + loopscholing (A-skip, B-skip, skippings 2×20 m) + 3 strides\n5 × 5 min @ 4:22–4:28/km · 90 s jog\nHF loopt op tot 165–172 in de laatste minuten · RPE 7, níét 9\nCD 2 km · totaal ~11–12 km\nEerste blok NIET sneller dan 4:22.",
        "min": 60,
-       "km": 11.5
+       "km": 11.5,
+       "tgt": {
+        "pace": [
+         262,
+         268
+        ]
+       }
       },
       {
        "id": "2026-11-19-b",
@@ -1255,7 +1268,8 @@
      ]
     }
    ],
-   "vert": 0
+   "vert": 0,
+   "note": "Focus: herstel na de race (ma–wo), daarna squat/RDL licht terug en eerste drempelsessie.\nDrempel do: eerste blok niet sneller dan 4:22. De app beoordeelt je ronden; druk op de lap-knop per blok.\nLange duur za: eerste 16 km echt rustig (HF ≤ 145). Voeding loggen."
   },
   {
    "id": "2026-W48",
@@ -1350,7 +1364,13 @@
        "title": "5 × 1200 m @ 4:08–4:14",
        "detail": "WU 2,5 km + loopscholing + 3 strides\nPlyo in de warming-up: pogo 2×15, snap-down 3×3\n5 × 1200 m @ 4:08–4:14/km · 2 min jog\nCD 2 km · totaal ~12 km · RPE 8 in de laatste herhaling",
        "min": 60,
-       "km": 12
+       "km": 12,
+       "tgt": {
+        "pace": [
+         248,
+         254
+        ]
+       }
       },
       {
        "id": "2026-11-24-b",
@@ -1440,7 +1460,13 @@
        "title": "2 × 15 min @ 4:25–4:32",
        "detail": "WU 2,5 km\n2 × 15 min @ 4:25–4:32 · 3 min jog · HF ≤ 170\nCD 2 km · totaal ~13 km · RPE 7",
        "min": 65,
-       "km": 13
+       "km": 13,
+       "tgt": {
+        "pace": [
+         265,
+         272
+        ]
+       }
       },
       {
        "id": "2026-11-26-b",
@@ -1754,7 +1780,13 @@
        "title": "8 × 800 m @ 3:58–4:05",
        "detail": "WU 2,5 km + loopscholing\nPlyo in warming-up: zie plyo-sessie Wo (licht)\n8 × 800 m @ 3:58–4:05/km · 400 m jog (2:30)\nCD 2 km · totaal ~12,5 km · RPE 8",
        "min": 60,
-       "km": 12.5
+       "km": 12.5,
+       "tgt": {
+        "pace": [
+         238,
+         245
+        ]
+       }
       },
       {
        "id": "2026-12-01-b",
@@ -1879,7 +1911,13 @@
        "title": "3 × 12 min @ 4:25–4:30",
        "detail": "WU 2,5 km\n3 × 12 min @ 4:25–4:30 · 2 min jog\nCD 2 km · totaal ~14 km · RPE 7",
        "min": 70,
-       "km": 14
+       "km": 14,
+       "tgt": {
+        "pace": [
+         265,
+         270
+        ]
+       }
       },
       {
        "id": "2026-12-03-b",

@@ -32,7 +32,13 @@ Deze regels gelden voor elke release, ook kleine. Ze beschermen de data op de te
 
 Toekomstige weken blijven `concept`. Komt er geen update, dan opent de app gewoon de conceptweek met een gele banner.
 
-## strava.json
+## strava.json (v2.4)
+
+Bouwen/bijwerken met `tools/strava_build.py <connector-lijst.json …> [--hr id=bpm …] [--best best.json]`. Bestaande `hr`/`laps` blijven behouden. Velden: `id, date, t, sport, name, km, sec (moving), el (elapsed, alleen als > 5% hoger), hm, hr, w, laps[{m,sec,hr}], race (bool), kind ('mobility'|'hyrox')`, plus `best` (Strava-beste prestaties per afstand). Zondag: lijst van de afgelopen week ophalen, HF + ronden van runs via `get_activity_performance`, best efforts bijwerken.
+
+Plan-velden: `w.note` (coachnotitie bovenaan de week), sessie `tgt.pace = [snelst, langzaamst]` in s/km voor intervalbeoordeling op ronden.
+
+## strava.json (formaat v2.0, nog geldig)
 
 ```json
 {"updated":"2026-11-11","source":"Strava (opgehaald door coach)","activities":[
