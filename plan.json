@@ -1,6 +1,6 @@
 {
- "version": 3,
- "updated": "2026-11-11b",
+ "version": 4,
+ "updated": "2026-11-11c",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -22,8 +22,8 @@
    "name": "Zevenheuvelenloop 15 km"
   },
   {
-   "date": "2027-01-09",
-   "name": "Hyrox relay (datum bevestigen)"
+   "date": "2027-01-24",
+   "name": "Hyrox relay (team, stations nog te verdelen)"
   },
   {
    "date": "2027-04-04",
@@ -2071,46 +2071,46 @@
    "start": "2026-12-28",
    "status": "concept",
    "phase": "Basis 2 · week 3/3",
-   "focus": "Hyrox-scherpte, volume iets omlaag.",
+   "focus": "Hyrox-specifiek: stations + 1 km-runs op racetempo. Volume iets omlaag na kerst.",
    "days": []
   },
   {
    "id": "2027-W01",
    "start": "2027-01-04",
    "status": "concept",
-   "phase": "Hyrox relay (datum nog bevestigen)",
-   "focus": "Racedag + lichte week.",
+   "phase": "Hyrox-blok · week 1/2",
+   "focus": "Hyrox-simulaties (runs + alle 8 stations), VO2 + drempel. Lange duur weer naar 24–26 km.",
    "days": []
   },
   {
    "id": "2027-W02",
    "start": "2027-01-11",
    "status": "concept",
-   "phase": "Marathon 1 · week 1/4",
-   "focus": "Marathonopbouw: lange duur naar 30 km, drempel 2×/week, kracht zwaar maar minder volume.",
+   "phase": "Hyrox-blok · week 2/2",
+   "focus": "Laatste zware Hyrox-sessie; lange duur 26–28 km als start marathonopbouw.",
    "days": []
   },
   {
    "id": "2027-W03",
    "start": "2027-01-18",
    "status": "concept",
-   "phase": "Marathon 1 · week 2/4",
-   "focus": "",
+   "phase": "Hyrox raceweek",
+   "focus": "Volume −40%, intensiteit kort en scherp. Hyrox relay zo 24 januari.",
    "days": []
   },
   {
    "id": "2027-W04",
    "start": "2027-01-25",
    "status": "concept",
-   "phase": "Marathon 1 · week 3/4",
-   "focus": "",
+   "phase": "Marathon 1 · week 1/4",
+   "focus": "Herstel 2–3 dagen na Hyrox, daarna marathonopbouw: lange duur naar 30 km, drempel 2×/week, kracht zwaar met minder volume.",
    "days": []
   },
   {
    "id": "2027-W05",
    "start": "2027-02-01",
    "status": "concept",
-   "phase": "Marathon 1 · deload",
+   "phase": "Marathon 1 · week 2/4",
    "focus": "",
    "days": []
   },
@@ -2118,15 +2118,15 @@
    "id": "2027-W06",
    "start": "2027-02-08",
    "status": "concept",
-   "phase": "Marathon 2 · week 1/4",
-   "focus": "Marathonspecifiek: lange duur met MP-blokken. Vertical 1×/week onderhouden.",
+   "phase": "Marathon 1 · week 3/4",
+   "focus": "",
    "days": []
   },
   {
    "id": "2027-W07",
    "start": "2027-02-15",
    "status": "concept",
-   "phase": "Marathon 2 · week 2/4",
+   "phase": "Marathon 1 · deload",
    "focus": "",
    "days": []
   },
@@ -2134,15 +2134,15 @@
    "id": "2027-W08",
    "start": "2027-02-22",
    "status": "concept",
-   "phase": "Marathon 2 · week 3/4",
-   "focus": "Piek lange duur 32–34 km.",
+   "phase": "Marathon 2 · week 1/4",
+   "focus": "Lange duur met MP-blokken. Vertical 1×/week onderhouden.",
    "days": []
   },
   {
    "id": "2027-W09",
    "start": "2027-03-01",
    "status": "concept",
-   "phase": "Marathon 2 · deload",
+   "phase": "Marathon 2 · week 2/4",
    "focus": "Optioneel: Semi de Paris 7 maart als test.",
    "days": []
   },
@@ -2150,15 +2150,15 @@
    "id": "2027-W10",
    "start": "2027-03-08",
    "status": "concept",
-   "phase": "Marathon 3 · week 1/2",
-   "focus": "",
+   "phase": "Marathon 2 · week 3/4",
+   "focus": "Piek lange duur 32–34 km.",
    "days": []
   },
   {
    "id": "2027-W11",
    "start": "2027-03-15",
    "status": "concept",
-   "phase": "Marathon 3 · week 2/2",
+   "phase": "Marathon 2 · week 4/4",
    "focus": "Laatste zware week.",
    "days": []
   },
