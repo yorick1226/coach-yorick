@@ -1,5 +1,5 @@
 // Cachenummer ophogen bij ELKE release (zie ONDERHOUD.md).
-const CACHE = 'coach-v11';
+const CACHE = 'coach-v12';
 const CORE = ['./', 'index.html', 'plan.json', 'strava.json', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

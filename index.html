@@ -162,7 +162,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.6.1';
+const APP_VERSION = '2.6.2';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -609,6 +609,7 @@ function rToday(){
   for(const l of Object.keys(pains)) h += '<div style="margin-top:8px"><span class="small">'+esc(l)+' · hoe erg (1–8)?</span><div class="chips sm">'+[1,2,3,4,5,6,7,8].map(v => '<button class="chip'+(pains[l]===v?' on':'')+'" data-pscore="'+esc(l)+'" data-v="'+v+'">'+v+'</button>').join('')+'</div></div>';
   const ad = advice(d);
   if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+'<div class="small" style="color:inherit;opacity:.8">Vuistregel van de app, geen diagnose. Basis: '+esc(ad.basis)+'.</div></div>';
+  if(filled) h += '<div class="row"><button class="btn pri" data-dailydone="'+d+'">Klaar ✓</button></div>';
   h += '</div>'; }
   const w = weekByStart(mondayOf(d)); const m = matchWeek(w);
   const items = weekItems(w).filter(i => i.date===d);
@@ -1083,6 +1084,8 @@ function go(mut){ const before = snap(); mut(); if(before.tab===ui.tab && before
   ui.stack.push(before); if(ui.stack.length > 30) ui.stack.shift(); try { history.pushState({coach:ui.stack.length}, ''); } catch(e){}
   window.scrollTo(0,0); render(); }
 function goBack(){ const p = ui.stack.pop(); if(!p) return false; Object.assign(ui, {tab:p.tab, day:p.day, week:p.week, sid:p.sid, chkWeek:p.chkWeek}); render(); window.scrollTo(0, p.y||0); return true; }
+/* app wordt weggeklikt: veld verlaten zodat alles is bewaard */
+document.addEventListener('visibilitychange', () => { if(document.visibilityState==='hidden' && document.activeElement && document.activeElement.blur) document.activeElement.blur(); });
 window.addEventListener('popstate', () => { goBack(); });
 function rerender(){ const y = window.scrollY; render(); window.scrollTo(0, y); }
 function exFor(code){ const f = sessById(ui.sid); return f && sessEx(f.s).find(x => (S.swaps[f.s.id+'|'+x.c]||x.c)===code); }
@@ -1109,6 +1112,7 @@ document.addEventListener('click', ev => {
   if(ds.info){ ui.info[ds.info] = !ui.info[ds.info]; rerender(); return; }
   if(ds.exfocus){ ui.exFocus[ui.sid] = ds.exfocus; rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+ds.exfocus); if(el) el.scrollIntoView({block:'start'}); }, 20); return; }
   if(ds.dailyedit){ ui.dailyEdit[ds.dailyedit] = true; rerender(); return; }
+  if(ds.dailydone){ ui.dailyEdit[ds.dailydone] = false; ui.painOpen = false; window.scrollTo(0,0); render(); return; }
   if(ds.painopen){ ui.painOpen = true; rerender(); return; }
   if(ds.ploc){ const d = ui.day || today(); const x = S.daily[d] || (S.daily[d] = {}); const p = Object.assign({}, x.pains||{}); if(p[ds.ploc]!=null) delete p[ds.ploc]; else p[ds.ploc] = 2; setPains(d, p); rerender(); return; }
   if(ds.pscore){ const d = ui.day || today(); const p = Object.assign({}, (dailyOf(d).pains)||{}); p[ds.pscore] = Number(ds.v); setPains(d, p); rerender(); return; }
@@ -1191,7 +1195,15 @@ document.addEventListener('change', ev => { const t = ev.target, ds = t.dataset;
   if(ds.kg) ui['kg_'+ui.sid+ds.kg] = t.value;
   if(t.id && t.id.startsWith('c_')) updCalc();
 });
-document.addEventListener('input', ev => { const t = ev.target; if(t.id && t.id.startsWith('c_')) updCalc();
+document.addEventListener('input', ev => { const t = ev.target, ds = t.dataset || {};
+  if(ds.dly){ ui.dailyEdit[ui.day || today()] = true; setDaily(ui.day || today(), ds.dly, num(t.value)); }
+  if(ds.min) setDone(ds.min, {min:t.value});
+  if(ds.note) setDone(ds.note, {note:t.value});
+  if(ds.ct) setAns(ds.ct, t.value);
+  if(ds.avmin) setAvail(ds.avmin, ds.i, {min:t.value});
+  if(ds.avnote) setAvail(ds.avnote, ds.i, {note:t.value});
+  if(ds.avn) setAvail(ds.avn, null, {n:t.value});
+  if(t.id && t.id.startsWith('c_')) updCalc();
   if(t.dataset && t.dataset.exsearch){ const q = t.value.trim().toLowerCase(); t.closest('.picker').querySelectorAll('.exlist [data-name]').forEach(b => b.style.display = !q || b.dataset.name.includes(q) ? '' : 'none'); } });
 document.addEventListener('keydown', ev => { const t = ev.target; if(ev.key==='Enter' && t.dataset && t.dataset.repx){ const v = num(t.value); if(v!=null) logSet(t.dataset.repx, v); } });
 
