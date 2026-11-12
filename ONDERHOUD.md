@@ -116,3 +116,4 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - Warming-up/cooldown per sessie via `wuFor(s)` (type + titel). Afvinken: `S.rt[datum][ID@sessieId]`; dagroutines: `S.rt[datum][ID]`. Sheet-kind `routine`.
 - Onderrugpijn ≥ 4 in de ochtendcheck: rugadvies op Vandaag en knop RDL→HT, SQ→LP in krachtsessies.
 - Zondag-export: regel "Routines: rug x/y · mobiliteit · warming-ups · herstel".
+- v2.8: `mobex` = oefenbibliotheek {k: {n, how[], q (YouTube-zoekterm)}}; routine-items verwijzen met `k`. `mobFocus` = 4 gebieden × 3 varianten (A/B/C) die rouleren; `chooseMob(d)` kiest per dag op basis van dagen sinds laatst + trainingen gisteren/vandaag/morgen + onderrugpijn. Holds +10 s per 6 keer per gebied (max +20). `MOB_LANG` = 3 minst recente gebieden. `mobTests` + `S.mob` = maandelijkse test (check-in, inzicht).

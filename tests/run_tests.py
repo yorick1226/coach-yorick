@@ -121,9 +121,12 @@ def features(pg, shots=True):
     pg.click('[data-dailyedit="2026-11-17"]'); pg.type('[data-dly="hrv"]', "48"); pg.reload(); pg.wait_for_selector("#tabs")
     ok(store(pg)["daily"]["2026-11-17"].get("hrv") == 48, "getypte waarde bewaard zonder veld te verlaten (app sluiten)")
     # Routines
-    tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart="RUG"]').count() == 1 and pg.locator('#rtcard [data-rtstart="MOB_ENKEL"]').count() == 1, "dagroutines (rug + enkel op dinsdag)")
+    tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart="RUG"]').count() == 1 and pg.locator('#rtcard .rtrow [data-rtstart^="MOB_"]').count() >= 1, "dagroutines (rug + gekozen mobiliteit)")
+    mob = pg.evaluate("chooseMob('2026-11-17')"); ok(mob and mob["id"].startswith("MOB_") and mob["why"], f"mobiliteit op maat gekozen: {mob}")
+    ok(pg.evaluate("rtDef('MOB_LANG','2026-11-17').parts.length") == 3, "Mobiliteit compleet = 3 gebieden")
     pg.click('#rtcard [data-rtstart="RUG"]'); ok(pg.is_visible("#rp") and "Cat-cow" in pg.inner_text("#rp"), "routinespeler opent")
     pg.click('[data-rp="next"]'); ok("McGill" in pg.inner_text("#rp") and "Klaar maken" in pg.inner_text("#rp"), "timed oefening met aftellen")
+    ok(pg.locator('#rp a[href*="youtube.com/results"]').count() == 1 and "handen onder je onderrug" in pg.inner_text("#rp").lower(), "uitleg + video in speler")
     for _ in range(40):
         if not pg.is_visible("#rp"): break
         pg.click('[data-rp="next"]')
@@ -137,6 +140,9 @@ def features(pg, shots=True):
         ok(any(k.startswith(sid) and v in ("HT","LP") for k, v in sw.items()), "rugvriendelijk wisselen")
     pg.evaluate("delete S.daily['2026-11-17'].pains.Onderrug; save(); render()")
     ok("Routines: rug 1/" in pg.evaluate("weekText('2026-11-16')"), "routines in zondag-export")
+    pg.click('[data-mobtest="1"]'); pg.fill("#mt_ktwL", "8"); pg.fill("#mt_sq", "35"); pg.click("#mt_save")
+    ok(store(pg)["mob"][-1]["ktwL"] == 8, "mobiliteitstest bewaard")
+    tab(pg, "inzicht"); ok("Knie-naar-muur links" in pg.inner_text("#mobins"), "mobiliteit in inzicht"); tab(pg, "vandaag")
     pg.reload(); pg.wait_for_selector("#tabs"); tab(pg, "vandaag")
     ok(pg.locator("#dailysum").count() == 1 and "55" in pg.inner_text("#dailysum") and pg.locator('[data-dly="rd"]').count() == 0, "ingevulde ochtendcheck klapt in tot één regel")
     pg.click('[data-dailyedit="2026-11-17"]'); ok(pg.locator('[data-dly="rd"]').count() == 1, "ochtendcheck weer te wijzigen")

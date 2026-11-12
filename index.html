@@ -89,16 +89,18 @@ nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:6;display:grid;grid-temp
 nav.tabs button{background:none;border:0;color:var(--mut);font:inherit;font-size:12px;font-weight:600;min-height:58px;padding:4px 0}
 nav.tabs button span{display:block;font-size:20px;line-height:1.2}
 nav.tabs button.on{color:var(--acc)}
+a{color:var(--blue)}
+#rp a.btn{text-decoration:none;color:var(--tx)}
 #rp{position:fixed;inset:0;z-index:30;background:var(--bg);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
 #rp.show{display:flex}
 #rp .rpt{font-size:14px;color:var(--mut);display:flex;justify-content:space-between;align-items:center}
 #rp .rpbar{height:6px;background:var(--line);border-radius:3px;margin:10px 0 18px;overflow:hidden}#rp .rpbar i{display:block;height:100%;background:var(--acc)}
 #rp .rpn{font-size:26px;font-weight:700;line-height:1.2}
 #rp .rps{font-size:17px;color:var(--acc);margin-top:4px;min-height:22px}
-#rp .rpbig{font-size:92px;font-weight:800;text-align:center;margin:auto 0 6px;font-variant-numeric:tabular-nums;line-height:1}
+#rp .rpbig{font-size:84px;font-weight:800;text-align:center;margin:auto 0 6px;font-variant-numeric:tabular-nums;line-height:1}
 #rp .rpbig.reps{font-size:44px}
 #rp .rpph{text-align:center;font-size:16px;color:var(--mut);min-height:22px}
-#rp .rpcue{font-size:16px;margin:16px 0;min-height:44px;color:var(--tx)}
+#rp .rpcue{font-size:16px;margin:12px 0;min-height:44px;color:var(--tx);overflow:auto;max-height:40vh}
 #rp .rpnext{font-size:14px;color:var(--mut);margin-bottom:12px}
 #rp .rpctl{display:grid;grid-template-columns:1fr 1fr 2fr;gap:8px}
 #rp .rpctl .btn{min-height:56px;font-size:18px}
@@ -182,7 +184,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.7.0';
+const APP_VERSION = '2.8.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -239,7 +241,7 @@ const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','V
 const RUNS = ['Run','TrailRun','VirtualRun'];
 
 /* ---------- opslag ---------- */
-function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, body:[], rt:{}, sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
+function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, body:[], rt:{}, mob:[], sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
   settings:{ftp:null,lthr:null,tpace:null,sheetUrl:'',lastBackup:null,seenPlan:null}, queue:[]}; }
 function migrate(o){
   const b = blank();
@@ -247,7 +249,7 @@ function migrate(o){
   for(const k of Object.keys(b)) if(o[k] === undefined || o[k] === null) o[k] = b[k];
   if(typeof o.settings!=='object') o.settings = b.settings;
   for(const k of Object.keys(b.settings)) if(o.settings[k] === undefined) o.settings[k] = b.settings[k];
-  for(const k of ['sets','cardio','queue','body']) if(!Array.isArray(o[k])) o[k] = [];
+  for(const k of ['sets','cardio','queue','body','mob']) if(!Array.isArray(o[k])) o[k] = [];
   o.schema = Math.max(o.schema||1, SCHEMA);
   return o; // onbekende velden blijven bewaard
 }
@@ -611,11 +613,41 @@ function render(){
 
 /* ---------- routines (mobiliteit, warming-up, cooldown, herstel) ---------- */
 const RT = () => PLAN.routines || {};
-function rtDef(id){ const r = RT()[id]; if(!r) return null; return r.of ? Object.assign({}, r, {items: r.of.flatMap(x => (RT()[x]||{}).items||[])}) : r; }
+const VID = q => 'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
+function exInfo(it){ const m = (PLAN.mobex||{})[it.k]; return m ? {n:m.n, how:m.how||[], q:m.q||m.n} : {n:it.n||'', how:it.cue?[it.cue]:[], q:it.n||''}; }
+function diffD(a, b){ return Math.round((parseD(a)-parseD(b))/864e5); }
+function mobHist(){ const h = {}; for(const [dt,x] of Object.entries(S.rt||{})) for(const k of Object.keys(x)){ const m = k.match(/^MOB_([A-Z]+)_[A-C]$/); if(m) (h[m[1]] = h[m[1]]||[]).push(dt); } return h; }
+function mobNext(f, d){ const F = (PLAN.mobFocus||{})[f]; const n = ((mobHist()[f])||[]).filter(t => t < d).length; return F.v[n % F.v.length]; }
+function mobLevel(id, d){ const m = id.match(/^MOB_([A-Z]+)_/); if(!m) return 0; return Math.min(2, Math.floor(((mobHist()[m[1]])||[]).filter(t => t < d).length / 6)); }
+function dayItems(d){ return weekItems(weekByStart(mondayOf(d))).filter(i => i.date===d && !isSkipped(i.s.id)); }
+/* kies het mobiliteitsgebied dat vandaag het meest oplevert: hoe lang geleden + wat je gisteren/vandaag/morgen traint */
+function chooseMob(d){ const F = PLAN.mobFocus||{}; const x = S.rt[d]||{};
+  const done = Object.keys(x).find(k => /^MOB_[A-Z]+_[A-C]$/.test(k)); if(done) return {id:done, why:['vandaag gedaan']};
+  const hist = mobHist(); const T = dayItems(d), Y = dayItems(addDays(d,-1)), N = dayItems(addDays(d,1));
+  const wk = it => (wuFor(it.s)||[])[0] || '';
+  const has = (L, f) => L.some(f);
+  const sc = {}; const why = {};
+  for(const f of Object.keys(F)){ const last = (hist[f]||[]).filter(t => t < d).sort().pop(); const days = last ? diffD(d, last) : 9;
+    sc[f] = Math.min(days, 7); why[f] = [last ? days+' dagen geleden' : 'nog niet gedaan']; if(days===1){ sc[f] -= 5; } }
+  const add = (f, v, r) => { if(sc[f]==null) return; sc[f] += v; if(v > 0) why[f].push(r); };
+  if(has([...T, ...N], i => ['WU_RUNQ','WU_PLYO','WU_LOWER','WU_RACE'].includes(wk(i)))) { add('ENKEL', 3, 'snelheid/plyo/lower vandaag of morgen'); add('HEUP', 1, 'beenwerk op komst'); }
+  if(has(T, i => ['WU_UPPER','WU_HYROX'].includes(wk(i)) || i.s.t==='swim')) add('THOR', 3, 'upper/Hyrox/zwemmen vandaag');
+  if(has([...Y, ...T], i => ['WU_LONG','WU_RACE','WU_LOWER'].includes(wk(i)))) { add('HEUP', 2, 'zware benen'); add('ACHTER', 2, 'zware benen'); }
+  if(has([...Y, ...T], i => i.s.t==='bike' && (i.s.min||0) >= 90)) { add('HEUP', 2, 'lang fietsen: heupbuigers'); add('THOR', 1, 'lang fietsen'); }
+  if(backPain(d) >= 4){ add('ACHTER', -4, ''); add('THOR', 1, 'rugvriendelijk'); }
+  const f = Object.keys(sc).sort((a,b) => sc[b]-sc[a])[0]; if(!f) return null;
+  return {id: mobNext(f, d), focus: f, why: why[f]}; }
+function rtDef(id, d){ d = d || today();
+  if(id==='MOB_LANG'){ const ch = chooseMob(d); const fs = Object.keys(PLAN.mobFocus||{}).filter(f => !ch || f!==ch.focus);
+    const hist = mobHist(); fs.sort((a,b) => ((hist[a]||[]).sort().pop()||'').localeCompare((hist[b]||[]).sort().pop()||'')); const parts = fs.slice(0,3).map(f => mobNext(f, d));
+    return {n:'Mobiliteit compleet', min:6*parts.length, tag:'mob', parts, items: parts.flatMap(p => rtDef(p, d).items)}; }
+  const r = RT()[id]; if(!r) return null; const lvl = mobLevel(id, d);
+  if(!lvl) return r; return Object.assign({}, r, {lvl, items: r.items.map(it => it.sec ? Object.assign({}, it, {sec: it.sec + 10*lvl}) : it)}); }
 function rtSteps(r){ const st = [];
-  for(const it of r.items){ const sets = it.sets||1, sides = it.side ? ['links','rechts'] : [null]; const n = sets*sides.length; let k = 0;
-    for(let a=0;a<sets;a++) for(const sd of sides){ k++; st.push({n:it.n, cue:it.cue||'', sec:it.sec||0, reps:it.reps||'', side:sd, set: sets>1 ? 'set '+(a+1)+'/'+sets : '', rest: (it.rest && k<n) ? it.rest : 0}); } }
+  for(const it of r.items){ const ei = exInfo(it); const sets = it.sets||1, sides = it.side ? ['links','rechts'] : [null]; const n = sets*sides.length; let k = 0;
+    for(let a=0;a<sets;a++) for(const sd of sides){ k++; st.push({n:ei.n, how:ei.how, q:ei.q, cue:it.cue||'', sec:it.sec||0, reps:it.reps||'', side:sd, set: sets>1 ? 'set '+(a+1)+'/'+sets : '', rest: (it.rest && k<n) ? it.rest : 0}); } }
   return st; }
+function rtList(r){ return '<ol class="small" style="margin:6px 0 0 18px;padding:0">'+r.items.map(it => { const ei = exInfo(it); return '<li style="margin:4px 0">'+esc(ei.n)+' · '+esc(it.sec ? (it.sets?it.sets+' × ':'')+it.sec+' s' : (it.sets?it.sets+' × ':'')+(it.reps||''))+(it.side?' per kant':'')+' <a href="'+VID(ei.q)+'" target="_blank" rel="noopener">▶ video</a></li>'; }).join('')+'</ol>'; }
 function rtDone(date, key){ return !!((S.rt[date]||{})[key]); }
 function setRt(date, key, on){ const x = S.rt[date] || (S.rt[date] = {}); if(on) x[key] = Date.now(); else delete x[key]; enqueue('routine', date, date, x); }
 function wuFor(s){ if(s.rt || s.t==='rest' || s.t==='mobility' || s.t==='swim') return null; const t = (s.title||'').toLowerCase();
@@ -625,16 +657,20 @@ function wuFor(s){ if(s.rt || s.t==='rest' || s.t==='mobility' || s.t==='swim') 
   if(s.t==='strength') return [/lower|been|leg/.test(t) ? 'WU_LOWER' : 'WU_UPPER', null];
   if(s.t==='plyo') return ['WU_PLYO', null]; if(s.t==='hyrox') return ['WU_HYROX','CD_RUN']; if(s.t==='bike') return ['WU_BIKE', null]; return null; }
 function dailyList(d){ const dow = (parseD(d).getDay()+6)%7; let l = ((PLAN.dailyRoutines||[])[dow] || []).slice();
-  const its = weekItems(weekByStart(mondayOf(d))).filter(i => i.date===d);
-  if(its.some(i => i.s.rt && /^MOB/.test(i.s.rt) && !isSkipped(i.s.id))) l = l.filter(x => !/^MOB/.test(x)); return l; }
-function rtChip(id, key, date, lbl){ const r = rtDef(id); if(!r) return ''; const on = rtDone(date, key);
+  if(dayItems(d).some(i => i.s.rt && /^MOB/.test(i.s.rt))) l = l.filter(x => !/^MOB/.test(x));
+  return l.map(x => x==='MOB' ? (chooseMob(d)||{}).id : x).filter(Boolean); }
+function rtChip(id, key, date, lbl){ const r = rtDef(id, date); if(!r) return ''; const on = rtDone(date, key);
   return '<button class="rtchip'+(on?' on':'')+'" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+date+'">'+(on?'✓ ':'▶ ')+lbl+' '+r.min+'′</button>'; }
 function backPain(d){ return ((dailyOf(d).pains)||{})['Onderrug'] || 0; }
 function routinesCard(d, items){
   const bp = backPain(d); let h = '<div class="card" id="rtcard"><h3>Routines <span class="small">tik ▶ voor de speler, ✓ = gedaan</span></h3>';
-  const row = (id, key, why) => { const r = rtDef(id); if(!r) return ''; const on = rtDone(d, key);
-    return '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"><b>'+esc(r.n)+'</b> <span class="small">'+r.min+' min'+(why?' · '+esc(why):'')+'</span></div><button class="btn sm pri" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+d+'">▶ Start</button></div>'; };
-  for(const id of dailyList(d)) h += row(id, id, id==='RUG' ? 'ochtend of na lang zitten' : 'ochtend');
+  const row = (id, key, why) => { const r = rtDef(id, d); if(!r) return ''; const on = rtDone(d, key);
+    return '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"><b>'+esc(r.n)+'</b> <span class="small">'+r.min+' min'+(r.lvl?' · niveau '+(r.lvl+1):'')+(why?' · '+esc(why):'')+'</span>'
+      +'<details><summary class="small">Oefeningen bekijken</summary>'+rtList(r)+'</details></div><button class="btn sm pri" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+d+'">▶ Start</button></div>'; };
+  const cm = chooseMob(d);
+  for(const id of dailyList(d)) h += row(id, id, id==='RUG' ? 'ochtend of na lang zitten' : (cm && cm.id===id ? cm.why.join(' · ') : ''));
+  const lt = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
+  if(!lt || diffD(d, lt.date) >= 28) h += '<div class="rtrow"><span style="font-size:22px;width:44px;text-align:center">📏</span><div class="nm"><b>Mobiliteitstest</b> <span class="small">5 min · elke 4 weken · '+(lt?'laatste '+fmtDay(lt.date):'nulmeting nog doen')+'</span></div><button class="btn sm" data-mobtest="1">Open</button></div>';
   if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: doe alleen cat-cow, curl-up en bird dog; side plank op je knieën. Wandelen mag. In krachtsessies: RDL en squat wisselen (knop in de sessie). Volg het advies van de huisarts.</div>';
   else if(bp) h += '<div class="small" style="margin-top:6px">Onderrug '+bp+'/8 gemeld: rustig, pijn tijdens de oefeningen max 3/10.</div>';
   /* herstel: wat past vandaag */
@@ -648,11 +684,12 @@ function routinesCard(d, items){
   const restDay = !items.some(i => !['rest','mobility'].includes(i.s.t) && !isSkipped(i.s.id));
   if(restDay && tips.sauna) h += '<div class="small" style="margin-top:6px">🧖 '+esc(tips.sauna)+'</div>';
   h += '<details style="margin-top:8px"><summary class="small">Meer herstel en routines</summary>';
-  for(const id of ['REC_ROLL','REC_DOWN','MOB_HEUP','MOB_ENKEL','MOB_THOR'].filter(x => !sug.some(z=>z[0]===x) && !dailyList(d).includes(x))) h += row(id, id, '');
+  for(const id of ['REC_ROLL','REC_DOWN'].filter(x => !sug.some(z=>z[0]===x))) h += row(id, id, '');
+  for(const f of Object.keys(PLAN.mobFocus||{})){ const id = mobNext(f, d); if(!dailyList(d).includes(id) && !(cm && cm.focus===f)) h += row(id, id, 'extra'); }
   for(const k of ['sauna','boots','sleep']) if(tips[k] && !(k==='sauna'&&restDay) && !(k==='boots'&&heavy)) h += '<div class="small" style="margin-top:6px">'+({sauna:'🧖 ',boots:'🦵 ',sleep:'😴 '})[k]+esc(tips[k])+'</div>';
   h += '</details></div>'; return h; }
 /* routinespeler */
-function rpStart(id, key, date){ const r = rtDef(id); if(!r) return; unlockAudio();
+function rpStart(id, key, date){ const r = rtDef(id, date); if(!r) return; unlockAudio();
   ui.rp = {id, key, date, r, steps: rtSteps(r), i: 0, phase:'', end:0, left:0, paused:false}; $('rp').classList.add('show'); keepAwake(true); rpEnter(0, false); clearInterval(ui.rpInt); ui.rpInt = setInterval(rpTick, 250); }
 function rpEnter(i, afterRest){ const p = ui.rp; p.i = i; const st = p.steps[i]; if(!st) return rpFinish();
   if(st.sec){ if(afterRest){ p.phase = 'work'; p.end = Date.now() + st.sec*1000; } else { p.phase = 'prep'; p.end = Date.now() + 5000; } } else { p.phase = 'reps'; p.end = 0; }
@@ -667,7 +704,7 @@ function rpNext(){ const p = ui.rp; const st = p.steps[p.i]; if(p.phase==='reps'
 function rpPrev(){ rpEnter(Math.max(0, ui.rp.i-1), false); }
 function rpPause(){ const p = ui.rp; if(!p.end) return; if(p.paused){ p.end = Date.now() + p.left; p.paused = false; } else { p.left = p.end - Date.now(); p.paused = true; } rpRender(); }
 function rpClose(){ clearInterval(ui.rpInt); ui.rp = null; $('rp').classList.remove('show'); $('rp').innerHTML = ''; keepAwake(ui.tab==='log'); }
-function rpFinish(){ const p = ui.rp; setRt(p.date, p.key, true);
+function rpFinish(){ const p = ui.rp; setRt(p.date, p.key, true); for(const pt of (p.r.parts||[])) setRt(p.date, pt, true);
   const ss = p.key.includes('@') ? null : (weekItems(weekByStart(mondayOf(p.date))).find(i => i.date===p.date && i.s.rt===p.id) || null);
   if(ss && !(S.done[ss.s.id]||{}).d) setDone(ss.s.id, {d:true, min:String(p.r.min)});
   beep(); toast(p.r.n+' afgerond ✓'); rpClose(); rerender(); }
@@ -678,7 +715,7 @@ function rpRender(){ const p = ui.rp; if(!p) return; const st = p.steps[p.i]; co
   $('rp').innerHTML = '<div class="rpt"><span>'+esc(p.r.n)+' · '+(p.i+1)+'/'+p.steps.length+'</span><button class="btn sm" data-rp="stop">✕ Stop</button></div>'
     +'<div class="rpbar"><i style="width:'+Math.round(p.i/p.steps.length*100)+'%"></i></div>'
     +'<div class="rpn">'+esc(st.n)+'</div><div class="rps">'+[st.side, st.set].filter(Boolean).join(' · ')+'</div>'
-    +'<div class="rpcue">'+esc(st.cue)+(p.i===0 && p.r.note ? '<div class="small" style="margin-top:8px;color:var(--warn)">'+esc(p.r.note)+'</div>' : '')+'</div>'
+    +'<div class="rpcue">'+(st.how.length ? '<ol style="margin:0 0 6px 18px;padding:0">'+st.how.map(x => '<li>'+esc(x)+'</li>').join('')+'</ol>' : '')+(st.cue && !st.how.includes(st.cue) ? '<div class="small">'+esc(st.cue)+'</div>' : '')+'<a class="btn sm" style="margin-top:8px;display:inline-flex;align-items:center" href="'+VID(st.q)+'" target="_blank" rel="noopener">▶ Bekijk video</a>'+(p.i===0 && p.r.note ? '<div class="small" style="margin-top:8px;color:var(--warn)">'+esc(p.r.note)+'</div>' : '')+'</div>'
     + big + '<div class="rpph">'+ph+'</div>'
     +'<div class="rpnext">'+(nx ? 'Hierna: '+esc(nx.n)+[nx.side, nx.set].filter(Boolean).map(z=>' · '+z).join('') : 'Laatste oefening')+'</div>'
     +'<div class="rpctl"><button class="btn" data-rp="prev">◀</button><button class="btn" data-rp="pause"'+(p.end?'':' disabled')+'>'+(p.paused?'Verder':'Pauze')+'</button><button class="btn pri" data-rp="next">'+(nx?'Volgende ▶':'Klaar ✓')+'</button></div>'; }
@@ -950,6 +987,12 @@ function rInsight(){
   const vol = weeks.map(a => { const b2 = addDays(a,6); return S.sets.filter(x => work(x) && x.date>=a && x.date<=b2 && (x.rir==null||x.rir<=4) && !['plyo','hyrox'].includes(EXN(x.code).g)).length; });
   if(vol.some(Boolean)){ const tg = PLAN.setTargets||{}; const last4 = weeks.slice(-4); const per = {}; for(const x of S.sets) if(work(x) && x.date>=last4[0] && (x.rir==null||x.rir<=4)){ const g = EXN(x.code).g; if(g && !['plyo','hyrox'].includes(g)) per[g] = (per[g]||0)+1; }
     h += '<div class="card" id="volins"><h3>Krachtvolume: harde sets/week</h3>'+barSvg(vol, lab)+'<table><tr><th>Spiergroep</th><th class="r">gem./wk (4 wk)</th><th class="r">doel</th></tr>'+Object.keys(Object.assign({}, tg, per)).map(g => '<tr><td>'+g+'</td><td class="r">'+fmtN((per[g]||0)/4)+'</td><td class="r">'+(tg[g]||'–')+'</td></tr>').join('')+'</table></div>'; }
+  { const T = PLAN.mobTests||[]; const L = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+    const cnt = {}; for(const x of Object.values(S.rt||{})) for(const k of Object.keys(x)){ const m = k.match(/^MOB_([A-Z]+)_/); if(m) cnt[m[1]] = (cnt[m[1]]||0)+1; }
+    if(L.length || Object.keys(cnt).length){ h += '<div class="card" id="mobins"><h3>Mobiliteit</h3>';
+      if(Object.keys(cnt).length) h += '<div class="small">Gedaan per gebied: '+Object.entries(PLAN.mobFocus||{}).map(([f,v]) => v.n+' '+(cnt[f]||0)+'×').join(' · ')+'</div>';
+      if(L.length) h += '<table><tr><th>Test</th>'+L.slice(-4).map(x => '<th class="r">'+fmtDay(x.date).split(' ').slice(1).join(' ')+'</th>').join('')+'<th class="r">doel</th></tr>'+T.map(t => '<tr><td>'+esc(t.n.split(' (')[0])+'</td>'+L.slice(-4).map(x => '<td class="r">'+(x[t.k]!=null?fmtN(x[t.k]):'–')+'</td>').join('')+'<td class="r">'+esc(t.goal)+'</td></tr>').join('')+'</table>';
+      h += '</div>'; } }
   h += blockHtml();
   h += recordsHtml();
   const fl = S.cardio.filter(c => !c.del && (c.kh || c.wat)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,10);
@@ -1024,6 +1067,13 @@ function bodyCard(){
 function addBody(rec){ rec.ts = Date.now(); rec.id = rec.id || 'b|'+rec.date+'|'+(rec.src||'')+'|'+rec.ts; const i = S.body.findIndex(x => x.date===rec.date && (x.src||'')===(rec.src||''));
   if(i>=0) S.body[i] = Object.assign({}, S.body[i], rec); else S.body.push(rec); enqueue('body', rec.id, rec.date, rec); }
 function importBody(code){ try { let c = String(code).trim(); if(c.startsWith('YB1:')) c = c.slice(4); const arr = JSON.parse(decodeURIComponent(escape(atob(c)))); arr.forEach(addBody); toast(arr.length+' metingen geïmporteerd'); return arr.length; } catch(e){ toast('Ongeldige code'); return 0; } }
+function mobCard(){ const T = PLAN.mobTests||[]; if(!T.length) return ''; const L = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)); const last = L[L.length-1], first = L[0];
+  const due = !last || diffD(today(), last.date) >= 28;
+  let h = '<div class="card" id="mobcard"><details'+(due||ui.mobOpen?' open':'')+'><summary><b>Mobiliteitstest</b> <span class="small">elke 4 weken · '+(last?'laatste '+fmtDay(last.date):'nulmeting')+'</span></summary>';
+  for(const t of T) h += '<div style="border-top:1px solid var(--line);margin-top:8px;padding-top:6px"><b style="font-size:15px">'+esc(t.n)+'</b> <span class="small">doel '+esc(t.goal)+(last && last[t.k]!=null ? ' · vorige '+fmtN(last[t.k])+' '+t.u : '')+'</span><div class="small">'+esc(t.how)+' <a href="'+VID(t.q)+'" target="_blank" rel="noopener">▶ video</a></div><input type="text" inputmode="decimal" id="mt_'+t.k+'" placeholder="'+t.u+'"></div>';
+  h += '<div class="row"><button class="btn pri" id="mt_save">Bewaar test</button></div>';
+  if(first && last && first!==last) h += '<div class="small" style="margin-top:6px">Sinds '+fmtDay(first.date)+': '+T.filter(t => first[t.k]!=null && last[t.k]!=null).map(t => t.n.split(' (')[0]+' '+(last[t.k]-first[t.k]>=0?'+':'')+fmtN(last[t.k]-first[t.k])+' '+t.u).join(' · ')+'</div>';
+  return h+'</details></div>'; }
 function rCheck(){
   if(!ui.chkWeek){ const t = today(), mon = mondayOf(t), dow = (parseD(t).getDay()+6)%7; const prev = addDays(mon,-7);
     ui.chkWeek = (dow <= 1 && !S.checkins[weekIdOf(prev)]) ? prev : mon; }
@@ -1040,6 +1090,7 @@ function rCheck(){
     h += '</div>';
   }
   h += availHtml(addDays(ui.chkWeek,7));
+  h += mobCard();
   h += bodyCard();
   const w = weekByStart(ui.chkWeek); const st = w && w.days.length ? weekStats(w) : null;
   if(st) h += '<div class="card small">Automatisch: sessies '+st.sessDone+'/'+st.sessPlan+' · '+fmtN(st.runDone)+' km · '+Math.round(st.vertDone)+' hm · belasting '+Math.round(st.load)+(st.rd.length?' · Oura readiness gem. '+avg(st.rd):'')+(st.sl.length?' · slaap '+avg(st.sl):'')+'</div>';
@@ -1214,6 +1265,7 @@ document.addEventListener('click', ev => {
     else { const el = document.getElementById('d_'+ds.strip); if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); } return; }
   if(ds.info){ ui.info[ds.info] = !ui.info[ds.info]; rerender(); return; }
   if(ds.exfocus){ ui.exFocus[ui.sid] = ds.exfocus; rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+ds.exfocus); if(el) el.scrollIntoView({block:'start'}); }, 20); return; }
+  if(ds.mobtest){ ui.mobOpen = true; go(() => { ui.tab = 'check'; }); setTimeout(() => { const e = $('mobcard'); if(e) e.scrollIntoView({block:'start'}); }, 50); return; }
   if(ds.rtstart){ rpStart(ds.rtstart, ds.rtkey, ds.rtdate); return; }
   if(ds.rtchk){ setRt(ds.rtdate, ds.rtchk, !rtDone(ds.rtdate, ds.rtchk)); rerender(); return; }
   if(ds.rp){ ({stop: rpClose, prev: rpPrev, next: rpNext, pause: rpPause})[ds.rp](); return; }
@@ -1274,6 +1326,8 @@ document.addEventListener('click', ev => {
       c.ts = Date.now(); c.id = 'c|'+c.date+'|'+c.ts;
       if(ui.prefill && ui.prefill.sid){ c.sid = ui.prefill.sid; const cur = S.done[c.sid]||{}; const patch = {}; if(!cur.d) patch.d = true; if(c.sec && !cur.min) patch.min = String(Math.round(c.sec/60)); if(c.rpe && !cur.rpe) patch.rpe = c.rpe; if(Object.keys(patch).length) setDone(c.sid, patch); }
       S.cardio.push(c); enqueue('cardio', c.id, c.date, c); ui.prefill = null; toast('Opgeslagen'); rDuur(); return; }
+    case 'mt_save': { const r = {date: today()}; for(const t of (PLAN.mobTests||[])){ const v = num($('mt_'+t.k).value); if(v!=null) r[t.k] = v; }
+      if(Object.keys(r).length < 2){ toast('Vul minstens één test in'); return; } S.mob = (S.mob||[]).filter(x => x.date!==r.date); S.mob.push(r); enqueue('mob', r.date, r.date, r); ui.mobOpen = false; toast('Mobiliteitstest bewaard'); rerender(); return; }
     case 'b_save': { const r = {date: today(), src:'weekly'}; for(const [k,id] of [['w','b_w'],['waist','b_waist'],['chest','b_chest'],['arm','b_arm'],['thigh','b_thigh']]){ const v = num($(id).value); if(v!=null) r[k] = v; }
       if(Object.keys(r).length <= 2){ toast('Vul minstens één waarde in'); return; } addBody(r); toast('Meting bewaard'); rerender(); return; }
     case 'ib_save': { const r = {date: $('ib_d').value, src:'InBody', w:num($('ib_w').value), ssm:num($('ib_ssm').value), fatkg:num($('ib_fk').value), fatp:num($('ib_fp').value)}; if(!r.w && !r.ssm){ toast('Vul gewicht of SSM in'); return; } addBody(r); toast('InBody bewaard'); rerender(); return; }

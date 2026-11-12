@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-12a",
+ "updated": "2026-11-12b",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -888,8 +888,8 @@
       {
        "id": "2026-11-16-b",
        "t": "mobility",
-       "title": "Mobiliteit compleet (18 min)",
-       "detail": "Start de routinespeler. Heup, enkel/kuit en rug/hamstring achter elkaar. Vervangt die dag de korte mobiliteit.",
+       "title": "Mobiliteit compleet (~20 min)",
+       "detail": "Start de routinespeler: de drie minst recent gedane gebieden achter elkaar, in de volgende variant.",
        "min": 15,
        "rt": "MOB_LANG"
       }
@@ -1170,8 +1170,8 @@
       {
        "id": "2026-11-20-b",
        "t": "mobility",
-       "title": "Mobiliteit compleet (18 min)",
-       "detail": "Start de routinespeler. Heup, enkel/kuit en rug/hamstring achter elkaar. Vervangt die dag de korte mobiliteit.",
+       "title": "Mobiliteit compleet (~20 min)",
+       "detail": "Start de routinespeler: de drie minst recent gedane gebieden achter elkaar, in de volgende variant.",
        "min": 15,
        "rt": "MOB_LANG"
       }
@@ -1447,8 +1447,8 @@
       {
        "id": "2026-11-25-b",
        "t": "mobility",
-       "title": "Mobiliteit compleet (18 min)",
-       "detail": "Start de routinespeler. Heup, enkel/kuit en rug/hamstring achter elkaar. Vervangt die dag de korte mobiliteit.",
+       "title": "Mobiliteit compleet (~20 min)",
+       "detail": "Start de routinespeler: de drie minst recent gedane gebieden achter elkaar, in de volgende variant.",
        "min": 15,
        "rt": "MOB_LANG"
       }
@@ -2313,129 +2313,32 @@
    "note": "Rustig, pijn max 3/10. Bij meer pijn: stoppen. Advies van de huisarts gaat voor.",
    "items": [
     {
-     "n": "Cat-cow",
-     "reps": "10×",
-     "cue": "Langzaam, adem mee; klein bereik als het trekt"
+     "k": "catcow",
+     "reps": "10×"
     },
     {
-     "n": "McGill curl-up",
+     "k": "curlup",
      "sets": 5,
      "sec": 8,
-     "rest": 5,
-     "cue": "Eén knie gebogen, handen onder holle rug; hoofd en schouders net los, rug neutraal"
+     "rest": 5
     },
     {
-     "n": "Side plank",
+     "k": "sideplank",
      "sets": 2,
      "sec": 20,
      "side": true,
-     "rest": 10,
-     "cue": "Op knieën als het zwaar is; heup omhoog, lijn schouder-heup-knie"
+     "rest": 10
     },
     {
-     "n": "Bird dog",
+     "k": "birddog",
      "sets": 3,
      "reps": "6× · 5 s vast",
-     "side": true,
-     "cue": "Bekken stil; arm en been lang, niet hoog"
+     "side": true
     },
     {
-     "n": "Glute bridge",
+     "k": "bridge",
      "sets": 2,
-     "reps": "10× · 2 s knijpen",
-     "cue": "Duw door hielen; billen aanspannen, geen holle rug"
-    }
-   ]
-  },
-  "MOB_HEUP": {
-   "n": "Mobiliteit heup",
-   "min": 6,
-   "tag": "mob",
-   "items": [
-    {
-     "n": "90/90 hip switches",
-     "reps": "10×",
-     "cue": "Rechtop, handen achter je; rustig wisselen"
-    },
-    {
-     "n": "Adductor rocks",
-     "reps": "10×",
-     "side": true,
-     "cue": "Eén been opzij gestrekt, heup naar achter"
-    },
-    {
-     "n": "Couch stretch",
-     "sec": 40,
-     "side": true,
-     "cue": "Bil aanspannen, ribben omlaag; geen holle rug (sla over als de rug trekt)"
-    },
-    {
-     "n": "Figure-4 / pigeon",
-     "sec": 30,
-     "side": true,
-     "cue": "Rustig ademen, niet doordrukken"
-    }
-   ]
-  },
-  "MOB_ENKEL": {
-   "n": "Mobiliteit enkel & kuit",
-   "min": 6,
-   "tag": "mob",
-   "items": [
-    {
-     "n": "Ankle rocks",
-     "reps": "15×",
-     "side": true,
-     "cue": "Knie over de tenen naar de muur; hiel blijft aan de grond"
-    },
-    {
-     "n": "Soleus-stretch (gebogen knie)",
-     "sec": 30,
-     "side": true,
-     "cue": "Tegen de muur, achterste knie gebogen"
-    },
-    {
-     "n": "Tibialis raises",
-     "sets": 2,
-     "reps": "15×",
-     "cue": "Rug tegen de muur, voeten naar voren; tenen omhoog"
-    },
-    {
-     "n": "Langzame calf raise op trede",
-     "reps": "10× · 3 s zakken",
-     "side": true,
-     "cue": "Volledige range, gecontroleerd"
-    }
-   ]
-  },
-  "MOB_THOR": {
-   "n": "Mobiliteit rug & hamstring",
-   "min": 6,
-   "tag": "mob",
-   "items": [
-    {
-     "n": "Open book",
-     "reps": "8×",
-     "side": true,
-     "cue": "Op je zij, knieën 90°; volg je hand met je ogen"
-    },
-    {
-     "n": "Thoracic rotation (viervoeters)",
-     "reps": "8×",
-     "side": true,
-     "cue": "Hand achter het hoofd; draai vanuit de borst"
-    },
-    {
-     "n": "World's greatest stretch",
-     "reps": "4×",
-     "side": true,
-     "cue": "Diepe uitvalspas, elleboog naar de voet, dan draaien"
-    },
-    {
-     "n": "Hamstring flossing",
-     "reps": "10×",
-     "side": true,
-     "cue": "Dynamisch, niet vasthouden; stop bij tintelen"
+     "reps": "10× · 2 s knijpen"
     }
    ]
   },
@@ -2450,20 +2353,20 @@
      "cue": "Echt rustig, HF < 145"
     },
     {
-     "n": "Leg swings voor-achter + zijwaarts",
      "reps": "10×",
-     "side": true
+     "side": true,
+     "k": "legswing"
     },
     {
-     "n": "Loopscholing: A-skip, B-skip, hakken-billen",
-     "reps": "2 × 20 m elk"
+     "reps": "2 × 20 m elk",
+     "k": "askip"
     },
     {
-     "n": "Strides",
      "sets": 4,
      "sec": 20,
      "rest": 40,
-     "cue": "Opbouwen naar ~5 km-tempo, ontspannen; terugwandelen"
+     "cue": "Opbouwen naar ~5 km-tempo, ontspannen; terugwandelen",
+     "k": "strides"
     }
    ]
   },
@@ -2473,14 +2376,14 @@
    "tag": "wu",
    "items": [
     {
-     "n": "Leg swings voor-achter",
      "reps": "10×",
-     "side": true
+     "side": true,
+     "k": "legswing"
     },
     {
-     "n": "Ankle rocks",
      "reps": "10×",
-     "side": true
+     "side": true,
+     "k": "anklerock"
     },
     {
      "n": "Eerste 10 min bewust traag",
@@ -2495,14 +2398,14 @@
    "tag": "wu",
    "items": [
     {
-     "n": "Leg swings voor-achter + zijwaarts",
      "reps": "10×",
-     "side": true
+     "side": true,
+     "k": "legswing"
     },
     {
-     "n": "Ankle rocks",
      "reps": "10×",
-     "side": true
+     "side": true,
+     "k": "anklerock"
     },
     {
      "n": "Eerste 15 min trager dan je wilt",
@@ -2522,8 +2425,8 @@
      "cue": "Licht, oplopend"
     },
     {
-     "n": "Glute bridge",
-     "reps": "10×"
+     "reps": "10×",
+     "k": "bridge"
     },
     {
      "n": "Bodyweight squat met pauze",
@@ -2531,9 +2434,9 @@
      "cue": "2 s onderin"
     },
     {
-     "n": "Hip hinge met stok",
      "reps": "8×",
-     "cue": "Stok raakt achterhoofd, rug en stuit"
+     "cue": "Stok raakt achterhoofd, rug en stuit",
+     "k": "hinge"
     },
     {
      "n": "Opwarmsets eerste oefening",
@@ -2552,12 +2455,12 @@
      "sec": 180
     },
     {
-     "n": "Band pull-apart",
-     "reps": "15×"
+     "reps": "15×",
+     "k": "pullapart"
     },
     {
-     "n": "Band dislocates",
-     "reps": "10×"
+     "reps": "10×",
+     "k": "dislocate"
     },
     {
      "n": "Opwarmsets eerste oefening",
@@ -2575,19 +2478,19 @@
      "sec": 180
     },
     {
-     "n": "Pogo jumps",
      "sets": 2,
      "reps": "15 contacten",
-     "cue": "Stijve enkels, kort grondcontact"
+     "cue": "Stijve enkels, kort grondcontact",
+     "k": "pogo"
     },
     {
      "n": "Laterale ankle hops",
      "reps": "10×"
     },
     {
-     "n": "Snap-downs",
      "reps": "5×",
-     "cue": "Stil landen"
+     "cue": "Stil landen",
+     "k": "snapdown"
     }
    ]
   },
@@ -2601,9 +2504,9 @@
      "sec": 240
     },
     {
-     "n": "World's greatest stretch",
      "reps": "3×",
-     "side": true
+     "side": true,
+     "k": "wgs"
     },
     {
      "n": "Walking lunges",
@@ -2639,15 +2542,15 @@
      "sec": 600
     },
     {
-     "n": "Leg swings + drills",
-     "reps": "A-skip, B-skip · 2 × 20 m"
+     "reps": "A-skip, B-skip · 2 × 20 m",
+     "k": "askip"
     },
     {
-     "n": "Strides",
      "sets": 4,
      "sec": 15,
      "rest": 45,
-     "cue": "Naar wedstrijdtempo"
+     "cue": "Naar wedstrijdtempo",
+     "k": "strides"
     },
     {
      "n": "Laatste 5 min: wandelen, gel 15 min voor start",
@@ -2665,15 +2568,15 @@
      "sec": 240
     },
     {
-     "n": "Kuitstretch tegen de muur",
-     "sec": 30,
-     "side": true
-    },
-    {
-     "n": "Heupbuiger, halve knielstand",
      "sec": 30,
      "side": true,
-     "cue": "Bil aanspannen, geen holle rug"
+     "k": "wallcalf"
+    },
+    {
+     "sec": 30,
+     "side": true,
+     "cue": "Bil aanspannen, geen holle rug",
+     "k": "hfreach"
     }
    ]
   },
@@ -2688,13 +2591,13 @@
      "cue": "Drink en eet binnen 30 min: koolhydraten + 25–30 g eiwit"
     },
     {
-     "n": "Benen tegen de muur",
-     "sec": 180
+     "sec": 180,
+     "k": "legswall"
     },
     {
-     "n": "Soleus-stretch (gebogen knie)",
      "sec": 30,
-     "side": true
+     "side": true,
+     "k": "soleus"
     }
    ]
   },
@@ -2740,64 +2643,974 @@
    "tag": "rec",
    "items": [
     {
-     "n": "Ademhaling 4 s in, 6 s uit",
      "sec": 180,
-     "cue": "Door de neus, buik beweegt"
+     "cue": "Door de neus, buik beweegt",
+     "k": "breath"
     },
     {
-     "n": "Benen tegen de muur",
-     "sec": 180
+     "sec": 180,
+     "k": "legswall"
     },
     {
-     "n": "Child's pose",
      "sec": 60,
-     "cue": "Knieën breed, armen lang"
+     "cue": "Knieën breed, armen lang",
+     "k": "childpose"
     }
    ]
   },
-  "MOB_LANG": {
-   "n": "Mobiliteit compleet",
-   "min": 18,
+  "MOB_HEUP_A": {
+   "n": "Mobiliteit · Heup A",
+   "min": 6,
    "tag": "mob",
-   "of": [
-    "MOB_HEUP",
-    "MOB_ENKEL",
-    "MOB_THOR"
+   "items": [
+    {
+     "k": "9090",
+     "reps": "10×"
+    },
+    {
+     "k": "addrock",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "k": "couch",
+     "sec": 40,
+     "side": true
+    },
+    {
+     "k": "fig4",
+     "sec": 30,
+     "side": true
+    }
+   ]
+  },
+  "MOB_HEUP_B": {
+   "n": "Mobiliteit · Heup B",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "hipcar",
+     "reps": "5×",
+     "side": true
+    },
+    {
+     "k": "cossack",
+     "reps": "6×",
+     "side": true
+    },
+    {
+     "k": "hfreach",
+     "reps": "8×",
+     "side": true
+    },
+    {
+     "k": "frog",
+     "reps": "10×"
+    }
+   ]
+  },
+  "MOB_HEUP_C": {
+   "n": "Mobiliteit · Heup C",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "9090lift",
+     "reps": "5× · 2 s",
+     "side": true
+    },
+    {
+     "k": "deepsq",
+     "sec": 60
+    },
+    {
+     "k": "airplane",
+     "reps": "5×",
+     "side": true
+    },
+    {
+     "k": "pigeon",
+     "sec": 40,
+     "side": true
+    }
+   ]
+  },
+  "MOB_ENKEL_A": {
+   "n": "Mobiliteit · Enkel & kuit A",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "anklerock",
+     "reps": "15×",
+     "side": true
+    },
+    {
+     "k": "soleus",
+     "sec": 30,
+     "side": true
+    },
+    {
+     "k": "tibraise",
+     "sets": 2,
+     "reps": "15×"
+    },
+    {
+     "k": "calfslow",
+     "reps": "10× · 3 s zakken",
+     "side": true
+    }
+   ]
+  },
+  "MOB_ENKEL_B": {
+   "n": "Mobiliteit · Enkel & kuit B",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "wankle",
+     "reps": "10× · 2 s",
+     "side": true
+    },
+    {
+     "k": "toesit",
+     "sec": 30
+    },
+    {
+     "k": "heeltoe",
+     "reps": "2 × 20 m"
+    },
+    {
+     "k": "slbalance",
+     "sec": 30,
+     "side": true
+    }
+   ]
+  },
+  "MOB_ENKEL_C": {
+   "n": "Mobiliteit · Enkel & kuit C",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "anklecar",
+     "reps": "5×",
+     "side": true
+    },
+    {
+     "k": "shin",
+     "sec": 45
+    },
+    {
+     "k": "calfdrop",
+     "reps": "8× gestrekt + 8× gebogen",
+     "side": true
+    },
+    {
+     "k": "deepsq",
+     "sec": 45
+    }
+   ]
+  },
+  "MOB_THOR_A": {
+   "n": "Mobiliteit · Bovenrug & schouder A",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "openbook",
+     "reps": "8×",
+     "side": true
+    },
+    {
+     "k": "qrot",
+     "reps": "8×",
+     "side": true
+    },
+    {
+     "k": "doorpec",
+     "sec": 30,
+     "side": true
+    },
+    {
+     "k": "wallslide",
+     "reps": "10×"
+    }
+   ]
+  },
+  "MOB_THOR_B": {
+   "n": "Mobiliteit · Bovenrug & schouder B",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "rollthor",
+     "sec": 60
+    },
+    {
+     "k": "threadneedle",
+     "reps": "8×",
+     "side": true
+    },
+    {
+     "k": "ytw",
+     "sets": 2,
+     "reps": "6× elk"
+    },
+    {
+     "k": "sidereach",
+     "sec": 30,
+     "side": true
+    }
+   ]
+  },
+  "MOB_THOR_C": {
+   "n": "Mobiliteit · Bovenrug & schouder C",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "wgs",
+     "reps": "4×",
+     "side": true
+    },
+    {
+     "k": "shcar",
+     "reps": "5×",
+     "side": true
+    },
+    {
+     "k": "puppy",
+     "sec": 40
+    },
+    {
+     "k": "scappu",
+     "reps": "12×"
+    }
+   ]
+  },
+  "MOB_ACHTER_A": {
+   "n": "Mobiliteit · Hamstring & achterketen A",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "floss",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "k": "doorham",
+     "sec": 40,
+     "side": true
+    },
+    {
+     "k": "dogpedal",
+     "reps": "10×"
+    },
+    {
+     "k": "fig4sup",
+     "sec": 30,
+     "side": true
+    }
+   ]
+  },
+  "MOB_ACHTER_B": {
+   "n": "Mobiliteit · Hamstring & achterketen B",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "hamrock",
+     "reps": "8×",
+     "side": true
+    },
+    {
+     "k": "slrdl",
+     "reps": "6×",
+     "side": true
+    },
+    {
+     "k": "wallcalf",
+     "sec": 30,
+     "side": true
+    },
+    {
+     "k": "legswing",
+     "reps": "10× elk",
+     "side": true
+    }
+   ]
+  },
+  "MOB_ACHTER_C": {
+   "n": "Mobiliteit · Hamstring & achterketen C",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "k": "aslr",
+     "reps": "8×",
+     "side": true
+    },
+    {
+     "k": "floss",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "k": "dogpedal",
+     "reps": "10×"
+    },
+    {
+     "k": "9090",
+     "reps": "10×"
+    }
    ]
   }
  },
  "dailyRoutines": [
   [
    "RUG",
-   "MOB_HEUP"
+   "MOB"
   ],
   [
    "RUG",
-   "MOB_ENKEL"
+   "MOB"
   ],
   [
    "RUG",
-   "MOB_THOR"
+   "MOB"
   ],
   [
    "RUG",
-   "MOB_HEUP"
+   "MOB"
   ],
   [
    "RUG",
-   "MOB_ENKEL"
+   "MOB"
   ],
   [
    "RUG",
-   "MOB_THOR"
+   "MOB"
   ],
   [
-   "RUG"
+   "RUG",
+   "MOB"
   ]
  ],
  "recoveryTips": {
   "sauna": "Sauna 1–3× per week, 2–3 rondes van 8–12 min, ná training of op een rustdag (niet vlak voor kwaliteit). Drink 0,5–1 l extra met zout. Voelt goed voor ontspanning; het bewijs voor sneller herstel is beperkt.",
   "boots": "Compressieboots 20–30 min na een lange duurloop of zware benen. Prettig voor het gevoel; het effect op prestatie is waarschijnlijk klein.",
   "sleep": "Slaap is de grootste herstelfactor: mik op 7,5–9 uur, vaste bedtijd."
- }
+ },
+ "mobex": {
+  "catcow": {
+   "n": "Cat-cow",
+   "q": "cat cow exercise",
+   "how": [
+    "Op handen en knieën, handen onder schouders.",
+    "Inademen: buik zakt, borst naar voren, kijk licht omhoog.",
+    "Uitademen: rug bol, kin naar borst. Klein bereik als het trekt."
+   ]
+  },
+  "curlup": {
+   "n": "McGill curl-up",
+   "q": "mcgill curl up",
+   "how": [
+    "Lig op je rug, één been gestrekt, één knie gebogen.",
+    "Handen onder je onderrug (holte blijft).",
+    "Til hoofd en schouders een paar cm op, nek lang, adem door. Rug buigt niet."
+   ]
+  },
+  "sideplank": {
+   "n": "Side plank",
+   "q": "side plank knees modified",
+   "how": [
+    "Op je zij, elleboog onder je schouder.",
+    "Op knieën (makkelijk) of voeten (zwaar).",
+    "Heup omhoog tot een rechte lijn, niet laten zakken."
+   ]
+  },
+  "birddog": {
+   "n": "Bird dog",
+   "q": "bird dog exercise mcgill",
+   "how": [
+    "Op handen en knieën, rug neutraal.",
+    "Strek tegenovergestelde arm en been lang uit, niet hoog.",
+    "5 s vasthouden, bekken blijft stil (alsof er een glas water op ligt)."
+   ]
+  },
+  "bridge": {
+   "n": "Glute bridge",
+   "q": "glute bridge proper form",
+   "how": [
+    "Op je rug, voeten plat, heupbreedte.",
+    "Duw door je hielen, heupen omhoog tot schouder-heup-knie één lijn.",
+    "Billen 2 s aanspannen bovenin, geen holle rug."
+   ]
+  },
+  "9090": {
+   "n": "90/90 hip switches",
+   "q": "90 90 hip switch",
+   "how": [
+    "Zit met beide knieën 90° gebogen, beide naar dezelfde kant.",
+    "Handen achter je op de grond, borst rechtop.",
+    "Draai beide knieën naar de andere kant zonder handen te verplaatsen."
+   ]
+  },
+  "9090lift": {
+   "n": "90/90 met lift-off",
+   "q": "90 90 hip lift off",
+   "how": [
+    "Zit in de 90/90-houding, borst rechtop.",
+    "Til de voet van het achterste been 2–3 cm op en houd 2 s.",
+    "Moeilijk? Handen naast je als steun."
+   ]
+  },
+  "addrock": {
+   "n": "Adductor rocks",
+   "q": "adductor rock back",
+   "how": [
+    "Op handen en knieën, één been gestrekt opzij.",
+    "Duw je heup naar achter richting hiel, rug neutraal.",
+    "Terug naar voren. Rustig ritme."
+   ]
+  },
+  "couch": {
+   "n": "Couch stretch",
+   "q": "couch stretch",
+   "how": [
+    "Knie tegen de muur of bank, scheen omhoog langs de muur.",
+    "Andere voet voor je (uitvalspas).",
+    "Bil van het achterste been aanspannen, ribben omlaag. Sla over als de rug trekt."
+   ]
+  },
+  "fig4": {
+   "n": "Figure-4 / pigeon",
+   "q": "figure 4 stretch glute",
+   "how": [
+    "Op je rug: enkel op de andere knie, trek dat bovenbeen naar je toe.",
+    "Of pigeon: voorste scheen dwars op de grond, achterste been gestrekt.",
+    "Rustig ademen, niet doordrukken."
+   ]
+  },
+  "pigeon": {
+   "n": "Pigeon stretch",
+   "q": "pigeon pose stretch",
+   "how": [
+    "Voorste scheen schuin op de grond, achterste been gestrekt naar achter.",
+    "Heupen recht naar voren, zak rustig naar beneden.",
+    "Kussen onder de bil als het te diep is."
+   ]
+  },
+  "hipcar": {
+   "n": "Hip CARs (staand)",
+   "q": "hip CARs standing",
+   "how": [
+    "Sta naast een muur, één hand als steun.",
+    "Knie omhoog, draai hem langzaam zo ver mogelijk naar buiten en achter, dan terug.",
+    "Romp blijft stil; maak de grootst mogelijke cirkel."
+   ]
+  },
+  "cossack": {
+   "n": "Cossack squat (ondersteund)",
+   "q": "cossack squat beginner",
+   "how": [
+    "Brede stand, tenen licht naar buiten.",
+    "Zak naar één kant, andere been gestrekt met tenen omhoog.",
+    "Houd iets vast als steun; hiel aan de grond."
+   ]
+  },
+  "hfreach": {
+   "n": "Heupbuiger met reach",
+   "q": "half kneeling hip flexor stretch reach",
+   "how": [
+    "Halve knielstand, achterste bil aanspannen.",
+    "Schuif heup iets naar voren, arm van de achterste kant over je hoofd.",
+    "2 s vasthouden, terug. Dynamisch."
+   ]
+  },
+  "frog": {
+   "n": "Frog rocks",
+   "q": "frog stretch rock back",
+   "how": [
+    "Op handen en knieën, knieën wijd, enkels in lijn met knieën.",
+    "Schuif heupen rustig naar achter en terug.",
+    "Rug neutraal, niet forceren."
+   ]
+  },
+  "deepsq": {
+   "n": "Diepe squat hold",
+   "q": "deep squat hold",
+   "how": [
+    "Zak zo diep mogelijk, hielen plat (eventueel iets onder de hielen).",
+    "Ellebogen duwen knieën naar buiten, borst rechtop.",
+    "Schuif rustig van links naar rechts; houd iets vast als steun."
+   ]
+  },
+  "airplane": {
+   "n": "Hip airplane (ondersteund)",
+   "q": "hip airplane exercise",
+   "how": [
+    "Sta op één been, hand aan een muur, romp naar voren.",
+    "Draai je bekken open naar buiten en terug naar binnen.",
+    "Langzaam en gecontroleerd."
+   ]
+  },
+  "anklerock": {
+   "n": "Ankle rocks",
+   "q": "knee to wall ankle mobility",
+   "how": [
+    "Uitvalspas voor een muur, voorste voet 10 cm van de muur.",
+    "Knie naar voren over de tenen richting muur, hiel blijft aan de grond.",
+    "Terug en herhaal; voet steeds iets verder van de muur als het makkelijk gaat."
+   ]
+  },
+  "wankle": {
+   "n": "Gewogen ankle rocks",
+   "q": "weighted ankle dorsiflexion kettlebell",
+   "how": [
+    "Halve knielstand, kettlebell of dumbbell op de voorste knie.",
+    "Duw de knie ver naar voren over de tenen, hiel blijft aan de grond.",
+    "2 s eindstand vasthouden."
+   ]
+  },
+  "soleus": {
+   "n": "Soleus-stretch (gebogen knie)",
+   "q": "soleus stretch bent knee",
+   "how": [
+    "Handen tegen de muur, achterste voet plat.",
+    "Buig de achterste knie licht, zak naar beneden.",
+    "Je voelt het laag in de kuit."
+   ]
+  },
+  "tibraise": {
+   "n": "Tibialis raises",
+   "q": "tibialis raise wall",
+   "how": [
+    "Rug tegen de muur, voeten 30 cm naar voren.",
+    "Til je tenen zo hoog mogelijk op, rustig weer zakken.",
+    "Brandt aan de voorkant van je scheen: goed."
+   ]
+  },
+  "calfslow": {
+   "n": "Langzame calf raise op trede",
+   "q": "eccentric calf raise step",
+   "how": [
+    "Voorvoet op een trede, hielen vrij.",
+    "Omhoog op twee voeten, 3 s zakken tot onder de trede op één voet.",
+    "Volledige range, houd iets vast voor balans."
+   ]
+  },
+  "toesit": {
+   "n": "Toe sit (kniel op tenen)",
+   "q": "toe sit kneeling stretch",
+   "how": [
+    "Kniel met tenen gebogen onder je.",
+    "Zit rustig naar achter op je hielen.",
+    "Intens onder de voet; begin met 20 s."
+   ]
+  },
+  "shin": {
+   "n": "Scheenstretch (zit op hielen)",
+   "q": "kneeling shin stretch",
+   "how": [
+    "Kniel met de wreef plat op de grond.",
+    "Zit naar achter op je hielen, eventueel knieën licht optillen.",
+    "Voorkant scheen en enkel strekken."
+   ]
+  },
+  "heeltoe": {
+   "n": "Hiel- en teenloop",
+   "q": "heel walk toe walk",
+   "how": [
+    "20 m lopen op je hielen, tenen omhoog.",
+    "20 m lopen op je tenen, hielen hoog.",
+    "Rechtop, kleine stapjes."
+   ]
+  },
+  "slbalance": {
+   "n": "Eenbeensbalans, ogen dicht",
+   "q": "single leg balance eyes closed",
+   "how": [
+    "Sta op één been, knie licht gebogen.",
+    "Sluit je ogen, houd vast.",
+    "Wankelen is de training; steun dichtbij."
+   ]
+  },
+  "anklecar": {
+   "n": "Ankle CARs",
+   "q": "ankle CARs",
+   "how": [
+    "Zit of sta, één voet los.",
+    "Draai de voet in de grootst mogelijke cirkel, langzaam.",
+    "Onderbeen blijft stil."
+   ]
+  },
+  "calfdrop": {
+   "n": "Excentrische calf drop",
+   "q": "eccentric heel drop alfredson",
+   "how": [
+    "Op een trede, omhoog op twee voeten.",
+    "Op één voet in 3–4 s zakken tot onder de trede, rechte knie.",
+    "Herhaal met gebogen knie voor de soleus."
+   ]
+  },
+  "openbook": {
+   "n": "Open book",
+   "q": "open book thoracic stretch",
+   "how": [
+    "Op je zij, knieën 90° op elkaar, armen gestrekt voor je.",
+    "Draai de bovenste arm open naar de andere kant, volg met je ogen.",
+    "Knieën blijven op elkaar."
+   ]
+  },
+  "qrot": {
+   "n": "Thoracale rotatie (viervoeters)",
+   "q": "quadruped thoracic rotation",
+   "how": [
+    "Op handen en knieën, één hand achter je hoofd.",
+    "Elleboog naar de andere arm, dan zo ver mogelijk open naar het plafond.",
+    "Draai vanuit de borst, niet vanuit de onderrug."
+   ]
+  },
+  "wgs": {
+   "n": "World's greatest stretch",
+   "q": "worlds greatest stretch",
+   "how": [
+    "Grote uitvalspas, hand naast de voorste voet.",
+    "Elleboog naar de enkel, dan arm open naar het plafond.",
+    "Terug en volgende kant."
+   ]
+  },
+  "doorpec": {
+   "n": "Borststretch in deuropening",
+   "q": "doorway pec stretch",
+   "how": [
+    "Onderarm tegen de deurpost, elleboog op schouderhoogte.",
+    "Stap rustig naar voren.",
+    "Schouder blijft laag."
+   ]
+  },
+  "wallslide": {
+   "n": "Wall slides",
+   "q": "wall slides shoulder",
+   "how": [
+    "Rug en armen tegen de muur (W-vorm).",
+    "Schuif armen omhoog tot een Y en terug, blijf contact houden.",
+    "Ribben omlaag, geen holle rug."
+   ]
+  },
+  "rollthor": {
+   "n": "Foamroller thoracale extensie",
+   "q": "foam roller thoracic extension",
+   "how": [
+    "Roller dwars onder je bovenrug, handen achter je hoofd.",
+    "Leun over de roller naar achter, 3 plekken.",
+    "Niet op de onderrug."
+   ]
+  },
+  "threadneedle": {
+   "n": "Thread the needle",
+   "q": "thread the needle stretch",
+   "how": [
+    "Op handen en knieën.",
+    "Schuif één arm onder je door, schouder naar de grond.",
+    "Daarna arm open naar boven."
+   ]
+  },
+  "ytw": {
+   "n": "Prone Y-T-W",
+   "q": "prone y t w exercise",
+   "how": [
+    "Op je buik, voorhoofd op een handdoek.",
+    "Armen in Y, dan T, dan W optillen, duimen omhoog.",
+    "Schouderbladen naar achter en omlaag."
+   ]
+  },
+  "sidereach": {
+   "n": "Child's pose met zijwaartse reach",
+   "q": "child pose side stretch",
+   "how": [
+    "In child's pose, handen naar één kant lopen.",
+    "Voel de zijkant en lat.",
+    "Rustig ademen."
+   ]
+  },
+  "shcar": {
+   "n": "Shoulder CARs",
+   "q": "shoulder CARs",
+   "how": [
+    "Sta rechtop, vuist gebald, arm gestrekt.",
+    "Draai de arm in de grootst mogelijke cirkel, langzaam.",
+    "Romp blijft stil."
+   ]
+  },
+  "puppy": {
+   "n": "Puppy pose (lat-stretch)",
+   "q": "puppy pose stretch",
+   "how": [
+    "Op handen en knieën, handen naar voren lopen.",
+    "Borst naar de grond, heupen boven knieën.",
+    "Of: ellebogen op een bank, borst zakt."
+   ]
+  },
+  "scappu": {
+   "n": "Scapula push-ups",
+   "q": "scapular push ups",
+   "how": [
+    "Plankpositie, armen gestrekt.",
+    "Laat borst zakken tussen schouderbladen, duw weer weg.",
+    "Ellebogen blijven gestrekt."
+   ]
+  },
+  "floss": {
+   "n": "Hamstring flossing",
+   "q": "hamstring nerve flossing",
+   "how": [
+    "Lig op je rug, knie omhoog vastgehouden.",
+    "Strek de knie en trek tegelijk de tenen naar je toe, dan terug.",
+    "Dynamisch; stop bij tintelen."
+   ]
+  },
+  "doorham": {
+   "n": "Hamstringstretch tegen deurpost",
+   "q": "doorway hamstring stretch lying",
+   "how": [
+    "Lig in een deuropening, één been omhoog tegen de deurpost.",
+    "Andere been plat op de grond.",
+    "Schuif dichterbij als het makkelijk wordt."
+   ]
+  },
+  "dogpedal": {
+   "n": "Downward dog pedal",
+   "q": "downward dog pedaling",
+   "how": [
+    "Handen en voeten op de grond, heupen hoog.",
+    "Duw om de beurt een hiel naar de grond.",
+    "Rug lang, knieën mogen licht buigen."
+   ]
+  },
+  "hamrock": {
+   "n": "Halve knielstand hamstring rock",
+   "q": "half kneeling hamstring stretch",
+   "how": [
+    "Halve knielstand, voorste been gestrekt, tenen omhoog.",
+    "Schuif heup naar achter met rechte rug.",
+    "Terug en herhaal."
+   ]
+  },
+  "slrdl": {
+   "n": "Eenbeens RDL (lichaamsgewicht)",
+   "q": "single leg romanian deadlift bodyweight",
+   "how": [
+    "Sta op één been, knie licht gebogen.",
+    "Romp naar voren, andere been naar achter, rug recht.",
+    "Terug omhoog; houd iets vast als steun."
+   ]
+  },
+  "wallcalf": {
+   "n": "Kuit + hamstring tegen muur",
+   "q": "wall calf stretch straight leg",
+   "how": [
+    "Voorvoet tegen de muur, hiel op de grond.",
+    "Leun met gestrekte knie naar de muur.",
+    "Rug recht."
+   ]
+  },
+  "aslr": {
+   "n": "Actieve beenheffing",
+   "q": "active straight leg raise",
+   "how": [
+    "Lig op je rug.",
+    "Til één gestrekt been zo hoog mogelijk op, zonder andere been te bewegen.",
+    "Langzaam zakken."
+   ]
+  },
+  "legswing": {
+   "n": "Leg swings",
+   "q": "leg swings dynamic warm up",
+   "how": [
+    "Houd een muur vast.",
+    "Zwaai je been ontspannen voor-achter, dan zijwaarts.",
+    "Grotere zwaai naarmate je opwarmt."
+   ]
+  },
+  "fig4sup": {
+   "n": "Figure-4 op de rug",
+   "q": "supine figure 4 stretch",
+   "how": [
+    "Op je rug, enkel op de andere knie.",
+    "Trek het onderste been naar je toe.",
+    "Rustig ademen."
+   ]
+  },
+  "askip": {
+   "n": "Loopscholing (A-skip, B-skip, hakken-billen)",
+   "q": "running drills a skip b skip",
+   "how": [
+    "A-skip: knie hoog, actief neerzetten onder je heup.",
+    "B-skip: knie hoog, onderbeen uitzwaaien en terugklauwen.",
+    "Hakken-billen: snelle korte passen, hielen naar billen."
+   ]
+  },
+  "strides": {
+   "n": "Strides",
+   "q": "running strides how to",
+   "how": [
+    "Opbouwen over 15–20 s naar ~5 km-tempo.",
+    "Ontspannen schouders, hoge frequentie.",
+    "Rustig terugwandelen."
+   ]
+  },
+  "pogo": {
+   "n": "Pogo jumps",
+   "q": "pogo jumps",
+   "how": [
+    "Kleine sprongetjes op de voorvoet, knieën bijna gestrekt.",
+    "Zo kort mogelijk grondcontact.",
+    "Stil en veerkrachtig landen."
+   ]
+  },
+  "snapdown": {
+   "n": "Snap-downs",
+   "q": "snap down drill",
+   "how": [
+    "Op tenen, armen omhoog.",
+    "Snel naar halve squat, armen naar achter, stil landen.",
+    "Houd 1 s vast."
+   ]
+  },
+  "hinge": {
+   "n": "Hip hinge met stok",
+   "q": "hip hinge dowel drill",
+   "how": [
+    "Stok langs je rug: achterhoofd, bovenrug, stuit.",
+    "Heupen naar achter, knieën licht gebogen.",
+    "Stok blijft op de drie punten."
+   ]
+  },
+  "pullapart": {
+   "n": "Band pull-apart",
+   "q": "band pull apart",
+   "how": [
+    "Band op schouderhoogte, armen gestrekt.",
+    "Trek de band uit elkaar tot je borst.",
+    "Schouders laag."
+   ]
+  },
+  "dislocate": {
+   "n": "Band dislocates",
+   "q": "band shoulder dislocates",
+   "how": [
+    "Band breed vast, armen gestrekt.",
+    "Langzaam over je hoofd naar achter en terug.",
+    "Breder vastpakken als het knelt."
+   ]
+  },
+  "legswall": {
+   "n": "Benen tegen de muur",
+   "q": "legs up the wall",
+   "how": [
+    "Lig met billen dicht bij de muur.",
+    "Benen omhoog tegen de muur.",
+    "Rustig ademen."
+   ]
+  },
+  "breath": {
+   "n": "Ademhaling 4 s in, 6 s uit",
+   "q": "box breathing relaxation 4 6",
+   "how": [
+    "In door de neus, buik beweegt.",
+    "Langzaam uit.",
+    "Ogen dicht."
+   ]
+  },
+  "childpose": {
+   "n": "Child's pose",
+   "q": "child pose",
+   "how": [
+    "Knieën breed, zit op je hielen.",
+    "Armen lang naar voren.",
+    "Rustig ademen."
+   ]
+  }
+ },
+ "mobFocus": {
+  "HEUP": {
+   "n": "heup",
+   "v": [
+    "MOB_HEUP_A",
+    "MOB_HEUP_B",
+    "MOB_HEUP_C"
+   ]
+  },
+  "ENKEL": {
+   "n": "enkel & kuit",
+   "v": [
+    "MOB_ENKEL_A",
+    "MOB_ENKEL_B",
+    "MOB_ENKEL_C"
+   ]
+  },
+  "THOR": {
+   "n": "bovenrug & schouder",
+   "v": [
+    "MOB_THOR_A",
+    "MOB_THOR_B",
+    "MOB_THOR_C"
+   ]
+  },
+  "ACHTER": {
+   "n": "hamstring & achterketen",
+   "v": [
+    "MOB_ACHTER_A",
+    "MOB_ACHTER_B",
+    "MOB_ACHTER_C"
+   ]
+  }
+ },
+ "mobTests": [
+  {
+   "k": "ktwL",
+   "n": "Knie-naar-muur links",
+   "u": "cm",
+   "how": "Uitvalspas, grote teen X cm van de muur. Knie raakt de muur, hiel blijft plat. Meet de grootste afstand teen–muur.",
+   "q": "knee to wall test",
+   "goal": "≥ 10 cm"
+  },
+  {
+   "k": "ktwR",
+   "n": "Knie-naar-muur rechts",
+   "u": "cm",
+   "how": "Zelfde, rechts.",
+   "q": "knee to wall test",
+   "goal": "≥ 10 cm"
+  },
+  {
+   "k": "toe",
+   "n": "Vingertoppen–vloer (staand, knieën gestrekt)",
+   "u": "cm",
+   "how": "Rustig voorover, niet veren. 0 = raakt de vloer; negatief = voorbij de vloer. Overslaan zolang de rug pijn doet.",
+   "q": "standing toe touch test",
+   "goal": "≤ 0 cm"
+  },
+  {
+   "k": "sq",
+   "n": "Diepe squat hold, hielen plat",
+   "u": "s",
+   "how": "Zo diep mogelijk, voeten schouderbreed, hielen plat. Hoe lang houd je het vol (max 120)?",
+   "q": "deep squat hold test",
+   "goal": "≥ 60 s"
+  },
+  {
+   "k": "thl",
+   "n": "Couch-stretch afstand knie–muur",
+   "u": "cm",
+   "how": "In de couch stretch: hoeveel cm zit je bovenlichaam nog van rechtop? Of: kan je rechtop zitten met bil aangespannen (0 cm)?",
+   "q": "couch stretch test",
+   "goal": "0 cm"
+  }
+ ]
 }
