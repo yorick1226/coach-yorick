@@ -89,6 +89,25 @@ nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:6;display:grid;grid-temp
 nav.tabs button{background:none;border:0;color:var(--mut);font:inherit;font-size:12px;font-weight:600;min-height:58px;padding:4px 0}
 nav.tabs button span{display:block;font-size:20px;line-height:1.2}
 nav.tabs button.on{color:var(--acc)}
+#rp{position:fixed;inset:0;z-index:30;background:var(--bg);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+#rp.show{display:flex}
+#rp .rpt{font-size:14px;color:var(--mut);display:flex;justify-content:space-between;align-items:center}
+#rp .rpbar{height:6px;background:var(--line);border-radius:3px;margin:10px 0 18px;overflow:hidden}#rp .rpbar i{display:block;height:100%;background:var(--acc)}
+#rp .rpn{font-size:26px;font-weight:700;line-height:1.2}
+#rp .rps{font-size:17px;color:var(--acc);margin-top:4px;min-height:22px}
+#rp .rpbig{font-size:92px;font-weight:800;text-align:center;margin:auto 0 6px;font-variant-numeric:tabular-nums;line-height:1}
+#rp .rpbig.reps{font-size:44px}
+#rp .rpph{text-align:center;font-size:16px;color:var(--mut);min-height:22px}
+#rp .rpcue{font-size:16px;margin:16px 0;min-height:44px;color:var(--tx)}
+#rp .rpnext{font-size:14px;color:var(--mut);margin-bottom:12px}
+#rp .rpctl{display:grid;grid-template-columns:1fr 1fr 2fr;gap:8px}
+#rp .rpctl .btn{min-height:56px;font-size:18px}
+.rtrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
+.rtrow:first-of-type{border-top:0}
+.rtrow .nm{flex:1;min-width:0}
+.rtchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.rtchip{border:1px solid var(--line);background:var(--card2);color:var(--tx);border-radius:999px;padding:0 12px;min-height:40px;font-size:14px}
+.rtchip.on{border-color:var(--acc);color:var(--acc)}
 #timer{position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:7;display:none;align-items:center;gap:8px;flex-direction:row-reverse}
 #timer.show{display:flex}
 body.timeron{padding-bottom:calc(240px + env(safe-area-inset-bottom))}
@@ -146,6 +165,7 @@ svg text{fill:var(--mut);font-size:10px}
   </div>
 </header>
 <main id="view"><p class="mut">Laden…</p></main>
+<div id="rp" role="dialog" aria-label="Routine"></div>
 <div id="timer"><button id="ring" aria-label="Rusttimer"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="37" fill="none" stroke="#1f2a24" stroke-width="6"/><circle id="rarc" cx="42" cy="42" r="37" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" transform="rotate(-90 42 42)" stroke-dasharray="232.5" stroke-dashoffset="0"/></svg><span class="t" id="tval">0:00</span></button>
   <div id="tctl"><button class="btn sm" data-tadd="-15">−15</button><button class="btn sm" data-tadd="15">+15</button><button class="btn sm" id="tstop">Stop</button></div></div>
 <div id="flash">RUST VOORBIJ</div>
@@ -162,7 +182,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.6.2';
+const APP_VERSION = '2.7.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -219,7 +239,7 @@ const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','V
 const RUNS = ['Run','TrailRun','VirtualRun'];
 
 /* ---------- opslag ---------- */
-function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, body:[], sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
+function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, body:[], rt:{}, sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
   settings:{ftp:null,lthr:null,tpace:null,sheetUrl:'',lastBackup:null,seenPlan:null}, queue:[]}; }
 function migrate(o){
   const b = blank();
@@ -548,7 +568,11 @@ function sessCard(it, m, opt){
   if(a) h += '<div class="strava"><b>✓ Strava</b> '+actLine(a)+(open && a.laps?'<br><button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>'+(ui.laps[s.id]?lapsTable(a):''):'')+'</div>';
   const quick = [];
   if(s.ex && !skip) quick.push('<button class="btn sm pri" data-logger="'+s.id+'">Logger</button>');
+  if(s.rt && !skip) quick.push('<button class="btn sm pri" data-rtstart="'+s.rt+'" data-rtkey="'+s.rt+'" data-rtdate="'+it.date+'">▶ Start routine</button>');
   if(quick.length) h += '<div class="row">'+quick.join('')+'</div>';
+  const wc = !skip && wuFor(s); if(wc) h += '<div class="rtchips">'+rtChip(wc[0], wc[0]+'@'+s.id, it.date, 'Warming-up')+(wc[1] ? rtChip(wc[1], wc[1]+'@'+s.id, it.date, 'Cooldown') : '')+'</div>';
+  if(!skip && s.ex && backPain(it.date) >= 4){ const has = c => sessEx(s).some(e => e.c===c && !S.swaps[s.id+'|'+c]);
+    if(has('RDL') || has('SQ')) h += '<div class="banner oranje" style="margin:8px 0 0;padding:6px 10px;font-size:14px">Onderrug ≥4 vandaag. <button class="btn sm" data-backswap="'+s.id+'">Rugvriendelijk wisselen</button><div class="small">RDL → hip thrust, squat → leg press. Zelf terug te zetten in de logger.</div></div>'; }
   if(open){
     if(s.detail) h += '<div class="det">'+esc(s.detail)+'</div>';
     if(s.ex) h += '<div class="det small">'+sessEx(s).filter(e => !S.exskip[s.id+'|'+e.c]).map(e => esc(EXN(S.swaps[s.id+'|'+e.c]||e.c).n)+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')+(e.rir?' @RIR'+e.rir:'')).join(' · ')+'</div>';
@@ -585,6 +609,79 @@ function render(){
   ({vandaag:rToday, week:rWeek, log:rLog, duur:rDuur, inzicht:rInsight, check:rCheck, meer:rMeer})[ui.tab]();
 }
 
+/* ---------- routines (mobiliteit, warming-up, cooldown, herstel) ---------- */
+const RT = () => PLAN.routines || {};
+function rtDef(id){ const r = RT()[id]; if(!r) return null; return r.of ? Object.assign({}, r, {items: r.of.flatMap(x => (RT()[x]||{}).items||[])}) : r; }
+function rtSteps(r){ const st = [];
+  for(const it of r.items){ const sets = it.sets||1, sides = it.side ? ['links','rechts'] : [null]; const n = sets*sides.length; let k = 0;
+    for(let a=0;a<sets;a++) for(const sd of sides){ k++; st.push({n:it.n, cue:it.cue||'', sec:it.sec||0, reps:it.reps||'', side:sd, set: sets>1 ? 'set '+(a+1)+'/'+sets : '', rest: (it.rest && k<n) ? it.rest : 0}); } }
+  return st; }
+function rtDone(date, key){ return !!((S.rt[date]||{})[key]); }
+function setRt(date, key, on){ const x = S.rt[date] || (S.rt[date] = {}); if(on) x[key] = Date.now(); else delete x[key]; enqueue('routine', date, date, x); }
+function wuFor(s){ if(s.rt || s.t==='rest' || s.t==='mobility' || s.t==='swim') return null; const t = (s.title||'').toLowerCase();
+  if(s.t==='race') return ['WU_RACE','CD_RUN'];
+  if(s.t==='run'){ if(!/easy|herstel/.test(t) && /drempel|interval|×|tempo|heuvel|vo2|fartlek|marathontempo|\bmp\b|progressie/.test(t)) return ['WU_RUNQ','CD_RUN'];
+    if(/lang|duur/.test(t) || (s.km||0) >= 18 || (s.min||0) >= 100) return ['WU_LONG','CD_LONG']; return ['WU_RUNE','CD_RUN']; }
+  if(s.t==='strength') return [/lower|been|leg/.test(t) ? 'WU_LOWER' : 'WU_UPPER', null];
+  if(s.t==='plyo') return ['WU_PLYO', null]; if(s.t==='hyrox') return ['WU_HYROX','CD_RUN']; if(s.t==='bike') return ['WU_BIKE', null]; return null; }
+function dailyList(d){ const dow = (parseD(d).getDay()+6)%7; let l = ((PLAN.dailyRoutines||[])[dow] || []).slice();
+  const its = weekItems(weekByStart(mondayOf(d))).filter(i => i.date===d);
+  if(its.some(i => i.s.rt && /^MOB/.test(i.s.rt) && !isSkipped(i.s.id))) l = l.filter(x => !/^MOB/.test(x)); return l; }
+function rtChip(id, key, date, lbl){ const r = rtDef(id); if(!r) return ''; const on = rtDone(date, key);
+  return '<button class="rtchip'+(on?' on':'')+'" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+date+'">'+(on?'✓ ':'▶ ')+lbl+' '+r.min+'′</button>'; }
+function backPain(d){ return ((dailyOf(d).pains)||{})['Onderrug'] || 0; }
+function routinesCard(d, items){
+  const bp = backPain(d); let h = '<div class="card" id="rtcard"><h3>Routines <span class="small">tik ▶ voor de speler, ✓ = gedaan</span></h3>';
+  const row = (id, key, why) => { const r = rtDef(id); if(!r) return ''; const on = rtDone(d, key);
+    return '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"><b>'+esc(r.n)+'</b> <span class="small">'+r.min+' min'+(why?' · '+esc(why):'')+'</span></div><button class="btn sm pri" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+d+'">▶ Start</button></div>'; };
+  for(const id of dailyList(d)) h += row(id, id, id==='RUG' ? 'ochtend of na lang zitten' : 'ochtend');
+  if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: doe alleen cat-cow, curl-up en bird dog; side plank op je knieën. Wandelen mag. In krachtsessies: RDL en squat wisselen (knop in de sessie). Volg het advies van de huisarts.</div>';
+  else if(bp) h += '<div class="small" style="margin-top:6px">Onderrug '+bp+'/8 gemeld: rustig, pijn tijdens de oefeningen max 3/10.</div>';
+  /* herstel: wat past vandaag */
+  const y = addDays(d, -1); const yIts = weekItems(weekByStart(mondayOf(y))).filter(i => i.date===y);
+  const heavy = [...items, ...yIts].some(i => { const w = wuFor(i.s); return (w && (w[0]==='WU_LONG' || w[0]==='WU_RACE' || w[0]==='WU_LOWER')) || i.s.t==='hyrox'; });
+  const ad = advice(d); const tips = PLAN.recoveryTips || {}; const sug = [];
+  if(ad && ad.lvl!=='groen') sug.push(['REC_DOWN', 'advies '+ad.lvl]);
+  if(heavy) sug.push(['REC_ROLL', 'zware benen gisteren/vandaag']);
+  if(sug.length || heavy){ h += '<div style="margin-top:10px"><b style="font-size:15px">Herstel vandaag</b></div>'; for(const [id, why] of sug) h += row(id, id, why);
+    if(heavy && tips.boots) h += '<div class="small" style="margin-top:4px">🦵 '+esc(tips.boots)+'</div>'; }
+  const restDay = !items.some(i => !['rest','mobility'].includes(i.s.t) && !isSkipped(i.s.id));
+  if(restDay && tips.sauna) h += '<div class="small" style="margin-top:6px">🧖 '+esc(tips.sauna)+'</div>';
+  h += '<details style="margin-top:8px"><summary class="small">Meer herstel en routines</summary>';
+  for(const id of ['REC_ROLL','REC_DOWN','MOB_HEUP','MOB_ENKEL','MOB_THOR'].filter(x => !sug.some(z=>z[0]===x) && !dailyList(d).includes(x))) h += row(id, id, '');
+  for(const k of ['sauna','boots','sleep']) if(tips[k] && !(k==='sauna'&&restDay) && !(k==='boots'&&heavy)) h += '<div class="small" style="margin-top:6px">'+({sauna:'🧖 ',boots:'🦵 ',sleep:'😴 '})[k]+esc(tips[k])+'</div>';
+  h += '</details></div>'; return h; }
+/* routinespeler */
+function rpStart(id, key, date){ const r = rtDef(id); if(!r) return; unlockAudio();
+  ui.rp = {id, key, date, r, steps: rtSteps(r), i: 0, phase:'', end:0, left:0, paused:false}; $('rp').classList.add('show'); keepAwake(true); rpEnter(0, false); clearInterval(ui.rpInt); ui.rpInt = setInterval(rpTick, 250); }
+function rpEnter(i, afterRest){ const p = ui.rp; p.i = i; const st = p.steps[i]; if(!st) return rpFinish();
+  if(st.sec){ if(afterRest){ p.phase = 'work'; p.end = Date.now() + st.sec*1000; } else { p.phase = 'prep'; p.end = Date.now() + 5000; } } else { p.phase = 'reps'; p.end = 0; }
+  p.paused = false; rpRender(); }
+function rpTick(){ const p = ui.rp; if(!p || p.paused || !p.end) return; const left = p.end - Date.now();
+  if(left <= 0){ const st = p.steps[p.i];
+    if(p.phase==='prep'){ beep(); p.phase = 'work'; p.end = Date.now() + st.sec*1000; }
+    else if(p.phase==='work'){ beep(); if(st.rest){ p.phase = 'rest'; p.end = Date.now() + st.rest*1000; } else return rpEnter(p.i+1, false); }
+    else if(p.phase==='rest'){ const nx = p.steps[p.i+1]; return rpEnter(p.i+1, !!(nx && nx.sec)); } }
+  rpRender(); }
+function rpNext(){ const p = ui.rp; const st = p.steps[p.i]; if(p.phase==='reps' && st.rest){ p.phase = 'rest'; p.end = Date.now() + st.rest*1000; rpRender(); return; } rpEnter(p.i+1, false); }
+function rpPrev(){ rpEnter(Math.max(0, ui.rp.i-1), false); }
+function rpPause(){ const p = ui.rp; if(!p.end) return; if(p.paused){ p.end = Date.now() + p.left; p.paused = false; } else { p.left = p.end - Date.now(); p.paused = true; } rpRender(); }
+function rpClose(){ clearInterval(ui.rpInt); ui.rp = null; $('rp').classList.remove('show'); $('rp').innerHTML = ''; keepAwake(ui.tab==='log'); }
+function rpFinish(){ const p = ui.rp; setRt(p.date, p.key, true);
+  const ss = p.key.includes('@') ? null : (weekItems(weekByStart(mondayOf(p.date))).find(i => i.date===p.date && i.s.rt===p.id) || null);
+  if(ss && !(S.done[ss.s.id]||{}).d) setDone(ss.s.id, {d:true, min:String(p.r.min)});
+  beep(); toast(p.r.n+' afgerond ✓'); rpClose(); rerender(); }
+function rpRender(){ const p = ui.rp; if(!p) return; const st = p.steps[p.i]; const nx = p.steps[p.i+1];
+  const left = p.paused ? p.left : Math.max(0, p.end - Date.now()); const sec = Math.ceil(left/1000);
+  const big = p.phase==='reps' ? '<div class="rpbig reps">'+esc(st.reps||'—')+'</div>' : '<div class="rpbig">'+(sec>=60 ? Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0') : sec)+'</div>';
+  const ph = {prep:'Klaar maken…', work:'Houden / bezig', rest:'Rust · daarna: '+(nx?esc(nx.n)+(nx.side?' ('+nx.side+')':''):'klaar'), reps:'Tik op Volgende als je klaar bent'}[p.phase] + (p.paused?' · gepauzeerd':'');
+  $('rp').innerHTML = '<div class="rpt"><span>'+esc(p.r.n)+' · '+(p.i+1)+'/'+p.steps.length+'</span><button class="btn sm" data-rp="stop">✕ Stop</button></div>'
+    +'<div class="rpbar"><i style="width:'+Math.round(p.i/p.steps.length*100)+'%"></i></div>'
+    +'<div class="rpn">'+esc(st.n)+'</div><div class="rps">'+[st.side, st.set].filter(Boolean).join(' · ')+'</div>'
+    +'<div class="rpcue">'+esc(st.cue)+(p.i===0 && p.r.note ? '<div class="small" style="margin-top:8px;color:var(--warn)">'+esc(p.r.note)+'</div>' : '')+'</div>'
+    + big + '<div class="rpph">'+ph+'</div>'
+    +'<div class="rpnext">'+(nx ? 'Hierna: '+esc(nx.n)+[nx.side, nx.set].filter(Boolean).map(z=>' · '+z).join('') : 'Laatste oefening')+'</div>'
+    +'<div class="rpctl"><button class="btn" data-rp="prev">◀</button><button class="btn" data-rp="pause"'+(p.end?'':' disabled')+'>'+(p.paused?'Verder':'Pauze')+'</button><button class="btn pri" data-rp="next">'+(nx?'Volgende ▶':'Klaar ✓')+'</button></div>'; }
 function rToday(){
   const t = today(); const d = ui.day || t; const isT = d===t;
   $('htitle').textContent = (isT ? 'Vandaag · ' : '')+fmtDay(d);
@@ -613,9 +710,10 @@ function rToday(){
   h += '</div>'; }
   const w = weekByStart(mondayOf(d)); const m = matchWeek(w);
   const items = weekItems(w).filter(i => i.date===d);
+  h += routinesCard(d, items);
   h += '<div class="day today"><h2>Training '+(isT?'vandaag':fmtDay(d))+'</h2>';
   if(!w) h += '<div class="card mut">Geen plan voor deze week.</div>';
-  else if(!items.length) h += '<div class="card mut">Niets gepland. Rust of mobiliteit.</div>';
+  else if(!items.length) h += '<div class="card mut">Niets gepland. Rust of de routines hierboven.</div>';
   for(const it of items){ const st = S.done[it.s.id]||{}; h += sessCard(it, m, {open: !(st.d || m.by[it.s.id] || st.skip)}); }
   for(const a of m.extra.filter(x => x.date===d)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
   h += '</div>';
@@ -984,6 +1082,11 @@ function weekText(start){
     L.push('- Rustige runs te hard: '+(st.easyFlags.length ? st.easyFlags.map(f => fmtDay(f.date)+' ('+f.txt.replace(/^.*?: /,'')+')').join('; ') : 'geen'));
     if(st.intv.length) L.push('- Intervallen: '+st.intv.map(x => fmtDay(x.date)+': '+x.iv.txt).join(' | '));
     L.push('- Pijn: '+(Object.keys(pains).length ? Object.entries(pains).map(([k,v])=>k+' max '+v).join(', ') : 'geen gemeld'));
+    { let rp = 0, rd = 0, mp = 0, md = 0, wp = 0, wd = 0, rec = 0; for(let i=0;i<7;i++){ const dd = addDays(start,i); if(dd > today()) break; const dl = dailyList(dd); const x = S.rt[dd]||{};
+        if(dl.includes('RUG')){ rp++; if(x.RUG) rd++; } for(const k of dl.filter(k => /^MOB/.test(k))){ mp++; if(x[k]) md++; }
+        for(const it of weekItems(w).filter(z => z.date===dd)){ if(it.s.rt){ mp++; if(x[it.s.rt]) md++; } const wc = wuFor(it.s); if(wc && (S.done[it.s.id]||{}).d){ wp++; if(x[wc[0]+'@'+it.s.id]) wd++; } }
+        rec += Object.keys(x).filter(k => /^REC/.test(k)).length; }
+      if(rp) L.push('- Routines: rug '+rd+'/'+rp+' · mobiliteit '+md+'/'+mp+' · warming-ups '+wd+'/'+wp+' (bij afgevinkte trainingen) · herstel '+rec+'×'); }
     if(st.rd.length||st.sl.length) L.push('- Oura gem.: readiness '+(avg(st.rd)??'–')+', slaap '+(avg(st.sl)??'–'));
     const cf = availConflicts(weekByStart(addDays(start,7))||{id:''}); if(cf.length) L.push('- Conflicten volgende week: '+cf.join(' '));
     L.push(''); }
@@ -1111,6 +1214,11 @@ document.addEventListener('click', ev => {
     else { const el = document.getElementById('d_'+ds.strip); if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); } return; }
   if(ds.info){ ui.info[ds.info] = !ui.info[ds.info]; rerender(); return; }
   if(ds.exfocus){ ui.exFocus[ui.sid] = ds.exfocus; rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+ds.exfocus); if(el) el.scrollIntoView({block:'start'}); }, 20); return; }
+  if(ds.rtstart){ rpStart(ds.rtstart, ds.rtkey, ds.rtdate); return; }
+  if(ds.rtchk){ setRt(ds.rtdate, ds.rtchk, !rtDone(ds.rtdate, ds.rtchk)); rerender(); return; }
+  if(ds.rp){ ({stop: rpClose, prev: rpPrev, next: rpNext, pause: rpPause})[ds.rp](); return; }
+  if(ds.backswap){ const sid = ds.backswap; const s0 = sessById(sid).s; for(const [a,b] of [['RDL','HT'],['SQ','LP']]) if(sessEx(s0).some(e => e.c===a)) S.swaps[sid+'|'+a] = b;
+    enqueue('sessmod', sid, sessById(sid).date, {swaps:Object.fromEntries(Object.entries(S.swaps).filter(([k])=>k.startsWith(sid+'|'))), extra:S.extra[sid]||[], exskip:Object.fromEntries(Object.entries(S.exskip).filter(([k])=>k.startsWith(sid+'|')))}); toast('Gewisseld naar rugvriendelijke varianten'); rerender(); return; }
   if(ds.dailyedit){ ui.dailyEdit[ds.dailyedit] = true; rerender(); return; }
   if(ds.dailydone){ ui.dailyEdit[ds.dailydone] = false; ui.painOpen = false; window.scrollTo(0,0); render(); return; }
   if(ds.painopen){ ui.painOpen = true; rerender(); return; }

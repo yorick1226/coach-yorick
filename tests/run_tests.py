@@ -120,6 +120,23 @@ def features(pg, shots=True):
     pg.click('[data-dailydone="2026-11-17"]'); ok(pg.locator("#dailysum").count() == 1, "Klaar klapt ochtendcheck in")
     pg.click('[data-dailyedit="2026-11-17"]'); pg.type('[data-dly="hrv"]', "48"); pg.reload(); pg.wait_for_selector("#tabs")
     ok(store(pg)["daily"]["2026-11-17"].get("hrv") == 48, "getypte waarde bewaard zonder veld te verlaten (app sluiten)")
+    # Routines
+    tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart="RUG"]').count() == 1 and pg.locator('#rtcard [data-rtstart="MOB_ENKEL"]').count() == 1, "dagroutines (rug + enkel op dinsdag)")
+    pg.click('#rtcard [data-rtstart="RUG"]'); ok(pg.is_visible("#rp") and "Cat-cow" in pg.inner_text("#rp"), "routinespeler opent")
+    pg.click('[data-rp="next"]'); ok("McGill" in pg.inner_text("#rp") and "Klaar maken" in pg.inner_text("#rp"), "timed oefening met aftellen")
+    for _ in range(40):
+        if not pg.is_visible("#rp"): break
+        pg.click('[data-rp="next"]')
+    ok(not pg.is_visible("#rp") and store(pg)["rt"].get("2026-11-17", {}).get("RUG"), "routine afgerond en afgevinkt")
+    ok(pg.locator('[data-rtkey^="WU_"]').count() >= 1, "warming-up bij training")
+    pg.evaluate("{ const y = S.daily['2026-11-17'] || (S.daily['2026-11-17'] = {}); y.pains = Object.assign({}, y.pains, {'Onderrug':5}); save(); render(); }")
+    ok("Onderrug 5/8" in pg.inner_text("#rtcard"), "rugadvies bij onderrugpijn")
+    bs = pg.locator('[data-backswap]')
+    if bs.count():
+        sid = bs.first.get_attribute("data-backswap"); bs.first.click(); sw = store(pg)["swaps"]
+        ok(any(k.startswith(sid) and v in ("HT","LP") for k, v in sw.items()), "rugvriendelijk wisselen")
+    pg.evaluate("delete S.daily['2026-11-17'].pains.Onderrug; save(); render()")
+    ok("Routines: rug 1/" in pg.evaluate("weekText('2026-11-16')"), "routines in zondag-export")
     pg.reload(); pg.wait_for_selector("#tabs"); tab(pg, "vandaag")
     ok(pg.locator("#dailysum").count() == 1 and "55" in pg.inner_text("#dailysum") and pg.locator('[data-dly="rd"]').count() == 0, "ingevulde ochtendcheck klapt in tot één regel")
     pg.click('[data-dailyedit="2026-11-17"]'); ok(pg.locator('[data-dly="rd"]').count() == 1, "ochtendcheck weer te wijzigen")

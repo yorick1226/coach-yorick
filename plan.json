@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-11e",
+ "updated": "2026-11-12a",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -888,9 +888,10 @@
       {
        "id": "2026-11-16-b",
        "t": "mobility",
-       "title": "Mobiliteit 15 min",
-       "detail": "Mobiliteit 15 min: ankle rocks 2×10, 90/90 hip switches 2×8, adductor rocks 2×10, couch stretch 2×45 s/kant, calf mobility 2×10, thoracic rotations 2×8/kant.",
-       "min": 15
+       "title": "Mobiliteit compleet (18 min)",
+       "detail": "Start de routinespeler. Heup, enkel/kuit en rug/hamstring achter elkaar. Vervangt die dag de korte mobiliteit.",
+       "min": 15,
+       "rt": "MOB_LANG"
       }
      ]
     },
@@ -1169,9 +1170,10 @@
       {
        "id": "2026-11-20-b",
        "t": "mobility",
-       "title": "Mobiliteit 15 min",
-       "detail": "Mobiliteit 15 min: ankle rocks 2×10, 90/90 hip switches 2×8, adductor rocks 2×10, couch stretch 2×45 s/kant, calf mobility 2×10, thoracic rotations 2×8/kant.",
-       "min": 15
+       "title": "Mobiliteit compleet (18 min)",
+       "detail": "Start de routinespeler. Heup, enkel/kuit en rug/hamstring achter elkaar. Vervangt die dag de korte mobiliteit.",
+       "min": 15,
+       "rt": "MOB_LANG"
       }
      ]
     },
@@ -1445,9 +1447,10 @@
       {
        "id": "2026-11-25-b",
        "t": "mobility",
-       "title": "Mobiliteit 15 min",
-       "detail": "Mobiliteit 15 min: ankle rocks 2×10, 90/90 hip switches 2×8, adductor rocks 2×10, couch stretch 2×45 s/kant, calf mobility 2×10, thoracic rotations 2×8/kant.",
-       "min": 15
+       "title": "Mobiliteit compleet (18 min)",
+       "detail": "Start de routinespeler. Heup, enkel/kuit en rug/hamstring achter elkaar. Vervangt die dag de korte mobiliteit.",
+       "min": 15,
+       "rt": "MOB_LANG"
       }
      ]
     },
@@ -2301,5 +2304,500 @@
   "kuiten": 8,
   "core": 6
  },
- "bodyGoal": "78–79 kg, geleidelijk (geen cut)"
+ "bodyGoal": "78–79 kg, geleidelijk (geen cut)",
+ "routines": {
+  "RUG": {
+   "n": "Rug-basis",
+   "min": 7,
+   "tag": "rug",
+   "note": "Rustig, pijn max 3/10. Bij meer pijn: stoppen. Advies van de huisarts gaat voor.",
+   "items": [
+    {
+     "n": "Cat-cow",
+     "reps": "10×",
+     "cue": "Langzaam, adem mee; klein bereik als het trekt"
+    },
+    {
+     "n": "McGill curl-up",
+     "sets": 5,
+     "sec": 8,
+     "rest": 5,
+     "cue": "Eén knie gebogen, handen onder holle rug; hoofd en schouders net los, rug neutraal"
+    },
+    {
+     "n": "Side plank",
+     "sets": 2,
+     "sec": 20,
+     "side": true,
+     "rest": 10,
+     "cue": "Op knieën als het zwaar is; heup omhoog, lijn schouder-heup-knie"
+    },
+    {
+     "n": "Bird dog",
+     "sets": 3,
+     "reps": "6× · 5 s vast",
+     "side": true,
+     "cue": "Bekken stil; arm en been lang, niet hoog"
+    },
+    {
+     "n": "Glute bridge",
+     "sets": 2,
+     "reps": "10× · 2 s knijpen",
+     "cue": "Duw door hielen; billen aanspannen, geen holle rug"
+    }
+   ]
+  },
+  "MOB_HEUP": {
+   "n": "Mobiliteit heup",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "n": "90/90 hip switches",
+     "reps": "10×",
+     "cue": "Rechtop, handen achter je; rustig wisselen"
+    },
+    {
+     "n": "Adductor rocks",
+     "reps": "10×",
+     "side": true,
+     "cue": "Eén been opzij gestrekt, heup naar achter"
+    },
+    {
+     "n": "Couch stretch",
+     "sec": 40,
+     "side": true,
+     "cue": "Bil aanspannen, ribben omlaag; geen holle rug (sla over als de rug trekt)"
+    },
+    {
+     "n": "Figure-4 / pigeon",
+     "sec": 30,
+     "side": true,
+     "cue": "Rustig ademen, niet doordrukken"
+    }
+   ]
+  },
+  "MOB_ENKEL": {
+   "n": "Mobiliteit enkel & kuit",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "n": "Ankle rocks",
+     "reps": "15×",
+     "side": true,
+     "cue": "Knie over de tenen naar de muur; hiel blijft aan de grond"
+    },
+    {
+     "n": "Soleus-stretch (gebogen knie)",
+     "sec": 30,
+     "side": true,
+     "cue": "Tegen de muur, achterste knie gebogen"
+    },
+    {
+     "n": "Tibialis raises",
+     "sets": 2,
+     "reps": "15×",
+     "cue": "Rug tegen de muur, voeten naar voren; tenen omhoog"
+    },
+    {
+     "n": "Langzame calf raise op trede",
+     "reps": "10× · 3 s zakken",
+     "side": true,
+     "cue": "Volledige range, gecontroleerd"
+    }
+   ]
+  },
+  "MOB_THOR": {
+   "n": "Mobiliteit rug & hamstring",
+   "min": 6,
+   "tag": "mob",
+   "items": [
+    {
+     "n": "Open book",
+     "reps": "8×",
+     "side": true,
+     "cue": "Op je zij, knieën 90°; volg je hand met je ogen"
+    },
+    {
+     "n": "Thoracic rotation (viervoeters)",
+     "reps": "8×",
+     "side": true,
+     "cue": "Hand achter het hoofd; draai vanuit de borst"
+    },
+    {
+     "n": "World's greatest stretch",
+     "reps": "4×",
+     "side": true,
+     "cue": "Diepe uitvalspas, elleboog naar de voet, dan draaien"
+    },
+    {
+     "n": "Hamstring flossing",
+     "reps": "10×",
+     "side": true,
+     "cue": "Dynamisch, niet vasthouden; stop bij tintelen"
+    }
+   ]
+  },
+  "WU_RUNQ": {
+   "n": "Warming-up kwaliteit",
+   "min": 15,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Inlopen easy",
+     "sec": 600,
+     "cue": "Echt rustig, HF < 145"
+    },
+    {
+     "n": "Leg swings voor-achter + zijwaarts",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "n": "Loopscholing: A-skip, B-skip, hakken-billen",
+     "reps": "2 × 20 m elk"
+    },
+    {
+     "n": "Strides",
+     "sets": 4,
+     "sec": 20,
+     "rest": 40,
+     "cue": "Opbouwen naar ~5 km-tempo, ontspannen; terugwandelen"
+    }
+   ]
+  },
+  "WU_RUNE": {
+   "n": "Warming-up easy",
+   "min": 3,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Leg swings voor-achter",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "n": "Ankle rocks",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "n": "Eerste 10 min bewust traag",
+     "reps": "HF onder 140",
+     "cue": "Tempo komt vanzelf"
+    }
+   ]
+  },
+  "WU_LONG": {
+   "n": "Warming-up lange duur",
+   "min": 4,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Leg swings voor-achter + zijwaarts",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "n": "Ankle rocks",
+     "reps": "10×",
+     "side": true
+    },
+    {
+     "n": "Eerste 15 min trager dan je wilt",
+     "reps": "HF onder 140",
+     "cue": "Voeding: eerste gel na 40–45 min"
+    }
+   ]
+  },
+  "WU_LOWER": {
+   "n": "Warming-up lower",
+   "min": 8,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Fiets of roeier",
+     "sec": 300,
+     "cue": "Licht, oplopend"
+    },
+    {
+     "n": "Glute bridge",
+     "reps": "10×"
+    },
+    {
+     "n": "Bodyweight squat met pauze",
+     "reps": "8×",
+     "cue": "2 s onderin"
+    },
+    {
+     "n": "Hip hinge met stok",
+     "reps": "8×",
+     "cue": "Stok raakt achterhoofd, rug en stuit"
+    },
+    {
+     "n": "Opwarmsets eerste oefening",
+     "reps": "2–3 sets oplopend",
+     "cue": "Log ze met \"Opwarmset\""
+    }
+   ]
+  },
+  "WU_UPPER": {
+   "n": "Warming-up upper",
+   "min": 5,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Roeier of SkiErg",
+     "sec": 180
+    },
+    {
+     "n": "Band pull-apart",
+     "reps": "15×"
+    },
+    {
+     "n": "Band dislocates",
+     "reps": "10×"
+    },
+    {
+     "n": "Opwarmsets eerste oefening",
+     "reps": "2 sets oplopend"
+    }
+   ]
+  },
+  "WU_PLYO": {
+   "n": "Warming-up plyo",
+   "min": 7,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Joggen / huppelen",
+     "sec": 180
+    },
+    {
+     "n": "Pogo jumps",
+     "sets": 2,
+     "reps": "15 contacten",
+     "cue": "Stijve enkels, kort grondcontact"
+    },
+    {
+     "n": "Laterale ankle hops",
+     "reps": "10×"
+    },
+    {
+     "n": "Snap-downs",
+     "reps": "5×",
+     "cue": "Stil landen"
+    }
+   ]
+  },
+  "WU_HYROX": {
+   "n": "Warming-up Hyrox",
+   "min": 8,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Roeier oplopend",
+     "sec": 240
+    },
+    {
+     "n": "World's greatest stretch",
+     "reps": "3×",
+     "side": true
+    },
+    {
+     "n": "Walking lunges",
+     "reps": "10×"
+    },
+    {
+     "n": "SkiErg versnelling",
+     "sets": 2,
+     "sec": 15,
+     "rest": 45
+    }
+   ]
+  },
+  "WU_BIKE": {
+   "n": "Warming-up fiets",
+   "min": 10,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Oplopend Z1 → Z2",
+     "sec": 600,
+     "cue": "Cadans 85–95"
+    }
+   ]
+  },
+  "WU_RACE": {
+   "n": "Warming-up wedstrijd",
+   "min": 18,
+   "tag": "wu",
+   "items": [
+    {
+     "n": "Inlopen easy",
+     "sec": 600
+    },
+    {
+     "n": "Leg swings + drills",
+     "reps": "A-skip, B-skip · 2 × 20 m"
+    },
+    {
+     "n": "Strides",
+     "sets": 4,
+     "sec": 15,
+     "rest": 45,
+     "cue": "Naar wedstrijdtempo"
+    },
+    {
+     "n": "Laatste 5 min: wandelen, gel 15 min voor start",
+     "reps": "—"
+    }
+   ]
+  },
+  "CD_RUN": {
+   "n": "Cooldown lopen",
+   "min": 6,
+   "tag": "cd",
+   "items": [
+    {
+     "n": "Uitlopen of wandelen",
+     "sec": 240
+    },
+    {
+     "n": "Kuitstretch tegen de muur",
+     "sec": 30,
+     "side": true
+    },
+    {
+     "n": "Heupbuiger, halve knielstand",
+     "sec": 30,
+     "side": true,
+     "cue": "Bil aanspannen, geen holle rug"
+    }
+   ]
+  },
+  "CD_LONG": {
+   "n": "Cooldown lange duur",
+   "min": 10,
+   "tag": "cd",
+   "items": [
+    {
+     "n": "Wandelen",
+     "sec": 300,
+     "cue": "Drink en eet binnen 30 min: koolhydraten + 25–30 g eiwit"
+    },
+    {
+     "n": "Benen tegen de muur",
+     "sec": 180
+    },
+    {
+     "n": "Soleus-stretch (gebogen knie)",
+     "sec": 30,
+     "side": true
+    }
+   ]
+  },
+  "REC_ROLL": {
+   "n": "Foamrollen & gun",
+   "min": 10,
+   "tag": "rec",
+   "note": "Niet direct op de wervelkolom of pijnlijke plek in de onderrug.",
+   "items": [
+    {
+     "n": "Foamroller kuiten",
+     "sec": 60,
+     "side": true,
+     "cue": "Langzaam, voet draaien"
+    },
+    {
+     "n": "Foamroller quads",
+     "sec": 60,
+     "side": true
+    },
+    {
+     "n": "Foamroller bilspieren",
+     "sec": 60,
+     "side": true,
+     "cue": "Enkel op de knie"
+    },
+    {
+     "n": "Foamroller bovenrug (thoracaal)",
+     "sec": 60,
+     "cue": "Handen achter het hoofd; niet op de onderrug"
+    },
+    {
+     "n": "Massagegun hamstrings",
+     "sec": 45,
+     "side": true,
+     "cue": "Laagste stand, rustig bewegen"
+    }
+   ]
+  },
+  "REC_DOWN": {
+   "n": "Ontspannen (avond)",
+   "min": 8,
+   "tag": "rec",
+   "items": [
+    {
+     "n": "Ademhaling 4 s in, 6 s uit",
+     "sec": 180,
+     "cue": "Door de neus, buik beweegt"
+    },
+    {
+     "n": "Benen tegen de muur",
+     "sec": 180
+    },
+    {
+     "n": "Child's pose",
+     "sec": 60,
+     "cue": "Knieën breed, armen lang"
+    }
+   ]
+  },
+  "MOB_LANG": {
+   "n": "Mobiliteit compleet",
+   "min": 18,
+   "tag": "mob",
+   "of": [
+    "MOB_HEUP",
+    "MOB_ENKEL",
+    "MOB_THOR"
+   ]
+  }
+ },
+ "dailyRoutines": [
+  [
+   "RUG",
+   "MOB_HEUP"
+  ],
+  [
+   "RUG",
+   "MOB_ENKEL"
+  ],
+  [
+   "RUG",
+   "MOB_THOR"
+  ],
+  [
+   "RUG",
+   "MOB_HEUP"
+  ],
+  [
+   "RUG",
+   "MOB_ENKEL"
+  ],
+  [
+   "RUG",
+   "MOB_THOR"
+  ],
+  [
+   "RUG"
+  ]
+ ],
+ "recoveryTips": {
+  "sauna": "Sauna 1–3× per week, 2–3 rondes van 8–12 min, ná training of op een rustdag (niet vlak voor kwaliteit). Drink 0,5–1 l extra met zout. Voelt goed voor ontspanning; het bewijs voor sneller herstel is beperkt.",
+  "boots": "Compressieboots 20–30 min na een lange duurloop of zware benen. Prettig voor het gevoel; het effect op prestatie is waarschijnlijk klein.",
+  "sleep": "Slaap is de grootste herstelfactor: mik op 7,5–9 uur, vaste bedtijd."
+ }
 }

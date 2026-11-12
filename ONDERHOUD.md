@@ -109,3 +109,10 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - **Herstel uit Google Sheet**: vereist `doGet` in sync/Code.gs (opnieuw implementeren als nieuwe versie). App vraagt bevestiging, bewaart vorige stand in de undo-sleutel, instellingen blijven lokaal.
 - **Vandaag compact**: ingevulde ochtendcheck = één regel (`#dailysum`, knop `data-dailyedit`); pijnchips achter `data-painopen`; afgeronde sessies ingeklapt.
 - Tests bevatten nu rekenkern-unittests (suggest, altKm, weekIdOf, parseTime, num, advice, easyFlag, matchScore, intervalEval).
+
+## v2.7 routines (nov 2026)
+- `plan.json` → `routines` {ID: {n, min, tag rug|mob|wu|cd|rec, note, items[{n, sets, sec|reps, side, rest, cue}]} of `of:[ID…]`}, `dailyRoutines` (index 0 = maandag), `recoveryTips`.
+- Sessie met `rt: ID` = routine-sessie (knop ▶ Start routine; afronden vinkt de sessie af). Op die dag vervalt de korte MOB-routine.
+- Warming-up/cooldown per sessie via `wuFor(s)` (type + titel). Afvinken: `S.rt[datum][ID@sessieId]`; dagroutines: `S.rt[datum][ID]`. Sheet-kind `routine`.
+- Onderrugpijn ≥ 4 in de ochtendcheck: rugadvies op Vandaag en knop RDL→HT, SQ→LP in krachtsessies.
+- Zondag-export: regel "Routines: rug x/y · mobiliteit · warming-ups · herstel".
