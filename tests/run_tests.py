@@ -83,7 +83,7 @@ def fill_prev(pg):
     pg.click('[data-done="2026-11-17-a"]'); ensure_open(pg, "2026-11-17-a")
     pg.fill('[data-min="2026-11-17-a"]', "50"); pg.press('[data-min="2026-11-17-a"]', "Tab")
     pg.fill('[data-note="2026-11-17-a"]', "test-notitie"); pg.press('[data-note="2026-11-17-a"]', "Tab")
-    pg.click('[data-logger="2026-11-17-b"]'); pg.wait_for_selector('[data-kg="SQ"]')
+    pg.click('[data-logger="2026-11-17-b"]'); pg.wait_for_selector("[data-exfocus], [data-kg]"); focus(pg, "SQ"); pg.wait_for_selector('[data-kg="SQ"]')
     pg.fill('[data-kg="SQ"]', "60"); pg.dispatch_event('[data-kg="SQ"]', "change")
     for r in ("6", "6", "5"): pg.click(f'[data-rep="SQ"][data-r="{r}"]')
     ok(pg.is_visible("#timer.show"), "rusttimer start automatisch na set (vorige versie)")
