@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-15e",
+ "updated": "2026-11-15f",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -815,7 +815,7 @@
    "start": "2026-11-16",
    "status": "definitief",
    "phase": "Basis 1 · week 1/3",
-   "focus": "Na de PR-race: opbouw naar ~48 km lopen, eerste powerhike-hoogtemeters, kracht 3×. Tandje bij in volume, niet in intensiteit.",
+   "focus": "Na de PR-race: opbouw naar ~50 km lopen, eerste powerhike-hoogtemeters, kracht 3×. Tandje bij in volume, niet in intensiteit.",
    "days": [
     {
      "date": "2026-11-16",
@@ -902,10 +902,10 @@
       {
        "id": "2026-11-17-a",
        "t": "run",
-       "title": "Easy 10 km + 6 strides",
-       "detail": "HF ≤ 145 · 5:40–6:00/km · RPE 2–3\nBenen nog zwaar van de race? Dan 8 km en geen strides.\nStrides 6 × 20 s @ ~3:45/km-gevoel, 80 s herstel.",
-       "min": 60,
-       "km": 10
+       "title": "Easy 8 km + 6 strides",
+       "detail": "HF ≤ 145 · 5:40–6:00/km · RPE 2–3\nBenen nog zwaar van de race? Dan geen strides.\nStrides 6 × 20 s @ ~3:45/km-gevoel, 80 s herstel.",
+       "min": 50,
+       "km": 8
       },
       {
        "id": "2026-11-17-b",
@@ -1006,10 +1006,10 @@
       {
        "id": "2026-11-18-c",
        "t": "run",
-       "title": "Easy 6–8 km (ochtend)",
-       "detail": "HF ≤ 140 · 5:50–6:10/km · RPE 2\nGoed gevoel? Dan 8 km, anders 6.",
-       "min": 45,
-       "km": 7
+       "title": "Easy 6 km (ochtend)",
+       "detail": "HF ≤ 140 · 5:50–6:10/km · RPE 2",
+       "min": 36,
+       "km": 6
       },
       {
        "id": "2026-11-18-b",
@@ -1175,10 +1175,10 @@
       {
        "id": "2026-11-21-a",
        "t": "run",
-       "title": "Lange duur 22–24 km",
-       "detail": "Eerste 17–18 km @ 5:40–5:55 (HF ≤ 145)\nLaatste 5 km @ 5:00–5:10 (steady, HF ≤ 158)\nVoeding: 60–70 g KH/uur vanaf 45 min (bijv. Gel 100 elke 25–30 min) → noteer gram/uur + maag.",
-       "min": 135,
-       "km": 23
+       "title": "Lange duur 20–22 km",
+       "detail": "Eerste 16–17 km @ 5:40–5:55 (HF ≤ 145)\nLaatste 4–5 km @ 5:00–5:10 (steady, HF ≤ 158)\nVoeding: 60–70 g KH/uur vanaf 45 min (bijv. Gel 100 elke 25–30 min) → noteer gram/uur + maag.",
+       "min": 125,
+       "km": 21
       }
      ]
     },
@@ -1196,7 +1196,7 @@
     }
    ],
    "vert": 500,
-   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38), ~11 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Maximaal 2 trainingen per dag, zondag 1. Plyo zit aan het begin van Lower A (di). Lower B vervalt deze week (geen vrije plek zonder een derde training op een dag); volgende week weer 2× lower.\nLange duur za: eerste 17 km echt rustig, voeding loggen."
+   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38; +29%, net onder de 30%-grens), ~10,5 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Maximaal 2 trainingen per dag, zondag 1. Plyo zit aan het begin van Lower A (di). Lower B vervalt deze week (geen vrije plek zonder een derde training op een dag); volgende week weer 2× lower.\nLange duur za: eerste 17 km echt rustig, voeding loggen."
   },
   {
    "id": "2026-W48",
