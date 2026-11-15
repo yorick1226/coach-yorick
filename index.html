@@ -71,6 +71,8 @@ label.f{display:block;font-size:14px;color:var(--mut);margin:10px 2px 4px}
 .chip{min-width:48px;min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--tx);font:inherit;font-weight:700;font-size:17px;padding:0 10px}
 .chip.on{background:var(--blue);border-color:var(--blue);color:#06101f}
 .chip.tgt{border-color:var(--acc)}
+.avday{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);margin-top:6px;padding-top:6px}.avday b{width:78px;font-size:15px}
+.avrow3{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.avrow3 .chip{min-width:0;min-height:44px;font-size:14px;padding:0 4px}
 .avrow{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px}
 .avrow .chip{min-width:0;min-height:44px;font-size:13px;padding:0 2px}
 .chips.sm .chip{min-width:44px;min-height:44px;font-size:15px}
@@ -184,7 +186,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.8.0';
+const APP_VERSION = '2.9.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -296,6 +298,11 @@ function fmtSec(t){ t = Math.round(t); const h = Math.floor(t/3600), m = Math.fl
 const fmtN = (n, d=1) => (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toString().replace('.', ',');
 const fmtH = sec => fmtN(sec/3600)+' u';
 const fmtKg = k => fmtN(k, 2);
+/* tijdvelden: alleen cijfers typen (numeriek toetsenbord heeft geen ':'), de app zet de dubbele punten zelf. 5230 → 52:30, 14512 → 1:45:12 */
+function tmFormat(v){ const d = String(v).replace(/\D/g, '').replace(/^0+(?=\d{3})/, '').slice(0, 6); if(d.length <= 2) return d; if(d.length <= 4) return d.slice(0,-2)+':'+d.slice(-2); return d.slice(0,-4)+':'+d.slice(-4,-2)+':'+d.slice(-2); }
+/* mode h: losse 1–2 cijfers = minuten (duur); mode s: = seconden (holds, tempo) */
+function tmParse(v, mode){ const t = String(v||'').trim(); if(!t) return NaN; if(!t.includes(':')){ const n = Number(t.replace(',', '.')); return isNaN(n) ? NaN : (mode==='s' ? n : n*60); } return parseTime(t); }
+function tmHint(sec){ if(isNaN(sec)) return 'Typ alleen cijfers'; const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), x = Math.round(sec%60); return '= '+[h?h+' u':'', m?m+' min':'', x?x+' s':''].filter(Boolean).join(' '); }
 function parseTime(str){ if(!str) return NaN; const p = String(str).trim().replace(',', '.').split(':').map(Number); if(p.some(isNaN)) return NaN;
   return p.length===3 ? p[0]*3600+p[1]*60+p[2] : p.length===2 ? p[0]*60+p[1] : p[0]*60; }
 
@@ -829,7 +836,7 @@ function rLog(){
     if(timed){
       const run = ui.sw[code];
       h += '<div class="row"><button class="btn '+(run?'warn':'pri')+'" data-sw="'+code+'" '+(run?'data-swlive="'+code+'"':'')+'>'+(run?'■ Stop · 0:00':'▶ Start '+e.lo+' '+u)+'</button></div>';
-      h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="m:ss" data-secx="'+code+'"><button class="btn sm" data-secgo="'+code+'">✓ tijd loggen</button></div>';
+      h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="m:ss" data-tm="s" autocomplete="off" data-secx="'+code+'"><button class="btn sm" data-secgo="'+code+'">✓ tijd loggen</button></div>';
     } else {
       if(u==='kg') h += '<div class="row" style="margin-top:6px"><button class="btn sm'+(ui.wu[rk]?' warn':'')+'" data-wu="'+rk+'">'+(ui.wu[rk]?'🔥 Opwarmset: AAN (telt niet mee)':'Opwarmset loggen')+'</button></div>';
       if(u==='kg' && e.rir!==0 && !ui.wu[rk]) h += '<div class="small" style="margin-top:8px;display:flex;align-items:center">RIR van deze set'+infoBtn('rir')+'</div>'+infoBox('rir')+'<div class="chips sm">'+[0,1,2,3,4].map(r => '<button class="chip'+(r===rirSel?' on':'')+'" data-rir="'+rk+'" data-v="'+r+'">'+r+'</button>').join('')+'</div>';
@@ -878,27 +885,29 @@ function rDuur(){
   $('htitle').textContent = 'Duursessie loggen';
   const p = ui.prefill || {}; const sp = p.sport || 'run';
   let h = '<div class="card">';
-  if(p.sid){ const f = sessById(p.sid); if(f) h += '<div class="mut">Hoort bij: '+fmtDay(f.date)+' · '+esc(f.s.title)+'</div>';
-    const m = f ? matchWeek(f.w) : null; if(m && m.by[p.sid]) h += '<div class="banner info" style="margin-top:8px">Deze sessie staat al in Strava. Log hier alleen RPE, voeding of correcties. Afstand en tijd tellen niet dubbel.</div>'; }
+  let sv = {}, isRace = false, longS = false;
+  if(p.sid){ const f = sessById(p.sid); if(f){ h += '<div class="mut">Hoort bij: '+fmtDay(f.date)+' · '+esc(f.s.title)+'</div>'; isRace = f.s.t==='race'; longS = (f.s.min||0) > 75 || (f.s.km||0) >= 15; }
+    const m = f ? matchWeek(f.w) : null; const a = m && m.by[p.sid];
+    if(a){ sv = {km:a.km, sec:a.el||a.sec, hr:a.hr, w:a.w, hm:a.hm}; h += '<div class="banner info" style="margin-top:8px">Overgenomen uit Strava. Vul alleen RPE, voeding of correcties aan. Afstand en tijd tellen niet dubbel.</div>'; } }
   h += '<label class="f">Datum</label><input type="date" id="c_date" value="'+(p.date||today())+'">';
   h += '<label class="f">Sport</label><select id="c_sport">'+[['run','Hardlopen'],['trail','Trail'],['bike','Fiets'],['swim','Zwemmen'],['other','Anders']].map(o => '<option value="'+o[0]+'"'+(o[0]===sp?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
-  h += '<div class="row"><div><label class="f">Afstand (km)</label><input id="c_km" type="text" inputmode="decimal" placeholder="10,0"></div><div><label class="f">Tijd (u:mm:ss)</label><input id="c_time" type="text" inputmode="numeric" placeholder="52:30"></div></div>';
-  h += '<div class="row"><div><label class="f">Gem. HF</label><input id="c_hr" type="text" inputmode="numeric" placeholder="bpm"></div><div><label class="f">Gem. watt</label><input id="c_w" type="text" inputmode="numeric" placeholder="W"></div><div><label class="f">Hoogtemeters</label><input id="c_hm" type="text" inputmode="numeric" placeholder="m"></div></div>';
+  h += '<div class="row"><div><label class="f">Afstand (km)</label><input id="c_km" type="text" inputmode="decimal" placeholder="10,0" value="'+(sv.km?fmtN(sv.km,2):'')+'"></div><div><label class="f">Tijd · alleen cijfers</label><input id="c_time" type="text" inputmode="numeric" data-tm="h" placeholder="5230 → 52:30" autocomplete="off" value="'+(sv.sec?fmtSec(sv.sec):'')+'"><div class="small" id="c_time_h">Typ alleen cijfers</div></div></div>';
+  h += '<div class="row nw"><div><label class="f">Gem. HF</label><input id="c_hr" type="text" inputmode="numeric" placeholder="bpm" value="'+(sv.hr||'')+'"></div><div id="c_wbox"'+(sp==='bike'?'':' style="display:none"')+'><label class="f">Gem. watt</label><input id="c_w" type="text" inputmode="numeric" placeholder="W" value="'+(sv.w||'')+'"></div><div><label class="f">Hoogtemeters</label><input id="c_hm" type="text" inputmode="numeric" placeholder="m" value="'+(sv.hm||'')+'"></div></div>';
   h += '<label class="f">RPE</label><div class="chips" id="c_rpe">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip" data-rpe="'+r+'">'+r+'</button>').join('')+'</div>';
-  h += '<div class="card" style="background:var(--card2);margin-top:12px"><b>Voeding</b> <span class="small">(sessies > 75 min)</span>';
+  h += '<details class="card" style="background:var(--card2);margin-top:12px"'+(longS?' open':'')+'><summary><b>Voeding</b> <span class="small">(sessies > 75 min)</span></summary>';
   h += '<div class="row nw"><div><label class="f">KH g/uur</label><input id="c_kh" type="text" inputmode="numeric" placeholder="bv. 70"></div><div><label class="f">Wat</label><input id="c_wat" type="text" placeholder="2× Gel 100, 500 ml 320"></div></div>';
-  h += '<label class="f">Maag (1 slecht – 5 perfect)</label><div class="chips sm">'+[1,2,3,4,5].map(v=>'<button class="chip" data-maag="'+v+'">'+v+'</button>').join('')+'</div></div>';
+  h += '<label class="f">Maag (1 slecht – 5 perfect)</label><div class="chips sm">'+[1,2,3,4,5].map(v=>'<button class="chip" data-maag="'+v+'">'+v+'</button>').join('')+'</div></details>';
   h += '<label class="f">Notitie</label><input id="c_note" type="text" placeholder="Gevoel, terrein, splits…">';
-  h += '<label class="f" style="display:flex;gap:10px;align-items:center"><input id="c_race" type="checkbox" style="width:28px;min-height:28px"> Wedstrijd/test (telt mee voor records)</label>';
+  h += '<label class="f" style="display:flex;gap:10px;align-items:center"><input id="c_race" type="checkbox" style="width:28px;min-height:28px"'+(isRace?' checked':'')+'> Wedstrijd/test (telt mee voor records)</label>';
   h += '<div class="calc" id="c_calc"><span class="mut">Vul afstand en tijd in voor berekening.</span></div>';
   h += '<div class="row"><button class="btn pri" id="c_save">Opslaan</button></div></div>';
   const recent = S.cardio.filter(c=>!c.del).sort((a,b)=> b.date.localeCompare(a.date) || b.ts-a.ts).slice(0,15);
   h += '<div class="card"><h3>Handmatig gelogd</h3>'+(recent.length?'':'<div class="mut">Nog niets.</div>');
   for(const c of recent) h += '<div style="border-bottom:1px solid var(--line);padding:8px 0;display:flex;gap:8px"><div style="flex:1"><b>'+fmtDay(c.date)+' · '+c.sport+(c.race?' 🏁':'')+'</b><div class="small">'+(c.km?fmtN(c.km,2)+' km · ':'')+(c.sec?fmtSec(c.sec):'')+(c.hr?' · '+c.hr+' bpm':'')+(c.w?' · '+c.w+' W':'')+(c.hm?' · '+c.hm+' hm':'')+(c.rpe?' · RPE '+c.rpe:'')+(c.kh?' · '+c.kh+' g/u':'')+(c.maag?' · maag '+c.maag:'')+'</div><div class="small">'+calcCardio(c).join(' · ')+'</div>'+(c.note?'<div class="small">'+esc(c.note)+'</div>':'')+'</div><button class="btn sm bad" data-cdel="'+c.id+'">×</button></div>';
   h += '</div>';
-  $('view').innerHTML = h; ui.rpe = null; ui.maag = null;
+  $('view').innerHTML = h; ui.rpe = null; ui.maag = null; if(sv.km || sv.sec) updCalc();
 }
-function cardioForm(){ const sec = parseTime($('c_time').value);
+function cardioForm(){ const sec = tmParse($('c_time').value, 'h');
   return {date:$('c_date').value, sport:$('c_sport').value, km:num($('c_km').value), sec: isNaN(sec)?null:sec, hr:num($('c_hr').value), w:num($('c_w').value), hm:num($('c_hm').value),
     rpe:ui.rpe||null, kh:num($('c_kh').value), maag:ui.maag||null, wat:$('c_wat').value.trim(), note:$('c_note').value.trim(), race:$('c_race').checked}; }
 function updCalc(){ const o = calcCardio(cardioForm());
@@ -1098,19 +1107,19 @@ function rCheck(){
   $('view').innerHTML = h;
 }
 const SLOT_SHORT = {'Alleen ochtend':'Ochtend', 'Alleen avond':'Avond'};
+/* beschikbaarheid: per dag alleen ochtend / avond / niet. Lange trainingen plant de coach altijd in het weekend. */
+function slotOf(x){ if(!x) return null; if(x.no) return 'Niet'; if(x.am && x.pm) return '2×'; if(x.am) return 'Alleen ochtend'; if(x.pm) return 'Alleen avond'; return x.slot || null; }
 function availHtml(nextMon){
   const nid = weekIdOf(nextMon); const av = S.avail[nid] || {d:{}, n:''};
-  let h = '<div class="card" id="avail"><b>Beschikbaarheid week '+nid.split('-W')[1]+'</b><div class="small">Tik per dag wat kan; daarna verschijnt een veld voor max. minuten en een notitie. Leeg = zoals gewoonlijk.</div>';
+  let h = '<div class="card" id="avail"><b>Beschikbaarheid week '+nid.split('-W')[1]+'</b><div class="small">Tik wanneer je kunt. Niets aangetikt = zoals gewoonlijk. Ik plan de trainingen; lange trainingen altijd in het weekend.</div>';
   for(let i=0;i<7;i++){ const dd = addDays(nextMon,i); const x = (av.d||{})[i] || {};
-    h += '<div style="border-top:1px solid var(--line);margin-top:8px;padding-top:6px"><b style="font-size:15px">'+fmtDay(dd)+'</b>'+(i===2||i===4?' <span class="small">thuiswerk?</span>':'');
-    h += '<div class="avrow">'+SLOTS.map(sl => '<button class="chip'+(x.slot===sl?' on':'')+'" data-av="'+nid+'" data-i="'+i+'" data-slot="'+sl+'">'+(SLOT_SHORT[sl]||sl)+'</button>').join('')+'</div>';
-    if(x.slot && x.slot!=='Niet' || x.min || x.note) h += '<div class="row nw"><input class="num" type="text" inputmode="numeric" placeholder="max min" data-avmin="'+nid+'" data-i="'+i+'" value="'+esc(x.min||'')+'"><input type="text" placeholder="bijv. pas na 19:00, gym met maat" data-avnote="'+nid+'" data-i="'+i+'" value="'+esc(x.note||'')+'"></div>';
-    h += '</div>'; }
-  h += '<label class="f">Algemeen (reizen, events, wensen)</label><input type="text" data-avn="'+nid+'" value="'+esc(av.n||'')+'"></div>';
+    const c = (k, lbl) => '<button class="chip'+(x[k]?' on':'')+'" data-avt="'+k+'" data-av="'+nid+'" data-i="'+i+'">'+lbl+'</button>';
+    h += '<div class="avday"><b>'+fmtDay(dd)+'</b><div class="avrow3">'+c('am','Ochtend')+c('pm','Avond')+c('no','Niet')+'</div></div>'; }
+  h += '<label class="f">Bijzonderheden (optioneel)</label><input type="text" data-avn="'+nid+'" value="'+esc(av.n||'')+'" placeholder="bijv. do pas na 20:00, za bruiloft"></div>';
   return h;
 }
 function availConflicts(w){ const av = S.avail[w.id]; if(!av || !av.d) return []; const out = [];
-  for(let i=0;i<7;i++){ const x = av.d[i]; if(!x || (!x.slot && !x.min)) continue; const dd = addDays(w.start,i);
+  for(let i=0;i<7;i++){ const x0 = av.d[i]; const x = x0 && Object.assign({}, x0, {slot: slotOf(x0)}); if(!x || (!x.slot && !x.min)) continue; const dd = addDays(w.start,i);
     const its = weekItems(w).filter(it => it.date===dd && !['rest'].includes(it.s.t) && !isSkipped(it.s.id)); const mins = its.reduce((p,it)=>p+(it.s.min||0),0);
     if(x.slot==='Niet' && its.length) out.push(fmtDay(dd)+': niet beschikbaar, maar '+its.length+' sessie(s) gepland.');
     else if(['1×','Alleen ochtend','Alleen avond'].includes(x.slot) && its.filter(it=>it.s.t!=='mobility').length > 1) out.push(fmtDay(dd)+': '+x.slot+', maar '+its.length+' sessies gepland.');
@@ -1171,7 +1180,7 @@ function weekText(start){
   else L.push('CHECK-IN: niet ingevuld');
   const nm = addDays(start,7), nid = weekIdOf(nm), av = S.avail[nid];
   L.push(''); L.push('BESCHIKBAARHEID '+nid);
-  if(av){ for(let i=0;i<7;i++){ const x = (av.d||{})[i] || {}; L.push('- '+fmtDay(addDays(nm,i))+': '+(x.slot||'–')+(x.min?' · max '+x.min+' min':'')+(x.note?' · '+x.note:'')); } if(av.n) L.push('- Algemeen: '+av.n); }
+  if(av){ for(let i=0;i<7;i++){ const x = (av.d||{})[i] || {}; L.push('- '+fmtDay(addDays(nm,i))+': '+(slotOf(x)||'zoals gewoonlijk')+(x.min?' · max '+x.min+' min':'')+(x.note?' · '+x.note:'')); } if(av.n) L.push('- Algemeen: '+av.n); }
   else L.push('- niet ingevuld');
   return L.join('\n');
 }
@@ -1208,7 +1217,7 @@ function rMeer(){
   h += '<div class="card"><h3>Instellingen</h3><div class="small">Leeg = waarde uit het plan.</div>';
   h += '<div class="row"><div><label class="f">FTP (W)</label><input id="s_ftp" type="text" inputmode="numeric" placeholder="'+(PLAN?PLAN.athlete.ftp:'')+'" value="'+esc(st.ftp??'')+'"></div><div><label class="f">LTHR (bpm)</label><input id="s_lthr" type="text" inputmode="numeric" placeholder="'+(PLAN?PLAN.athlete.lthr:'')+'" value="'+esc(st.lthr??'')+'"></div></div>';
   h += '<label class="f">Grens rustige run: max gem. HF</label><input id="s_easy" type="text" inputmode="numeric" placeholder="145" value="'+esc(st.easyHr??'')+'">';
-  h += '<label class="f">Drempeltempo (m:ss /km)</label><input id="s_tpace" type="text" inputmode="numeric" placeholder="'+(PLAN?fmtSec(PLAN.athlete.tpace):'')+'" value="'+(st.tpace?fmtSec(st.tpace):'')+'">';
+  h += '<label class="f">Drempeltempo (m:ss /km)</label><input id="s_tpace" type="text" inputmode="numeric" data-tm="s" autocomplete="off" placeholder="'+(PLAN?fmtSec(PLAN.athlete.tpace):'')+'" value="'+(st.tpace?fmtSec(st.tpace):'')+'">';
   h += '<label class="f">Google Sheet web-app-URL (optioneel)</label><input id="s_url" type="url" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(st.sheetUrl||'')+'">';
   h += '<div class="row"><button class="btn pri" id="s_save">Bewaar instellingen</button><button class="btn" id="s_sync">Sync nu ('+S.queue.length+')</button></div>';
   h += '<div class="small" style="margin-top:8px">Wachtrij: '+S.queue.length+' item(s). Versturen gaat zonder ontvangstbevestiging (no-cors). Leidend blijft je back-upcode.</div></div>';
@@ -1309,13 +1318,16 @@ document.addEventListener('click', ev => {
   if(ds.sw){ const c = ds.sw; const e = exFor(c);
     if(!ui.sw[c]){ ui.sw[c] = Date.now(); sessionStorage.setItem('sw', JSON.stringify(ui.sw)); unlockAudio(); stopTimer(); startTicker(); rerender(); }
     else { const sec = Math.round((Date.now()-ui.sw[c])/1000); ui.sw[c] = null; sessionStorage.setItem('sw', JSON.stringify(ui.sw)); logSet(c, e.lo, {sec}); } return; }
-  if(ds.secgo){ const i = document.querySelector('[data-secx="'+ds.secgo+'"]'); const sec = parseTime(i && i.value); const e = exFor(ds.secgo); if(!isNaN(sec) && e) logSet(ds.secgo, e.lo, {sec}); return; }
+  if(ds.secgo){ const i = document.querySelector('[data-secx="'+ds.secgo+'"]'); const sec = tmParse(i && i.value, 's'); const e = exFor(ds.secgo); if(!isNaN(sec) && e) logSet(ds.secgo, e.lo, {sec}); return; }
   if(ds.del){ const x = S.sets.find(s => s.id===ds.del); if(x){ x.del = true; x.ts2 = Date.now(); enqueue('set', x.id, x.date, x); } rerender(); return; }
   if(ds.rpe){ ui.rpe = Number(ds.rpe); document.querySelectorAll('[data-rpe]').forEach(c => c.classList.toggle('on', c===b)); updCalc(); return; }
   if(ds.maag){ ui.maag = Number(ds.maag); document.querySelectorAll('[data-maag]').forEach(c => c.classList.toggle('on', c===b)); return; }
   if(ds.cdel){ const c = S.cardio.find(x => x.id===ds.cdel); if(c){ c.del = true; enqueue('cardio', c.id, c.date, c); } rDuur(); return; }
   if(ds.ck){ setAns(ds.ck, ds.cv!==undefined ? Number(ds.cv) : ds.cvs); rerender(); return; }
   if(ds.dlyc){ const d = ui.day || today(); const v = Number(ds.v); const cur = dailyOf(d)[ds.dlyc]; setDaily(d, ds.dlyc, cur===v ? null : v); rerender(); return; }
+  if(ds.avt){ const cur = ((S.avail[ds.av]||{}).d||{})[ds.i] || {}; const on = !cur[ds.avt]; const patch = {[ds.avt]: on};
+    if(on && ds.avt==='no') Object.assign(patch, {am:false, pm:false}); if(on && ds.avt!=='no') patch.no = false;
+    const nx = Object.assign({}, cur, patch); patch.slot = slotOf(nx); setAvail(ds.av, ds.i, patch); rerender(); return; }
   if(ds.slot){ const cur = (((S.avail[ds.av]||{}).d||{})[ds.i]||{}).slot; setAvail(ds.av, ds.i, {slot: cur===ds.slot ? null : ds.slot}); rerender(); return; }
   if(ds.tadd){ if(tEnd){ tEnd += Number(ds.tadd)*1000; $('timer').classList.remove('end'); tick(); } return; }
   switch(b.id){
@@ -1342,11 +1354,12 @@ document.addEventListener('click', ev => {
       fetch(S.settings.sheetUrl+(S.settings.sheetUrl.includes('?')?'&':'?')+'all=1').then(r => r.json()).then(d => { const o = fromSheet(d); try { localStorage.setItem(KEY+'.undo', JSON.stringify(S)); } catch(_){} o.settings = S.settings; S = o; save(); toast('Hersteld uit Sheet'); render(); }).catch(e => toast('Sheet niet bereikbaar: '+e.message)); return; }
     case 'r_undo': { try { S = migrate(JSON.parse(localStorage.getItem(KEY+'.undo'))); save(); localStorage.removeItem(KEY+'.undo'); toast('Herstel ongedaan gemaakt'); render(); } catch(e){ toast('Niets om terug te zetten'); } return; }
     case 's_save': { S.settings.ftp = num($('s_ftp').value); S.settings.lthr = num($('s_lthr').value); S.settings.easyHr = num($('s_easy').value);
-      const tp = parseTime($('s_tpace').value); S.settings.tpace = isNaN(tp) ? null : tp; S.settings.sheetUrl = $('s_url').value.trim(); save(); toast('Bewaard'); scheduleSync(); return; }
+      const tp = tmParse($('s_tpace').value, 's'); S.settings.tpace = isNaN(tp) ? null : tp; S.settings.sheetUrl = $('s_url').value.trim(); save(); toast('Bewaard'); scheduleSync(); return; }
     case 's_sync': flush().then(()=> toast(S.queue.length ? 'Nog '+S.queue.length+' in wachtrij' : 'Verstuurd')); return;
   }
 });
 document.addEventListener('change', ev => { const t = ev.target, ds = t.dataset;
+  if(t.id==='c_sport'){ $('c_wbox').style.display = t.value==='bike' ? '' : 'none'; updCalc(); }
   if(ds.min) setDone(ds.min, {min:t.value});
   if(ds.note) setDone(ds.note, {note:t.value});
   if(ds.ct) setAns(ds.ct, t.value);
@@ -1358,6 +1371,7 @@ document.addEventListener('change', ev => { const t = ev.target, ds = t.dataset;
   if(t.id && t.id.startsWith('c_')) updCalc();
 });
 document.addEventListener('input', ev => { const t = ev.target, ds = t.dataset || {};
+  if(ds.tm){ const f = tmFormat(t.value); if(f !== t.value){ t.value = f; try { t.setSelectionRange(f.length, f.length); } catch(e){} } if(t.id==='c_time') $('c_time_h').textContent = tmHint(tmParse(f, 'h')); }
   if(ds.dly){ ui.dailyEdit[ui.day || today()] = true; setDaily(ui.day || today(), ds.dly, num(t.value)); }
   if(ds.min) setDone(ds.min, {min:t.value});
   if(ds.note) setDone(ds.note, {note:t.value});
