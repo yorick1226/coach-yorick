@@ -93,6 +93,7 @@ nav.tabs button span{display:block;font-size:20px;line-height:1.2}
 nav.tabs button.on{color:var(--acc)}
 a{color:var(--blue)}
 #rp a.btn{text-decoration:none;color:var(--tx)}
+#tabs button.dot{position:relative}#tabs button.dot::after{content:'';position:absolute;top:6px;right:22%;width:8px;height:8px;border-radius:50%;background:var(--warn)}
 #rp{position:fixed;inset:0;z-index:30;background:var(--bg);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
 #rp.show{display:flex}
 #rp .rpt{font-size:14px;color:var(--mut);display:flex;justify-content:space-between;align-items:center}
@@ -112,7 +113,7 @@ a{color:var(--blue)}
 .rtrow .rtw{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rtrow .btn.sm{min-width:48px}
 .rtchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.rtchip{border:1px solid var(--line);background:var(--card2);color:var(--tx);border-radius:999px;padding:0 12px;min-height:40px;font-size:14px}
+.rtchip{border:1px solid var(--line);background:var(--card2);color:var(--tx);border-radius:999px;padding:0 10px;min-height:40px;font-size:13px;white-space:nowrap}
 .rtchip.on{border-color:var(--acc);color:var(--acc)}
 #timer{position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:7;display:none;align-items:center;gap:8px;flex-direction:row-reverse}
 #timer.show{display:flex}
@@ -188,7 +189,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '3.2.0';
+const APP_VERSION = '3.3.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -611,6 +612,7 @@ function sessCard(it, m, opt){
 /* ---------- views ---------- */
 function render(){
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab===ui.tab));
+  { const lb = S.settings.lastBackup; const mb = document.querySelector('#tabs [data-tab="meer"]'); if(mb) mb.classList.toggle('dot', !lb || (Date.now()-lb) > 14*864e5); }
   const nav = ['week','check'].includes(ui.tab);
   $('prev').style.visibility = $('next').style.visibility = nav ? 'visible' : 'hidden';
   keepAwake(ui.tab==='log');
@@ -701,9 +703,11 @@ function routinesCard(d, items){
   if((ad && ad.lvl!=='groen') || K.n >= 2 || K.long){ const r = rtDef('REC_DOWN', d); L.push(['REC_DOWN','🌙','Ontspannen',r.min,'REC_DOWN', ad && ad.lvl!=='groen' ? 'advies '+ad.lvl : 'avond']); }
   const tot = L.reduce((p,z) => p + z[3], 0); const nDone = L.filter(z => rtDone(d, z[0])).length;
   let h = '<div class="card" id="rtcard"><div style="display:flex;align-items:baseline;gap:8px"><h3 style="margin:0;flex:1">Herstel & mobiliteit</h3><span class="small">'+nDone+'/'+L.length+' · ± '+tot+' min</span></div>';
-  for(const [key, icon, n, min, rid, why] of L){ const on = rtDone(d, key);
+  const recs = L.filter(z => !/^(RUG|MOB)/.test(z[0])); const rows = L.filter(z => /^(RUG|MOB)/.test(z[0]));
+  for(const [key, icon, n, min, rid, why] of rows){ const on = rtDone(d, key);
     h += '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"'+(on?' style="opacity:.55"':'')+'><b>'+icon+' '+esc(n)+'</b><div class="small rtw">'+min+' min · '+esc(why)+'</div></div>'
       +(rid ? '<button class="btn sm'+(on?'':' pri')+'" data-rtstart="'+rid+'" data-rtkey="'+key+'" data-rtdate="'+d+'" aria-label="Start '+esc(n)+'">▶</button>' : '')+'</div>'; }
+  if(recs.length) h += '<div class="rtchips" style="margin-top:8px">'+recs.map(([key, icon, n, min, rid]) => { const on = rtDone(d, key); return rid && !on ? '<button class="rtchip" data-rtstart="'+rid+'" data-rtkey="'+key+'" data-rtdate="'+d+'">'+icon+' '+esc(n)+' '+min+'′ ▶</button>' : '<button class="rtchip'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'">'+(on?'✓ ':icon+' ')+esc(n)+' '+min+'′</button>'; }).join('')+'</div>';
   if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: rug & core A (McGill), side plank op je knieën, geen hamstringstretch. RDL en squat wisselen (knop in de sessie).</div>';
   const sw = staticWeek(mondayOf(d)); const goal = PLAN.staticGoal || {}; const lt = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
   h += '<details style="margin-top:6px"><summary class="small">Rekken deze week: '+Object.keys(goal).map(t => t.replace('heupbuiger','heup')+' '+Math.round(sw[t]||0)+'/'+goal[t]).join(' · ')+' min'+((!lt || diffD(d, lt.date) >= 28) ? ' · 📏 test open' : '')+'</summary>';
@@ -751,23 +755,24 @@ function rToday(){
   h += nextRace();
   const pv = PLAN.version+'/'+PLAN.updated;
   if(S.settings.seenPlan !== pv) h += '<div class="banner info"><b>Plan bijgewerkt</b> ('+esc(PLAN.updated)+'). Bekijk je week. <button class="btn sm" data-seen="1" style="margin-left:6px">OK</button></div>';
-  const lb = S.settings.lastBackup; if(!lb || (Date.now()-lb) > 7*864e5) h += '<div class="banner oranje">Laatste back-up: '+(lb?fmtDay(iso(new Date(lb))):'nooit')+'. Ga naar Meer → Kopieer back-upcode en bewaar hem (bijv. in Notities).</div>';
   for(const it of fuelTodo()) h += '<div class="banner info">🍌 Voeding loggen voor <b>'+esc(it.s.title)+'</b> ('+fmtDay(it.date)+')? Hoeveel g KH/uur en hoe ging je maag? <button class="btn sm" data-cardio="'+it.s.id+'" style="margin-top:6px">Log voeding</button></div>';
   const x = dailyOf(d); const filled = x.rd!=null || x.sl!=null;
   if(filled && !ui.dailyEdit[d]){ const ad0 = advice(d);
     h += '<div class="card" id="dailysum" style="display:flex;align-items:center;gap:8px"><div style="flex:1"><b>Ochtendcheck</b> <span class="small">'+(isT?'':fmtDay(d))+'</span><br>Readiness <b>'+(x.rd??'–')+'</b> · Slaap <b>'+(x.sl??'–')+'</b>'+(x.legs!=null?' · benen '+x.legs:'')+(x.pains?' · pijn: '+esc(Object.keys(x.pains).join(', ')):'')+(ad0?' <span class="pill '+({groen:'g',oranje:'o',rood:'r'})[ad0.lvl]+'" style="background:'+({groen:'#0f2417',oranje:'#2b2108',rood:'#3a1414'})[ad0.lvl]+';color:'+({groen:'#4ade80',oranje:'#f5b942',rood:'#f87171'})[ad0.lvl]+'">'+ad0.lvl+'</span>':'')+'</div><button class="btn sm" data-dailyedit="'+d+'">Wijzig</button></div>';
     if(ad0 && ad0.lvl!=='groen') h += '<div class="banner '+ad0.lvl+'" id="advice">'+ad0.txt+'</div>'; }
   else {
-  h += '<div class="card"><h3>Ochtendcheck <span class="small">'+(isT?'Oura + gevoel':fmtDay(d))+'</span></h3>';
+  h += '<div class="card"><h3>Ochtendcheck <span class="small">'+(isT?'30 sec · Oura':fmtDay(d))+'</span></h3>';
   h += '<div class="row nw"><div><label class="f">Readiness</label><input type="text" inputmode="numeric" data-dly="rd" value="'+esc(x.rd??'')+'" placeholder="0–100"></div><div><label class="f">Slaapscore</label><input type="text" inputmode="numeric" data-dly="sl" value="'+esc(x.sl??'')+'" placeholder="0–100"></div></div>';
+  h += '<details style="margin-top:6px"><summary class="small">HRV en rust-HF (optioneel)</summary>';
   h += '<div class="row nw"><div><label class="f">HRV (ms)</label><input type="text" inputmode="numeric" data-dly="hrv" value="'+esc(x.hrv??'')+'" placeholder="opt."></div><div><label class="f">Rust-HF</label><input type="text" inputmode="numeric" data-dly="rhr" value="'+esc(x.rhr??'')+'" placeholder="opt."></div></div>';
+  h += '</details>';
   h += '<label class="f">Benen (1 kapot – 5 fris)</label><div class="chips sm">'+[1,2,3,4,5].map(v=>'<button class="chip'+(x.legs===v?' on':'')+'" data-dlyc="legs" data-v="'+v+'">'+v+'</button>').join('')+'</div>';
   const pains = x.pains || {};
   if(!Object.keys(pains).length && !ui.painOpen) h += '<div class="row"><button class="btn sm" data-painopen="1">Pijn melden</button></div>';
   else h += '<label class="f">Pijn? Tik de plek</label><div class="chips sm">'+PAIN_LOCS.map(l => '<button class="chip'+(pains[l]!=null?' on':'')+'" style="font-size:14px" data-ploc="'+esc(l)+'">'+esc(l)+'</button>').join('')+'</div>';
   for(const l of Object.keys(pains)) h += '<div style="margin-top:8px"><span class="small">'+esc(l)+' · hoe erg (1–8)?</span><div class="chips sm">'+[1,2,3,4,5,6,7,8].map(v => '<button class="chip'+(pains[l]===v?' on':'')+'" data-pscore="'+esc(l)+'" data-v="'+v+'">'+v+'</button>').join('')+'</div></div>';
   const ad = advice(d);
-  if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+'<div class="small" style="color:inherit;opacity:.8">Vuistregel van de app, geen diagnose. Basis: '+esc(ad.basis)+'.</div></div>';
+  if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+'</div>';
   if(filled) h += '<div class="row"><button class="btn pri" data-dailydone="'+d+'">Klaar ✓</button></div>';
   h += '</div>'; }
   const w = weekByStart(mondayOf(d)); const m = matchWeek(w);

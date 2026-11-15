@@ -118,7 +118,7 @@ def features(pg, shots=True):
     ok(pg.locator('[data-srpe="2026-11-17-a"]').count() == 0, "afgeronde sessie op Vandaag ingeklapt (compact)")
     ensure_open(pg, "2026-11-17-a"); pg.click('[data-info="rpe"]'); ok(pg.locator(".info").count() >= 1, "uitleg RPE via ⓘ")
     pg.click('[data-dailydone="2026-11-17"]'); ok(pg.locator("#dailysum").count() == 1, "Klaar klapt ochtendcheck in")
-    pg.click('[data-dailyedit="2026-11-17"]'); pg.type('[data-dly="hrv"]', "48"); pg.reload(); pg.wait_for_selector("#tabs")
+    pg.click('[data-dailyedit="2026-11-17"]'); pg.click("text=HRV en rust-HF"); pg.type('[data-dly="hrv"]', "48"); pg.reload(); pg.wait_for_selector("#tabs")
     ok(store(pg)["daily"]["2026-11-17"].get("hrv") == 48, "getypte waarde bewaard zonder veld te verlaten (app sluiten)")
     # Routines
     tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart^="RUG"]').count() == 1 and pg.locator('#rtcard .rtrow [data-rtstart^="MOB_"]').count() >= 1, "dagroutines (rug + gekozen mobiliteit)")
@@ -132,6 +132,7 @@ def features(pg, shots=True):
         pg.click('[data-rp="next"]')
     ok(not pg.is_visible("#rp") and store(pg)["rt"].get("2026-11-17", {}).get("RUG"), "routine afgerond en afgevinkt")
     ok(pg.locator('[data-rtkey^="WU_"]').count() >= 1, "warming-up bij training")
+    ok(pg.locator(".banner.oranje", has_text="back-up").count() == 0 and "dot" in (pg.get_attribute('#tabs [data-tab="meer"]', "class") or ""), "back-upmelding als stip op Meer, niet op Vandaag")
     ok(pg.evaluate("[chooseRug('2026-11-18'), chooseRug('2026-11-19')]")[0] == "RUG_B", "rug & core roteert (A → B)")
     ok("Rekken deze week" in pg.inner_text("#rtcard") and "Massagegun" in pg.inner_text("#rtcard") and pg.locator("#rtcard > .rtrow").count() <= 6, "compacte herstelkaart: max 6 regels, rekteller, herstel op maat")
     ok(pg.evaluate("(() => { const k = dayKind(dayItems('2026-11-21')); return k.long && !k.q; })()"), "dagtype lange duur herkend")
