@@ -6,7 +6,7 @@ METHOD:PUBLISH
 X-WR-CALNAME:Training 2026-W47
 BEGIN:VEVENT
 UID:2026-11-16-a@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261116
 DTEND;VALUE=DATE:20261117
 SUMMARY:Kracht: Upper A
@@ -19,7 +19,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-16-b@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261116
 DTEND;VALUE=DATE:20261117
 SUMMARY:Lopen: Powerhike loopband 30 min
@@ -30,7 +30,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-17-a@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261117
 DTEND;VALUE=DATE:20261118
 SUMMARY:Lopen: Easy 10 km + 6 strides
@@ -41,42 +41,36 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-17-b@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261117
 DTEND;VALUE=DATE:20261118
-SUMMARY:Kracht: Lower A (RIR 3)
-DESCRIPTION:Minstens 3 uur na de run. Squat en RDL terug\, licht: RIR 3\, 
- techniek eerst. Onderrug ≥4 → rugvriendelijk wisselen.\nBack squat 3×
- 5–6 @RIR3\nRomanian deadlift 3×6–8 @RIR3\nBulgarian split squat (per 
- been\, dumbbells totaal) 3×6–8 @RIR3\nStaande calf raise 3×8–12 @RIR
- 1\nTibialis raise 2×15–20 @RIR1\nCopenhagen plank (sec per kant) 2×20
- –30 @RIR2
+SUMMARY:Kracht: Plyo + Lower A (RIR 3)
+DESCRIPTION:Eén gymbezoek\, minstens 3 uur na de run. Start met plyo (fri
+ s\, kwaliteit > volume)\, dan squat en RDL licht terug: RIR 3\, techniek e
+ erst. Onderrug ≥4 → rugvriendelijk wisselen.\nPogo jumps 3×15\nLatera
+ le pogo's (per kant) 2×10\nSnap-down → verticale sprong 3×3\nBox jump 
+ (stap eraf) 3×3\nBack squat 3×5–6 @RIR3\nRomanian deadlift 3×6–8 @R
+ IR3\nBulgarian split squat (per been\, dumbbells totaal) 3×6–8 @RIR3\nS
+ taande calf raise 3×8–12 @RIR1\nTibialis raise 2×15–20 @RIR1\nCopenh
+ agen plank (sec per kant) 2×20–30 @RIR2
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-18-c@coach
-DTSTAMP:20261115T215943Z
+UID:2026-11-18-d@coach
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261119
-SUMMARY:Lopen: Easy 6 km (ochtend)
-DESCRIPTION:HF ≤ 140 · 5:50–6:10/km · RPE 2\nDirect daarna de plyo (
- benen zijn dan warm).
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-11-18-a@coach
-DTSTAMP:20261115T215943Z
-DTSTART;VALUE=DATE:20261118
-DTEND;VALUE=DATE:20261119
-SUMMARY:Plyo: Plyo
-DESCRIPTION:Direct na de easy run. Kwaliteit > volume\, volledig herstel t
- ussen sets.\nPogo jumps 3×15\nLaterale pogo's (per kant) 2×10\nSnap-down
-  → verticale sprong 3×3\nBox jump (stap eraf) 3×3
+SUMMARY:Kracht: Lower B licht (25 min\, ochtend)
+DESCRIPTION:Ochtend of lunch in de gym. Weinig spierpijn: geen nordics en 
+ geen excentrische step-ups deze week (drempel morgen). RIR 2–3.\nLeg pre
+ ss 3×10–12 @RIR2\nHip thrust 3×8–10 @RIR2\nZittende calf raise (sole
+ us) 3×12–15 @RIR1\nHip adduction (machine) 2×12–15 @RIR2\nHip abduct
+ ion (machine) 2×12–15 @RIR2
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-18-b@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261119
 SUMMARY:Fiets: KICKR Z2 75 min (avond)
@@ -86,21 +80,8 @@ DESCRIPTION:10 min opbouw · 60 min @ 60–70% FTP (≈130–150 W KICKR)
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-18-d@coach
-DTSTAMP:20261115T215943Z
-DTSTART;VALUE=DATE:20261118
-DTEND;VALUE=DATE:20261119
-SUMMARY:Kracht: Lower B licht (20–25 min\, na de fiets)
-DESCRIPTION:Direct na de KICKR\, benen zijn warm. Weinig spierpijn: geen n
- ordics en geen excentrische step-ups deze week (drempel morgen).\nRIR 2–
- 3.\nLeg press 3×10–12 @RIR2\nHip thrust 3×8–10 @RIR2\nZittende calf 
- raise (soleus) 3×12–15 @RIR1\nHip adduction (machine) 2×12–15 @RIR2\
- nHip abduction (machine) 2×12–15 @RIR2
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:2026-11-19-a@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261119
 DTEND;VALUE=DATE:20261120
 SUMMARY:Lopen: 5 × 6 min @ drempel
@@ -112,7 +93,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-19-b@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261119
 DTEND;VALUE=DATE:20261120
 SUMMARY:Kracht: Upper B + core
@@ -125,7 +106,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-20-a@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261120
 DTEND;VALUE=DATE:20261121
 SUMMARY:Hyrox: Hyrox engine (benen-zuinig)
@@ -137,7 +118,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-21-a@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261121
 DTEND;VALUE=DATE:20261122
 SUMMARY:Lopen: Lange duur 22–24 km
@@ -148,7 +129,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-22-a@coach
-DTSTAMP:20261115T215943Z
+DTSTAMP:20261115T220554Z
 DTSTART;VALUE=DATE:20261122
 DTEND;VALUE=DATE:20261123
 SUMMARY:Fiets: Duurrit 2:00–2:30

@@ -161,7 +161,7 @@ def features(pg, shots=True):
     pg.click('[data-menu="2026-11-21-a"]'); pg.click('[data-alt="2026-11-21-a"][data-i="0"]')
     ok(store(pg)["done"]["2026-11-21-a"].get("alt", "").startswith("Ingekort"), "alternatief gekozen voor lange duurloop")
     ok("Alternatief: Ingekort" in pg.inner_text("#s_2026-11-21-a"), "alternatief zichtbaar op de kaart")
-    pg.click('[data-logger="2026-11-18-a"]'); pg.wait_for_selector('[data-rep="POGO"]')
+    pg.click('[data-logger="2026-11-17-b"]'); pg.wait_for_selector('[data-rep="POGO"]')
     ok(pg.locator('[data-kg="POGO"]').count() == 0 and pg.locator('[data-kg="BOX"]').count() == 0, "geen kg-veld bij plyo")
     focus(pg, "BOX"); pg.click('[data-rep="BOX"][data-r="3"]'); bx = [x for x in store(pg)["sets"] if x["code"] == "BOX"][-1]
     ok(bx.get("kg") is None and bx["reps"] == 3, "box jump gelogd zonder kg")

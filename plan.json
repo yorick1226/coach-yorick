@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-15b",
+ "updated": "2026-11-15c",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -815,7 +815,7 @@
    "start": "2026-11-16",
    "status": "definitief",
    "phase": "Basis 1 · week 1/3",
-   "focus": "Na de PR-race: opbouw naar ~50 km lopen, eerste powerhike-hoogtemeters, kracht 4×. Tandje bij in volume, niet in intensiteit.",
+   "focus": "Na de PR-race: opbouw naar ~48 km lopen, eerste powerhike-hoogtemeters, kracht 4×. Tandje bij in volume, niet in intensiteit.",
    "days": [
     {
      "date": "2026-11-16",
@@ -910,9 +910,41 @@
       {
        "id": "2026-11-17-b",
        "t": "strength",
-       "title": "Lower A (RIR 3)",
-       "detail": "Minstens 3 uur na de run. Squat en RDL terug, licht: RIR 3, techniek eerst. Onderrug ≥4 → rugvriendelijk wisselen.",
+       "title": "Plyo + Lower A (RIR 3)",
+       "detail": "Eén gymbezoek, minstens 3 uur na de run. Start met plyo (fris, kwaliteit > volume), dan squat en RDL licht terug: RIR 3, techniek eerst. Onderrug ≥4 → rugvriendelijk wisselen.",
        "ex": [
+        {
+         "c": "POGO",
+         "s": 3,
+         "lo": 15,
+         "hi": 15,
+         "rir": 0,
+         "rest": 60
+        },
+        {
+         "c": "LPOG",
+         "s": 2,
+         "lo": 10,
+         "hi": 10,
+         "rir": 0,
+         "rest": 60
+        },
+        {
+         "c": "SNAP",
+         "s": 3,
+         "lo": 3,
+         "hi": 3,
+         "rir": 0,
+         "rest": 60
+        },
+        {
+         "c": "BOX",
+         "s": 3,
+         "lo": 3,
+         "hi": 3,
+         "rir": 0,
+         "rest": 75
+        },
         {
          "c": "SQ",
          "s": 3,
@@ -964,7 +996,7 @@
          "rest": 45
         }
        ],
-       "min": 55
+       "min": 70
       }
      ]
     },
@@ -972,66 +1004,10 @@
      "date": "2026-11-18",
      "s": [
       {
-       "id": "2026-11-18-c",
-       "t": "run",
-       "title": "Easy 6 km (ochtend)",
-       "detail": "HF ≤ 140 · 5:50–6:10/km · RPE 2\nDirect daarna de plyo (benen zijn dan warm).",
-       "min": 36,
-       "km": 6
-      },
-      {
-       "id": "2026-11-18-a",
-       "t": "plyo",
-       "title": "Plyo",
-       "detail": "Direct na de easy run. Kwaliteit > volume, volledig herstel tussen sets.",
-       "ex": [
-        {
-         "c": "POGO",
-         "s": 3,
-         "lo": 15,
-         "hi": 15,
-         "rir": 0,
-         "rest": 60
-        },
-        {
-         "c": "LPOG",
-         "s": 2,
-         "lo": 10,
-         "hi": 10,
-         "rir": 0,
-         "rest": 60
-        },
-        {
-         "c": "SNAP",
-         "s": 3,
-         "lo": 3,
-         "hi": 3,
-         "rir": 0,
-         "rest": 60
-        },
-        {
-         "c": "BOX",
-         "s": 3,
-         "lo": 3,
-         "hi": 3,
-         "rir": 0,
-         "rest": 75
-        }
-       ],
-       "min": 15
-      },
-      {
-       "id": "2026-11-18-b",
-       "t": "bike",
-       "title": "KICKR Z2 75 min (avond)",
-       "detail": "10 min opbouw · 60 min @ 60–70% FTP (≈130–150 W KICKR) · HF < 140 · cadans 85–95\nLaatste 10 min: 3 × 1 min 100 rpm, 1 min rustig. RPE 3.",
-       "min": 75
-      },
-      {
        "id": "2026-11-18-d",
        "t": "strength",
-       "title": "Lower B licht (20–25 min, na de fiets)",
-       "detail": "Direct na de KICKR, benen zijn warm. Weinig spierpijn: geen nordics en geen excentrische step-ups deze week (drempel morgen).\nRIR 2–3.",
+       "title": "Lower B licht (25 min, ochtend)",
+       "detail": "Ochtend of lunch in de gym. Weinig spierpijn: geen nordics en geen excentrische step-ups deze week (drempel morgen). RIR 2–3.",
        "ex": [
         {
          "c": "LP",
@@ -1075,6 +1051,13 @@
         }
        ],
        "min": 25
+      },
+      {
+       "id": "2026-11-18-b",
+       "t": "bike",
+       "title": "KICKR Z2 75 min (avond)",
+       "detail": "10 min opbouw · 60 min @ 60–70% FTP (≈130–150 W KICKR) · HF < 140 · cadans 85–95\nLaatste 10 min: 3 × 1 min 100 rpm, 1 min rustig. RPE 3.",
+       "min": 75
       }
      ]
     },
@@ -1254,7 +1237,7 @@
     }
    ],
    "vert": 500,
-   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38), ~11 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Zondag alleen de fietsrit; Lower B staat woensdag na de fiets (licht).\nLange duur za: eerste 17 km echt rustig, voeding loggen."
+   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38), ~11 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Maximaal 2 trainingen per dag, zondag 1. Plyo zit aan het begin van Lower A (di), Lower B licht op wo.\nLange duur za: eerste 17 km echt rustig, voeding loggen."
   },
   {
    "id": "2026-W48",
