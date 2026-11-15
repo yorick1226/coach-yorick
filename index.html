@@ -109,6 +109,8 @@ a{color:var(--blue)}
 .rtrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
 .rtrow:first-of-type{border-top:0}
 .rtrow .nm{flex:1;min-width:0}
+.rtrow .rtw{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rtrow .btn.sm{min-width:48px}
 .rtchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .rtchip{border:1px solid var(--line);background:var(--card2);color:var(--tx);border-radius:999px;padding:0 12px;min-height:40px;font-size:14px}
 .rtchip.on{border-color:var(--acc);color:var(--acc)}
@@ -186,7 +188,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '3.1.0';
+const APP_VERSION = '3.2.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -686,39 +688,31 @@ function dayKind(list){ const w = it => (wuFor(it.s)||[])[0] || '';
 function weekCount(d, key){ const mon = mondayOf(d); let n = 0; for(let i=0;i<7;i++) if((S.rt[addDays(mon,i)]||{})[key]) n++; return n; }
 function routinesCard(d, items){
   const bp = backPain(d); const act = items.filter(i => !isSkipped(i.s.id)); const K = dayKind(act); const tips = PLAN.recoveryTips || {};
-  let h = '<div class="card" id="rtcard"><h3>Herstel & mobiliteit <span class="small">▶ = speler, ✓ = gedaan</span></h3>';
-  const row = (id, key, why) => { const r = rtDef(id, d); if(!r) return ''; const on = rtDone(d, key);
-    return '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"><b>'+esc(r.n)+'</b> <span class="small">'+r.min+' min'+(r.lvl?' · niveau '+(r.lvl+1):'')+(why?' · '+esc(why):'')+'</span>'
-      +'<details><summary class="small">Oefeningen bekijken</summary>'+rtList(r)+'</details></div><button class="btn sm pri" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+d+'">▶ Start</button></div>'; };
-  const tick = (key, icon, title, why) => { const on = rtDone(d, key); return '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"><b>'+icon+' '+esc(title)+'</b> <span class="small">'+esc(why)+'</span></div></div>'; };
-  const cm = chooseMob(d); const late = K.q || K.lower;
-  for(const id of dailyList(d)){
-    if(/^RUG/.test(id)) h += row(id, id, 'ochtend of na lang zitten');
-    else h += row(id, id, (late ? 'na de training of ’s avonds' : 'ochtend of wanneer het uitkomt')+(cm && cm.id===id ? ' · '+cm.why.join(' · ') : '')); }
-  if(late) h += '<div class="small" style="margin-top:4px">Vandaag snelheid, plyo of kracht: lange stretches pas ná die training.</div>';
-  const sw = staticWeek(mondayOf(d)); const goal = PLAN.staticGoal || {};
-  if(Object.keys(goal).length) h += '<div class="small" style="margin-top:6px">Statisch rekken deze week (min per kant, doel '+Object.values(goal)[0]+'): '+Object.keys(goal).map(t => t+' '+fmtN(sw[t]||0)).join(' · ')+'</div>';
-  const lt = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
-  if(!lt || diffD(d, lt.date) >= 28) h += '<div class="rtrow"><span style="font-size:22px;width:44px;text-align:center">📏</span><div class="nm"><b>Mobiliteitstest</b> <span class="small">5 min · elke 4 weken · '+(lt?'laatste '+fmtDay(lt.date):'nulmeting nog doen')+'</span></div><button class="btn sm" data-mobtest="1">Open</button></div>';
-  if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: rug & core A (McGill), side plank op je knieën, geen hamstringstretch. Wandelen mag. In krachtsessies: RDL en squat wisselen (knop in de sessie). Volg het advies van de huisarts.</div>';
-  else if(bp) h += '<div class="small" style="margin-top:6px">Onderrug '+bp+'/8 gemeld: rustig, pijn tijdens de oefeningen max 3/10.</div>';
-  /* herstel op maat van de dag */
-  const Y = dayItems(addDays(d,-1)); const KY = dayKind(Y); const ad = advice(d); const x = dailyOf(d);
-  const plan = [];
-  if(K.long) plan.push(['row','CD_LONG@x','',''], ['tick','X_BOOTS','🦵','Compressieboots 20–30 min', 'na de lange duur'], ['tick','X_GUN','💆','Massagegun kuiten, quads, bilspieren', '5–8 min, ’s avonds']);
-  else if(K.lower || KY.long) plan.push(['tick','X_GUN','💆','Massagegun benen', K.lower ? 'na de krachttraining, 5–8 min · geen ijsbad' : 'dag na de lange duur, 5–8 min']);
-  if(KY.long && !K.long) plan.push(['tick','X_BOOTS','🦵','Compressieboots 20–30 min', 'dag na de lange duur']);
+  const cm = chooseMob(d); const late = K.q || K.lower; const Y = dayItems(addDays(d,-1)); const KY = dayKind(Y); const ad = advice(d); const x = dailyOf(d);
+  const L = [];   // [key, icon, naam, minuten, routine-id of null, korte reden]
+  for(const id of dailyList(d)){ const r = rtDef(id, d); if(!r) continue;
+    if(/^RUG/.test(id)) L.push([id, '🧘', r.n.replace(/ \(.*\)/, ''), r.min, id, 'ochtend']);
+    else L.push([id, '🤸', r.n.replace('Mobiliteit · ', 'Mobiliteit '), r.min, id, late ? 'na de training' : (cm && cm.why[1]) || 'ochtend']); }
+  if(K.long){ L.push(['X_BOOTS','🦵','Compressieboots',25,null,'na de lange duur']); L.push(['X_GUN','💆','Massagegun benen',6,null,'’s avonds']); }
+  else if(K.lower) L.push(['X_GUN','💆','Massagegun benen',6,null,'na kracht · geen ijsbad']);
+  else if(KY.long){ L.push(['X_GUN','💆','Massagegun benen',6,null,'dag na lange duur']); L.push(['X_BOOTS','🦵','Compressieboots',25,null,'dag na lange duur']); }
   const saunaN = weekCount(d, 'X_SAUNA');
-  if(!K.q && !K.long && (K.easy || K.upper || K.n===0) && (saunaN < 3 || rtDone(d,'X_SAUNA'))) plan.push(['tick','X_SAUNA','🧖','Sauna na de training', 'deze week '+saunaN+'/2–3 · 2–3 rondes, extra drinken']);
-  if((ad && ad.lvl!=='groen') || K.n >= 2 || K.long) plan.push(['row','REC_DOWN', ad && ad.lvl!=='groen' ? 'advies '+ad.lvl : (K.n>=2 ? 'dubbele trainingsdag' : 'zware dag')]);
-  if(plan.length){ h += '<div style="margin-top:10px"><b style="font-size:15px">Herstel vandaag</b></div>';
-    for(const it of plan){ if(it[0]==='row'){ if(it[1]==='CD_LONG@x') continue; h += row(it[1], it[1], it[2]); } else h += tick(it[1], it[2], it[3], it[4]); } }
-  if((x.sl!=null && x.sl < 75) || K.long || K.n >= 2) h += '<div class="small" style="margin-top:6px">😴 '+esc(tips.sleep||'')+'</div>';
-  h += '<details style="margin-top:8px"><summary class="small">Meer herstel, extra mobiliteit en de onderbouwing</summary>';
-  for(const id of ['REC_ROLL','REC_DOWN'].filter(z => !plan.some(q => q[1]===z))) h += row(id, id, '');
-  for(const f of Object.keys(PLAN.mobFocus||{})){ const id = mobNext(f, d); if(!dailyList(d).includes(id) && !(cm && cm.focus===f)) h += row(id, id, 'extra'); }
-  for(const k of ['static','gun','boots','sauna','cold','sleep']) if(tips[k]) h += '<div class="small" style="margin-top:6px">• '+esc(tips[k])+'</div>';
-  h += '</details></div>'; return h; }
+  if(!K.q && !K.long && (K.easy || K.upper || K.n===0) && (saunaN < 3 || rtDone(d,'X_SAUNA'))) L.push(['X_SAUNA','🧖','Sauna',30,null,'na training · '+saunaN+'/2–3 deze week']);
+  if((ad && ad.lvl!=='groen') || K.n >= 2 || K.long){ const r = rtDef('REC_DOWN', d); L.push(['REC_DOWN','🌙','Ontspannen',r.min,'REC_DOWN', ad && ad.lvl!=='groen' ? 'advies '+ad.lvl : 'avond']); }
+  const tot = L.reduce((p,z) => p + z[3], 0); const nDone = L.filter(z => rtDone(d, z[0])).length;
+  let h = '<div class="card" id="rtcard"><div style="display:flex;align-items:baseline;gap:8px"><h3 style="margin:0;flex:1">Herstel & mobiliteit</h3><span class="small">'+nDone+'/'+L.length+' · ± '+tot+' min</span></div>';
+  for(const [key, icon, n, min, rid, why] of L){ const on = rtDone(d, key);
+    h += '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"'+(on?' style="opacity:.55"':'')+'><b>'+icon+' '+esc(n)+'</b><div class="small rtw">'+min+' min · '+esc(why)+'</div></div>'
+      +(rid ? '<button class="btn sm'+(on?'':' pri')+'" data-rtstart="'+rid+'" data-rtkey="'+key+'" data-rtdate="'+d+'" aria-label="Start '+esc(n)+'">▶</button>' : '')+'</div>'; }
+  if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: rug & core A (McGill), side plank op je knieën, geen hamstringstretch. RDL en squat wisselen (knop in de sessie).</div>';
+  const sw = staticWeek(mondayOf(d)); const goal = PLAN.staticGoal || {}; const lt = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
+  h += '<details style="margin-top:6px"><summary class="small">Rekken deze week: '+Object.keys(goal).map(t => t.replace('heupbuiger','heup')+' '+Math.round(sw[t]||0)+'/'+goal[t]).join(' · ')+' min'+((!lt || diffD(d, lt.date) >= 28) ? ' · 📏 test open' : '')+'</summary>';
+  if(!lt || diffD(d, lt.date) >= 28) h += '<div class="rtrow"><div class="nm"><b>📏 Mobiliteitstest</b><div class="small">5 min · elke 4 weken · '+(lt?'laatste '+fmtDay(lt.date):'nulmeting')+'</div></div><button class="btn sm" data-mobtest="1">Open</button></div>';
+  for(const id of ['REC_ROLL','REC_DOWN'].filter(z => !L.some(q => q[0]===z))){ const r = rtDef(id, d); h += '<div class="rtrow"><div class="nm"><b>'+esc(r.n)+'</b><div class="small">'+r.min+' min · extra</div></div><button class="btn sm" data-rtstart="'+id+'" data-rtkey="'+id+'" data-rtdate="'+d+'">▶</button></div>'; }
+  for(const f of Object.keys(PLAN.mobFocus||{})){ const id = mobNext(f, d); if(dailyList(d).includes(id)) continue; const r = rtDef(id, d); h += '<div class="rtrow"><div class="nm"><b>'+esc(r.n)+'</b><div class="small">'+r.min+' min · extra</div></div><button class="btn sm" data-rtstart="'+id+'" data-rtkey="'+id+'" data-rtdate="'+d+'">▶</button></div>'; }
+  h += '<div class="small" style="margin-top:6px">'+['static','gun','boots','sauna','cold','sleep'].filter(k => tips[k]).map(k => '• '+esc(tips[k])).join('<br>')+'</div></details>';
+  if((x.sl!=null && x.sl < 70)) h += '<div class="small" style="margin-top:6px">😴 Slaapscore '+x.sl+': vanavond extra vroeg naar bed weegt zwaarder dan elke andere hersteltool.</div>';
+  h += '</div>'; return h; }
 /* routinespeler */
 function rpStart(id, key, date){ const r = rtDef(id, date); if(!r) return; unlockAudio();
   ui.rp = {id, key, date, r, steps: rtSteps(r), i: 0, phase:'', end:0, left:0, paused:false}; $('rp').classList.add('show'); keepAwake(true); rpEnter(0, false); clearInterval(ui.rpInt); ui.rpInt = setInterval(rpTick, 250); }
@@ -831,9 +825,9 @@ function rLog(){
   $('htitle').textContent = 'Logger';
   let f = ui.sid && sessById(ui.sid);
   if(!f){
-    const w = weekByStart(mondayOf(today())); const opts = weekItems(w).filter(i => i.s.ex && !isSkipped(i.s.id));
-    let h = '<div class="card"><h3>Kies een sessie</h3><div class="mut">Sessies met oefeningen deze week.</div></div>';
-    if(!opts.length) h += '<div class="card mut">Geen krachtsessies gevonden deze week.</div>';
+    const t0 = today(), mon = mondayOf(t0); const opts = [mon, addDays(mon,7)].flatMap(m => weekItems(weekByStart(m))).filter(i => i.s.ex && !isSkipped(i.s.id) && i.date >= addDays(t0,-3) && i.date <= addDays(t0,7)).sort((a,b) => a.date.localeCompare(b.date));
+    let h = '<div class="card"><h3>Kies een sessie</h3><div class="mut">Krachtsessies van de afgelopen 3 en komende 7 dagen.</div></div>';
+    if(!opts.length) h += '<div class="card mut">Geen krachtsessies gevonden.</div>';
     for(const o of opts) h += '<button class="btn" style="width:100%;margin-bottom:8px;text-align:left" data-logger="'+o.s.id+'">'+(o.date===today()?'▶ ':'')+fmtDay(o.date)+' · '+esc(o.s.title)+'</button>';
     $('view').innerHTML = h; return;
   }
