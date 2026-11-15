@@ -120,6 +120,7 @@ def features(pg, shots=True):
     pg.click('[data-dailydone="2026-11-17"]'); ok(pg.locator("#dailysum").count() == 1, "Klaar klapt ochtendcheck in")
     pg.click('[data-dailyedit="2026-11-17"]'); pg.click("text=HRV en rust-HF"); pg.type('[data-dly="hrv"]', "48"); pg.reload(); pg.wait_for_selector("#tabs")
     ok(store(pg)["daily"]["2026-11-17"].get("hrv") == 48, "getypte waarde bewaard zonder veld te verlaten (app sluiten)")
+    tab(pg, "check"); ok(pg.locator("#ckq").count() == 1 and pg.locator('[data-ct="pijn"]').count() == 0, "check-in v3: 3 tikken + opmerkingen") if pg.evaluate("!S.checkins[weekIdOf(ui.chkWeek)]") else None
     # Routines
     tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart^="RUG"]').count() == 1 and pg.locator('#rtcard .rtrow [data-rtstart^="MOB_"]').count() >= 1, "dagroutines (rug + gekozen mobiliteit)")
     mob = pg.evaluate("chooseMob('2026-11-17')"); ok(mob and mob["id"].startswith("MOB_") and mob["why"], f"mobiliteit op maat gekozen: {mob}")
@@ -240,6 +241,10 @@ def features(pg, shots=True):
     ok("3:25" in ins and "Wedstrijden" in ins and "Cauberg" in ins, "records en wedstrijden uit Strava")
     pg.click('[data-range="52"]'); ok("rustig / matig / hard" in pg.inner_text("#view"), "bereik 1 jaar + intensiteitsverdeling")
     ok("Back squat" in pg.inner_text("#recstr"), "krachtrecord zichtbaar")
+    ok(pg.locator("#drift").count() == 1, "duurvermogen/HF-drift kaart")
+    z = pg.evaluate("zwoXml({title:'Test 5×4', detail:'x', zwo:[{min:10,pct:[50,70]},{rep:5,on:{min:4,pct:105},off:{min:3,pct:55}},{min:10,pct:[65,45]}]})")
+    ok('<IntervalsT Repeat="5" OnDuration="240" OffDuration="180" OnPower="1.05" OffPower="0.55"/>' in z and "<Warmup" in z and "<Cooldown" in z, "Zwift .zwo-bestand opgebouwd")
+    gl = pg.evaluate("glance(sessById('2026-11-19-a').s)"); ok("4:22–4:28/km" in gl, f"doel in één oogopslag: {gl}")
     pf = pg.inner_text("#perf"); ok("Halve marathon" in pf and "Drempel" in pf and "Z2 duur" in pf, "prestatiekaart: prognoses, looptempo's, fietszones")
     ok(pg.locator("#bikewk").count() == 1 and pg.locator('[data-jump="mozart"]').count() == 1, "fietskaart en sectienavigatie in inzicht")
     ok("Gut training" in pg.inner_text("#mozart") and "excentrische" in pg.inner_text("#mozart"), "Mozart: afdaal- en maagtraining geteld")
@@ -262,11 +267,11 @@ def features(pg, shots=True):
     ok("(afgevinkt zonder te loggen)" in txt, "afvinken zonder loggen is prima en staat in de export")
     if shots: pg.screenshot(path=str(OUT/"checkin.png"))
     # Lichaam: weekmeting + InBody-import (testdata, geen echte metingen in de repo)
-    pg.fill("#b_w", "76,8"); pg.fill("#b_waist", "80"); pg.click("#b_save")
+    pg.click("#bodysum"); pg.fill("#b_w", "76,8"); pg.fill("#b_waist", "80"); pg.click("#b_save")
     bd = store(pg)["body"]; ok(bd and bd[-1]["w"] == 76.8 and bd[-1]["waist"] == 80, "gewicht en taille bewaard")
     code = pg.evaluate("""() => 'YB1:'+btoa(unescape(encodeURIComponent(JSON.stringify([
       {date:'2026-06-01',src:'InBody',w:70,ssm:35,fatkg:7,fatp:10},{date:'2026-10-01',src:'InBody',w:71,ssm:36,fatkg:6.5,fatp:9.2,seg:{arm:120,trunk:110,leg:100}}]))))""")
-    pg.click("#bodycard summary"); pg.fill("#ib_code", code); pg.click("#ib_import")
+    pg.click("#bodysum"); pg.click("#bodydet details summary"); pg.fill("#ib_code", code); pg.click("#ib_import")
     ok(len([x for x in store(pg)["body"] if x.get("src") == "InBody"]) == 2, "InBody-importcode ingelezen")
     tab(pg, "inzicht"); bi = pg.inner_text("#bodyins"); ok("SSM +1" in bi and "benen 100%" in bi, "lichaamstrend + segmenten in inzicht")
     pg.goto(pg.url.split("#")[0] + "#ib=" + code.replace("YB1:", "YB1%3A")); pg.reload(); pg.wait_for_selector("#bodyins")

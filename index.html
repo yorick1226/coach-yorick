@@ -110,6 +110,7 @@ a{color:var(--blue)}
 .rtrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
 .rtrow:first-of-type{border-top:0}
 .rtrow .nm{flex:1;min-width:0}
+.glance{color:var(--acc);margin-top:2px}
 .rtrow .rtw{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rtrow .btn.sm{min-width:48px}
 .rtchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -189,7 +190,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '3.3.0';
+const APP_VERSION = '3.4.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -212,7 +213,13 @@ const QSETS = {
     {k:'opm', q:'Overig voor de coach', t:'area'}
   ]
 };
-const QV_CURRENT = 2;
+QSETS[3] = [
+  {k:'cijfer', q:'Cijfer voor deze week', t:'scale', min:1, max:10},
+  {k:'benen', q:'Benen aan het eind van de week (1 kapot – 5 fris)', t:'scale', min:1, max:5},
+  {k:'richting', q:'Volgende week', t:'pick', opts:['Tandje erbij','Zo laten','Terug']},
+  {k:'opm', q:'Opmerkingen voor de coach (optioneel)', t:'area'}
+];
+const QV_CURRENT = 3;
 const TYPE_LABEL = {run:'Lopen',bike:'Fiets',swim:'Zwem',strength:'Kracht',plyo:'Plyo',hyrox:'Hyrox',mobility:'Mobiliteit',rest:'Rust',race:'Wedstrijd'};
 const DAYS = ['ma','di','wo','do','vr','za','zo'];
 const SLOTS = ['Niet','1×','2×','Alleen ochtend','Alleen avond','Lang'];
@@ -375,6 +382,7 @@ function actLine(a){
   if(a.km && a.sec && RUNS.includes(a.sport)) p.push(fmtSec(a.sec/a.km)+'/km');
   if(a.km && a.sec && a.sport.includes('Ride')) p.push(fmtN(a.km/(a.sec/3600))+' km/u');
   if(a.hr) p.push('HF '+Math.round(a.hr)); if(a.w) p.push(a.w+' W'); if(a.hm) p.push(a.hm+' hm');
+  if(a.dec != null) p.push('HF-drift '+fmtN(a.dec)+'%');
   return p.join(' · ');
 }
 function lapsTable(a){
@@ -564,13 +572,29 @@ function loadWarnings(w){
   return out; }
 
 /* ---------- sessiekaart ---------- */
+/* korte doelregel voor de dichte kaart: tempo/HF/watt/RIR uit de sessiegegevens */
+function glance(s){ const d = s.detail || ''; const p = [];
+  if(s.tgt && s.tgt.pace) p.push(fmtPace(s.tgt.pace[0])+'–'+fmtPace(s.tgt.pace[1])+'/km');
+  else { const m = d.match(/\d:\d\d\s*[–-]\s*\d:\d\d\s*\/km/) || d.match(/@\s*(\d:\d\d\s*[–-]\s*\d:\d\d)/); if(m) p.push((m[1]||m[0]).replace(/\s/g,'').replace(/\/km$/,'')+'/km'); }
+  const hr = d.match(/HF\s*[≤<]\s*\d{3}/); if(hr) p.push(hr[0].replace(/\s/g,' '));
+  const w = d.match(/≈?\s*\d{2,3}\s*[–-]\s*\d{2,3}\s*W\b/); if(w) p.push(w[0].replace('≈','').replace(/\s/g,''));
+  if(s.ex && s.ex.length && !p.length){ const r = s.ex.map(e => e.rir).filter(x => x > 0); p.push(s.ex.length+' oef.'+(r.length ? ' · RIR '+Math.min(...r)+(Math.max(...r)!==Math.min(...r)?'–'+Math.max(...r):'') : '')); }
+  if(s.zwo) p.push('Zwift-workout');
+  return p.join(' · '); }
+/* Zwift-workout (.zwo) uit s.zwo: [{min, pct} | {min, pct:[van,naar]} | {rep, on:{min,pct}, off:{min,pct}}], pct = % FTP */
+function zwoXml(s){ const f = v => (v/100).toFixed(2); const sec = m => Math.round(m*60); const st = s.zwo; const out = [];
+  st.forEach((b, i) => { if(b.rep) out.push('<IntervalsT Repeat="'+b.rep+'" OnDuration="'+sec(b.on.min)+'" OffDuration="'+sec(b.off.min)+'" OnPower="'+f(b.on.pct)+'" OffPower="'+f(b.off.pct)+'"/>');
+    else if(Array.isArray(b.pct)) out.push('<'+(i===0?'Warmup':i===st.length-1?'Cooldown':'Ramp')+' Duration="'+sec(b.min)+'" PowerLow="'+f(b.pct[0])+'" PowerHigh="'+f(b.pct[1])+'"/>');
+    else out.push('<SteadyState Duration="'+sec(b.min)+'" Power="'+f(b.pct)+'"/>'); });
+  const x = t => String(t).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]);
+  return '<workout_file>\n<author>Coach Yorick</author>\n<name>'+x(s.title)+'</name>\n<description>'+x((s.detail||'').split('\n')[0])+'</description>\n<sportType>bike</sportType>\n<tags/>\n<workout>\n'+out.join('\n')+'\n</workout>\n</workout_file>\n'; }
 function planLine(s){ const p = []; if(s.km) p.push(fmtN(s.km)+' km'); if(s.min) p.push('~'+s.min+' min'); if(s.hm) p.push(s.hm+' hm'); return p.join(' · '); }
 function sessCard(it, m, opt){
   const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id], skip = st.skip, done = !skip && (st.d || !!a);
   const open = ui.open[s.id] ?? !!opt.open;
   let h = '<div class="card sess'+(done?' done':'')+(skip?' skip':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
   h += '<button class="chk'+(done?' on':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
-  h += (s.t!=='rest' ? '<button class="tt tap" data-open="'+s.id+'" data-isopen="'+(open?1:0)+'" aria-expanded="'+open+'">' : '<div class="tt">')+'<span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span><span class="small">'+planLine(s)+'</span><b>'+esc(s.title)+'</b>';
+  h += (s.t!=='rest' ? '<button class="tt tap" data-open="'+s.id+'" data-isopen="'+(open?1:0)+'" aria-expanded="'+open+'">' : '<div class="tt">')+'<span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span><span class="small">'+planLine(s)+'</span><b>'+esc(s.title)+'</b>'+(glance(s) ? '<div class="small glance">🎯 '+esc(glance(s))+'</div>' : '');
   if(it.date!==it.orig) h += '<div class="small">↪ verplaatst van '+fmtDay(it.orig)+'</div>';
   if(skip) h += '<div class="small" style="color:var(--warn)">Niet uitgevoerd: '+esc(skip)+'</div>';
   if(st.alt) h += '<div class="small" style="color:var(--blue)">Alternatief: '+esc(st.alt)+'</div>';
@@ -581,6 +605,7 @@ function sessCard(it, m, opt){
   if(a) h += '<div class="strava"><b>✓ Strava</b> '+actLine(a)+(open && a.laps?'<br><button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>'+(ui.laps[s.id]?lapsTable(a):''):'')+'</div>';
   const quick = [];
   if(s.ex && !skip) quick.push('<button class="btn sm pri" data-logger="'+s.id+'">Logger</button>');
+  if(s.zwo && !skip) quick.push('<button class="btn sm" data-zwo="'+s.id+'">⬇ Zwift-bestand</button>');
   if(s.rt && !skip) quick.push('<button class="btn sm pri" data-rtstart="'+s.rt+'" data-rtkey="'+s.rt+'" data-rtdate="'+it.date+'">▶ Start routine</button>');
   if(quick.length) h += '<div class="row">'+quick.join('')+'</div>';
   const wc = !skip && wuFor(s); if(wc) h += '<div class="rtchips">'+rtChip(wc[0], wc[0]+'@'+s.id, it.date, 'Warming-up')+(wc[1] ? rtChip(wc[1], wc[1]+'@'+s.id, it.date, 'Cooldown') : '')+'</div>';
@@ -1000,7 +1025,7 @@ function rInsight(){
   const fuel = S.cardio.filter(c => !c.del && c.kh && c.sec >= (MZ.fuelH||4)*3600 && (c.maag||5) >= 3).map(c => c.kh); const fuelBest = fuel.length ? Math.max(...fuel) : 0;
   const days = Math.round((parseD(MZ.date||'2027-06-05') - parseD(t))/864e5);
   let h = '<div class="chips sm" style="margin:0 0 10px">'+[[12,'12 wk'],[26,'½ jaar'],[52,'jaar']].map(([n,l]) => '<button class="chip'+((ui.range||12)===n?' on':'')+'" data-range="'+n+'">'+l+'</button>').join('')+'</div>';
-  h += '<div class="chips sm" id="jump" style="margin:0 0 10px">'+[['perf','Tempo’s'],['mozart','Mozart'],['runwk','Lopen'],['bikewk','Fietsen'],['volins','Kracht'],['mobins','Mobiliteit'],['bodyins','Lichaam'],['recdist','Records']].map(([id,l]) => '<button class="chip" style="font-size:14px" data-jump="'+id+'">'+l+'</button>').join('')+'</div>';
+  h += '<div class="chips sm" id="jump" style="margin:0 0 10px">'+[['perf','Tempo’s'],['mozart','Mozart'],['drift','Duurvermogen'],['runwk','Lopen'],['bikewk','Fietsen'],['volins','Kracht'],['mobins','Mobiliteit'],['bodyins','Lichaam'],['recdist','Records']].map(([id,l]) => '<button class="chip" style="font-size:14px" data-jump="'+id+'">'+l+'</button>').join('')+'</div>';
   h += perfCard();
   h += '<div class="card" id="mozart"><h3>Richting Mozart <span class="small">nog '+days+' dagen</span></h3>';
   const pr = (l, v, tg, u, f) => '<div style="margin:8px 0"><div class="kv" style="border:0;padding:0"><span>'+l+'</span><span><b>'+(f?f(v):Math.round(v))+'</b> / '+tg+' '+u+'</span></div><div class="bar"><i style="width:'+Math.min(100, Math.round(v/tg*100))+'%"></i></div></div>';
@@ -1058,6 +1083,9 @@ function rInsight(){
       if(Object.keys(cnt).length) h += '<div class="small">Gedaan per gebied: '+Object.entries(PLAN.mobFocus||{}).map(([f,v]) => v.n+' '+(cnt[f]||0)+'×').join(' · ')+'</div>';
       if(L.length) h += '<table><tr><th>Test</th>'+L.slice(-4).map(x => '<th class="r">'+fmtDay(x.date).split(' ').slice(1).join(' ')+'</th>').join('')+'<th class="r">doel</th></tr>'+T.map(t => '<tr><td>'+esc(t.n.split(' (')[0])+'</td>'+L.slice(-4).map(x => '<td class="r">'+(x[t.k]!=null?fmtN(x[t.k]):'–')+'</td>').join('')+'<td class="r">'+esc(t.goal)+'</td></tr>').join('')+'</table>';
       h += '</div>'; } }
+  { const dr = (STRAVA.activities||[]).filter(a => a.dec != null && RUNS.includes(a.sport)).sort((p,q) => q.date.localeCompare(p.date)).slice(0,8);
+    h += '<div class="card" id="drift"><h3>Duurvermogen: HF-drift lange duurlopen</h3>'+(dr.length ? '<table><tr><th>Run</th><th class="r">km</th><th class="r">drift</th></tr>'+dr.map(a => '<tr><td>'+fmtDay(a.date)+' · '+esc(a.name)+'</td><td class="r">'+fmtN(a.km)+'</td><td class="r" style="color:'+(a.dec < 5 ? 'var(--acc)' : a.dec < 8 ? 'var(--warn)' : 'var(--bad)')+'">'+fmtN(a.dec)+'%</td></tr>').join('')+'</table>' : '<div class="mut">Wordt vanaf nu elke avond berekend voor vlakke duurlopen van ≥ 75 min.</div>')
+      +'<div class="small">Hoeveel je hartslag in de tweede helft oploopt bij hetzelfde tempo (snelheid/HF, eerste 10 min niet meegeteld). Vuistregel uit de coachpraktijk: < 5% = goed aeroob fundament, > 8% = duur nog te lang of te snel voor je huidige basis. Alleen op vlakke runs; warmte, wind en voeding beïnvloeden het ook.</div></div>'; }
   h += blockHtml();
   h += recordsHtml();
   const fl = S.cardio.filter(c => !c.del && (c.kh || c.wat)).sort((a,b)=> b.date.localeCompare(a.date)).slice(0,10);
@@ -1119,7 +1147,7 @@ function recordsHtml(){
 /* ---------- check-in + beschikbaarheid ---------- */
 function bodyCard(){
   const b = S.body.slice().sort((p,q)=> p.date.localeCompare(q.date)); const last = b.filter(x=>x.w).pop(); const ib = b.filter(x=>x.ssm).pop();
-  let h = '<div class="card" id="bodycard"><b>Lichaam</b> <span class="small">gewicht wekelijks (ochtend, nuchter), maten maandelijks</span>';
+  let h = '<div class="card" id="bodycard"><details id="bodydet"'+(ui.bodyOpen?' open':'')+'><summary id="bodysum"><b>Lichaam</b> <span class="small">'+(last?'laatst '+fmtN(last.w)+' kg':'gewicht wekelijks')+'</span></summary>';
   h += '<div class="row nw"><div><label class="f">Gewicht (kg)</label><input type="text" inputmode="decimal" id="b_w" placeholder="'+(last?fmtN(last.w):'77,0')+'"></div><div><label class="f">Taille (cm)</label><input type="text" inputmode="decimal" id="b_waist" placeholder="opt."></div></div>';
   h += '<div class="row nw"><div><label class="f">Borst</label><input type="text" inputmode="decimal" id="b_chest" placeholder="opt."></div><div><label class="f">Arm</label><input type="text" inputmode="decimal" id="b_arm" placeholder="opt."></div><div><label class="f">Bovenbeen</label><input type="text" inputmode="decimal" id="b_thigh" placeholder="opt."></div></div>';
   h += '<div class="row"><button class="btn pri" id="b_save">Bewaar meting</button></div>';
@@ -1127,14 +1155,14 @@ function bodyCard(){
   h += '<details style="margin-top:8px"><summary class="small">InBody-meting toevoegen of importcode plakken</summary>';
   h += '<div class="row nw"><div><label class="f">Datum</label><input type="date" id="ib_d" value="'+today()+'"></div><div><label class="f">Gewicht</label><input type="text" inputmode="decimal" id="ib_w"></div></div>';
   h += '<div class="row nw"><div><label class="f">SSM (kg)</label><input type="text" inputmode="decimal" id="ib_ssm"></div><div><label class="f">Vet (kg)</label><input type="text" inputmode="decimal" id="ib_fk"></div><div><label class="f">Vet %</label><input type="text" inputmode="decimal" id="ib_fp"></div></div>';
-  h += '<div class="row"><button class="btn" id="ib_save">Bewaar InBody</button></div><label class="f">Importcode (begint met YB1:)</label><textarea id="ib_code"></textarea><div class="row"><button class="btn" id="ib_import">Importeer</button></div></details></div>';
+  h += '<div class="row"><button class="btn" id="ib_save">Bewaar InBody</button></div><label class="f">Importcode (begint met YB1:)</label><textarea id="ib_code"></textarea><div class="row"><button class="btn" id="ib_import">Importeer</button></div></details></details></div>';
   return h; }
 function addBody(rec){ rec.ts = Date.now(); rec.id = rec.id || 'b|'+rec.date+'|'+(rec.src||'')+'|'+rec.ts; const i = S.body.findIndex(x => x.date===rec.date && (x.src||'')===(rec.src||''));
   if(i>=0) S.body[i] = Object.assign({}, S.body[i], rec); else S.body.push(rec); enqueue('body', rec.id, rec.date, rec); }
 function importBody(code){ try { let c = String(code).trim(); if(c.startsWith('YB1:')) c = c.slice(4); const arr = JSON.parse(decodeURIComponent(escape(atob(c)))); arr.forEach(addBody); toast(arr.length+' metingen geïmporteerd'); return arr.length; } catch(e){ toast('Ongeldige code'); return 0; } }
 function mobCard(){ const T = PLAN.mobTests||[]; if(!T.length) return ''; const L = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)); const last = L[L.length-1], first = L[0];
   const due = !last || diffD(today(), last.date) >= 28;
-  let h = '<div class="card" id="mobcard"><details'+(due||ui.mobOpen?' open':'')+'><summary><b>Mobiliteitstest</b> <span class="small">elke 4 weken · '+(last?'laatste '+fmtDay(last.date):'nulmeting')+'</span></summary>';
+  let h = '<div class="card" id="mobcard"><details'+(ui.mobOpen?' open':'')+'><summary><b>Mobiliteitstest</b> <span class="small">elke 4 weken · '+(last?'laatste '+fmtDay(last.date):'nulmeting')+'</span></summary>';
   for(const t of T) h += '<div style="border-top:1px solid var(--line);margin-top:8px;padding-top:6px"><b style="font-size:15px">'+esc(t.n)+'</b> <span class="small">doel '+esc(t.goal)+(last && last[t.k]!=null ? ' · vorige '+fmtN(last[t.k])+' '+t.u : '')+'</span><div class="small">'+esc(t.how)+' <a href="'+VID(t.q)+'" target="_blank" rel="noopener">▶ video</a></div><input type="text" inputmode="decimal" id="mt_'+t.k+'" placeholder="'+t.u+'"></div>';
   h += '<div class="row"><button class="btn pri" id="mt_save">Bewaar test</button></div>';
   if(first && last && first!==last) h += '<div class="small" style="margin-top:6px">Sinds '+fmtDay(first.date)+': '+T.filter(t => first[t.k]!=null && last[t.k]!=null).map(t => t.n.split(' (')[0]+' '+(last[t.k]-first[t.k]>=0?'+':'')+fmtN(last[t.k]-first[t.k])+' '+t.u).join(' · ')+'</div>';
@@ -1144,8 +1172,15 @@ function rCheck(){
     ui.chkWeek = (dow <= 1 && !S.checkins[weekIdOf(prev)]) ? prev : mon; }
   const wid = weekIdOf(ui.chkWeek); $('htitle').textContent = 'Check-in week '+wid.split('-W')[1];
   const ci = S.checkins[wid]; const qv = ci ? ci.qv : QV_CURRENT; const a = (ci && ci.a) || {};
-  let h = '<div class="card"><div class="mut">Week van '+fmtDay(ui.chkWeek)+' t/m '+fmtDay(addDays(ui.chkWeek,6))+'. Alles wordt automatisch bewaard. Zondag: vul in en kopieer de export onderaan.</div></div>';
-  for(const q of QSETS[qv]){
+  let h = '<div class="card"><div class="mut">Week van '+fmtDay(ui.chkWeek)+' t/m '+fmtDay(addDays(ui.chkWeek,6))+'. Trainingen, Strava, ochtendchecks en pijn gaan automatisch mee; jij geeft alleen je oordeel.</div></div>';
+  if(qv >= 3){ h += '<div class="card" id="ckq">';
+    for(const q of QSETS[qv]){ h += '<div style="margin-bottom:10px"><b style="font-size:15px">'+esc(q.q)+'</b>';
+      if(q.t==='scale'){ h += '<div class="chips sm">'; for(let i=q.min;i<=q.max;i++) h += '<button class="chip'+(a[q.k]===i?' on':'')+'" data-ck="'+q.k+'" data-cv="'+i+'">'+i+'</button>'; h += '</div>'; }
+      else if(q.t==='pick') h += '<div class="chips">'+q.opts.map(o => '<button class="chip'+(a[q.k]===o?' on':'')+'" style="flex:1;font-size:15px" data-ck="'+q.k+'" data-cvs="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div>';
+      else if(q.t==='area') h += '<textarea data-ct="'+q.k+'" style="margin-top:6px;min-height:60px" placeholder="Bijv. iets wat opviel, wensen voor volgende week">'+esc(a[q.k]||'')+'</textarea>';
+      h += '</div>'; }
+    h += '</div>'; }
+  else for(const q of QSETS[qv]){
     if(q.t==='avail') continue; // v1-beschikbaarheid: oude antwoorden blijven in export; invoer loopt via het blok hieronder
     h += '<div class="card"><b>'+esc(q.q)+'</b>';
     if(q.t==='scale'){ h += '<div class="chips">'; for(let i=q.min;i<=q.max;i++) h += '<button class="chip'+(a[q.k]===i?' on':'')+'" data-ck="'+q.k+'" data-cv="'+i+'">'+i+'</button>'; h += '</div>'; }
@@ -1332,6 +1367,8 @@ document.addEventListener('click', ev => {
   if(ds.info){ ui.info[ds.info] = !ui.info[ds.info]; rerender(); return; }
   if(ds.exfocus){ ui.exFocus[ui.sid] = ds.exfocus; rerender(); setTimeout(()=>{ const el = document.getElementById('ex_'+ds.exfocus); if(el) el.scrollIntoView({block:'start'}); }, 20); return; }
   if(ds.mobtest){ ui.mobOpen = true; go(() => { ui.tab = 'check'; }); setTimeout(() => { const e = $('mobcard'); if(e) e.scrollIntoView({block:'start'}); }, 50); return; }
+  if(ds.zwo){ const f = sessById(ds.zwo); if(!f || !f.s.zwo) return; const blob = new Blob([zwoXml(f.s)], {type:'application/xml'}); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = ds.zwo+'.zwo'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); toast('Zet het bestand in Documenten/Zwift/Workouts'); return; }
   if(ds.rtstart){ rpStart(ds.rtstart, ds.rtkey, ds.rtdate); return; }
   if(ds.rtchk){ setRt(ds.rtdate, ds.rtchk, !rtDone(ds.rtdate, ds.rtchk)); rerender(); return; }
   if(ds.rp){ ({stop: rpClose, prev: rpPrev, next: rpNext, pause: rpPause})[ds.rp](); return; }
