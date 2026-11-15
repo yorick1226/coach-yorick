@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-15f",
+ "updated": "2026-11-15g",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -911,7 +911,7 @@
        "id": "2026-11-17-b",
        "t": "strength",
        "title": "Plyo + Lower A (RIR 3)",
-       "detail": "Eén gymbezoek, minstens 3 uur na de run. Start met plyo (fris, kwaliteit > volume), dan squat en RDL licht terug: RIR 3, techniek eerst. Onderrug ≥4 → rugvriendelijk wisselen.",
+       "detail": "Eén gymbezoek, minstens 3 uur na de run. Start met plyo (fris, kwaliteit > volume). Squat en RDL: RIR 3 deze week omdat ze stillagen, techniek eerst; volgende week normaal opbouwen.",
        "ex": [
         {
          "c": "POGO",
@@ -1188,15 +1188,15 @@
       {
        "id": "2026-11-22-a",
        "t": "bike",
-       "title": "Duurrit 2:00–2:30",
-       "detail": "Z2 @ 60–70% FTP (≈140–160 W buiten) · HF < 140 · cadans 85–95\nRug: rechtop, elk half uur 1 min uit het zadel. Maximaal 2:30 tot de huisarts groen licht geeft voor langer. Afbreken bij uitstralende pijn.",
-       "min": 150
+       "title": "Duurrit 2:30–3:00",
+       "detail": "Z2 @ 56–75% FTP (≈130–170 W buiten) · HF < 140 · cadans 85–95\nRug: elk half uur 1 min uit het zadel en rechtop. Goed gevoel na 2:30? Door tot 3:00.\nVoeding: 60–80 g KH/uur, oefen meteen je Mozart-mix.",
+       "min": 170
       }
      ]
     }
    ],
    "vert": 500,
-   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38; +29%, net onder de 30%-grens), ~10,5 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Maximaal 2 trainingen per dag, zondag 1. Plyo zit aan het begin van Lower A (di). Lower B vervalt deze week (geen vrije plek zonder een derde training op een dag); volgende week weer 2× lower.\nLange duur za: eerste 17 km echt rustig, voeding loggen."
+   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38; +29%, net onder de 30%-grens), ~10,5 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: huisarts geeft groen licht (13 nov). Squat en RDL deze week nog op RIR 3 omdat ze een tijd stillagen, volgende week normaal opbouwen. Bij nieuwe pijn ≥4: rugvriendelijk wisselen.\nDrempel do: eerste blok niet sneller dan 4:22. Maximaal 2 trainingen per dag, zondag 1. Plyo zit aan het begin van Lower A (di). Lower B vervalt deze week (geen vrije plek zonder een derde training op een dag); volgende week weer 2× lower.\nLange duur za: eerste 17 km echt rustig, voeding loggen."
   },
   {
    "id": "2026-W48",

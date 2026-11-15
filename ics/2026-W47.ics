@@ -6,7 +6,7 @@ METHOD:PUBLISH
 X-WR-CALNAME:Training 2026-W47
 BEGIN:VEVENT
 UID:2026-11-16-a@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261116
 DTEND;VALUE=DATE:20261117
 SUMMARY:Kracht: Upper A
@@ -19,7 +19,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-16-b@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261116
 DTEND;VALUE=DATE:20261117
 SUMMARY:Lopen: Powerhike loopband 30 min
@@ -30,7 +30,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-17-a@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261117
 DTEND;VALUE=DATE:20261118
 SUMMARY:Lopen: Easy 8 km + 6 strides
@@ -41,23 +41,23 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-17-b@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261117
 DTEND;VALUE=DATE:20261118
 SUMMARY:Kracht: Plyo + Lower A (RIR 3)
 DESCRIPTION:Eén gymbezoek\, minstens 3 uur na de run. Start met plyo (fri
- s\, kwaliteit > volume)\, dan squat en RDL licht terug: RIR 3\, techniek e
- erst. Onderrug ≥4 → rugvriendelijk wisselen.\nPogo jumps 3×15\nLatera
- le pogo's (per kant) 2×10\nSnap-down → verticale sprong 3×3\nBox jump 
- (stap eraf) 3×3\nBack squat 3×5–6 @RIR3\nRomanian deadlift 3×6–8 @R
- IR3\nBulgarian split squat (per been\, dumbbells totaal) 3×6–8 @RIR3\nS
- taande calf raise 3×8–12 @RIR1\nTibialis raise 2×15–20 @RIR1\nCopenh
- agen plank (sec per kant) 2×20–30 @RIR2
+ s\, kwaliteit > volume). Squat en RDL: RIR 3 deze week omdat ze stillagen\
+ , techniek eerst\; volgende week normaal opbouwen.\nPogo jumps 3×15\nLate
+ rale pogo's (per kant) 2×10\nSnap-down → verticale sprong 3×3\nBox jum
+ p (stap eraf) 3×3\nBack squat 3×5–6 @RIR3\nRomanian deadlift 3×6–8 
+ @RIR3\nBulgarian split squat (per been\, dumbbells totaal) 3×6–8 @RIR3\
+ nStaande calf raise 3×8–12 @RIR1\nTibialis raise 2×15–20 @RIR1\nCope
+ nhagen plank (sec per kant) 2×20–30 @RIR2
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-18-c@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261119
 SUMMARY:Lopen: Easy 6 km (ochtend)
@@ -66,7 +66,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-18-b@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261118
 DTEND;VALUE=DATE:20261119
 SUMMARY:Fiets: Zwift/KICKR Z2 75 min (avond)
@@ -78,7 +78,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-19-a@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261119
 DTEND;VALUE=DATE:20261120
 SUMMARY:Lopen: 5 × 6 min @ drempel
@@ -90,7 +90,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-19-b@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261119
 DTEND;VALUE=DATE:20261120
 SUMMARY:Kracht: Upper B + core
@@ -103,7 +103,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-20-a@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261120
 DTEND;VALUE=DATE:20261121
 SUMMARY:Hyrox: Hyrox engine (benen-zuinig)
@@ -115,7 +115,7 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-21-a@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261121
 DTEND;VALUE=DATE:20261122
 SUMMARY:Lopen: Lange duur 20–22 km
@@ -126,14 +126,14 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-22-a@coach
-DTSTAMP:20261115T222102Z
+DTSTAMP:20261115T222558Z
 DTSTART;VALUE=DATE:20261122
 DTEND;VALUE=DATE:20261123
-SUMMARY:Fiets: Duurrit 2:00–2:30
-DESCRIPTION:Z2 @ 60–70% FTP (≈140–160 W buiten) · HF < 140 · cadan
- s 85–95\nRug: rechtop\, elk half uur 1 min uit het zadel. Maximaal 2:30 
- tot de huisarts groen licht geeft voor langer. Afbreken bij uitstralende p
- ijn.
+SUMMARY:Fiets: Duurrit 2:30–3:00
+DESCRIPTION:Z2 @ 56–75% FTP (≈130–170 W buiten) · HF < 140 · cadan
+ s 85–95\nRug: elk half uur 1 min uit het zadel en rechtop. Goed gevoel n
+ a 2:30? Door tot 3:00.\nVoeding: 60–80 g KH/uur\, oefen meteen je Mozart
+ -mix.
 TRANSP:TRANSPARENT
 END:VEVENT
 END:VCALENDAR
