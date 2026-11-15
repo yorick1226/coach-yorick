@@ -185,7 +185,8 @@ def features(pg, shots=True):
     ok(pg.locator("#coachnote").count() == 1, "coachnotitie zichtbaar in de week")
     pg.evaluate("""() => { STRAVA.activities.push({id:'t1',date:'2026-11-17',t:'09:00',sport:'Run',name:'Ochtendloop',km:8.1,sec:2600,hr:152}); render(); }""")
     ensure_open(pg, "2026-11-17-a"); ok("Te hard voor een rustige run" in pg.inner_text("#s_2026-11-17-a"), "rustige run met HF 152 wordt gemarkeerd")
-    st = pg.inner_text("#stats"); ok("/33," in st or "/33 " in st, f"geplande km gecorrigeerd voor alternatief (21 → 65%) [{st.splitlines()[1] if len(st.splitlines())>1 else st}]")
+    st = pg.inner_text("#stats"); exp = pg.evaluate("(() => { const w = weekByStart('2026-11-16'); const ks = weekItems(w).filter(i => ['run','race'].includes(i.s.t)).map(i => i.s.km||0); const lr = (sessById('2026-11-21-a').s.km||0); return ks.reduce((a,b)=>a+b,0) - lr*0.35; })()")
+    ok(("/"+f"{exp:.1f}".replace(".", ",")) in st, f"geplande km gecorrigeerd voor alternatief (lange duur → 65%, verwacht {exp:.1f}) [{st.splitlines()[1] if len(st.splitlines())>1 else st}]")
     # Logger: komma, RIR, wissel
     pg.click("#next"); pg.click('[data-logger="2026-11-24-b"]'); pg.wait_for_selector('[data-kg="SQ"]')
     ok("Vorige keer" in pg.inner_text("#ex_SQ") and "60" in pg.inner_text("#ex_SQ"), "‘vorige keer’ + suggestie in volgende sessie")

@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-12b",
+ "updated": "2026-11-15a",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -813,9 +813,9 @@
   {
    "id": "2026-W47",
    "start": "2026-11-16",
-   "status": "concept",
+   "status": "definitief",
    "phase": "Basis 1 · week 1/3",
-   "focus": "Herstel na race (ma–wo), daarna opbouw. Squat/RDL licht terug. Hyrox-prikkel.",
+   "focus": "Na de PR-race: opbouw naar ~50 km lopen, eerste powerhike-hoogtemeters, kracht 4×. Tandje bij in volume, niet in intensiteit.",
    "days": [
     {
      "date": "2026-11-16",
@@ -824,7 +824,7 @@
        "id": "2026-11-16-a",
        "t": "strength",
        "title": "Upper A",
-       "detail": "Benen rust. Dagelijks (5–8 min): cat-cow ×10, McGill big 3 (curl-up, side plank, bird dog: 3×10 s per houding), hamstring flossing 2×10 per been.",
+       "detail": "Benen rust (powerhike telt als herstel). Na of vóór het powerhiken.",
        "ex": [
         {
          "c": "BP",
@@ -887,11 +887,12 @@
       },
       {
        "id": "2026-11-16-b",
-       "t": "mobility",
-       "title": "Mobiliteit compleet (~20 min)",
-       "detail": "Start de routinespeler: de drie minst recent gedane gebieden achter elkaar, in de volgende variant.",
-       "min": 15,
-       "rt": "MOB_LANG"
+       "t": "run",
+       "title": "Powerhike loopband 30 min",
+       "detail": "Herstel na de race én eerste Mozart-hoogtemeters.\nLoopband 12–15% helling, 5,0–5,5 km/u wandelen, HF < 130, niet rennen, handen los.\n≈ 350–400 hm. Stop bij kuit- of rugklachten.",
+       "min": 30,
+       "km": 2.7,
+       "hm": 380
       }
      ]
     },
@@ -901,16 +902,16 @@
       {
        "id": "2026-11-17-a",
        "t": "run",
-       "title": "Easy 8 km + 6 strides",
-       "detail": "HF ≤ 145 · 5:40–6:00/km · RPE 2–3\nStrides 6 × 20 s @ ~3:45/km-gevoel, 80 s herstel. Alleen als de benen soepel zijn.",
-       "min": 50,
-       "km": 8
+       "title": "Easy 10 km + 6 strides",
+       "detail": "HF ≤ 145 · 5:40–6:00/km · RPE 2–3\nBenen nog zwaar van de race? Dan 8 km en geen strides.\nStrides 6 × 20 s @ ~3:45/km-gevoel, 80 s herstel.",
+       "min": 60,
+       "km": 10
       },
       {
        "id": "2026-11-17-b",
        "t": "strength",
-       "title": "Lower A (intro, RIR 3)",
-       "detail": "Minstens 3 uur na de run. Squat licht terug.",
+       "title": "Lower A (RIR 3)",
+       "detail": "Minstens 3 uur na de run. Squat en RDL terug, licht: RIR 3, techniek eerst. Onderrug ≥4 → rugvriendelijk wisselen.",
        "ex": [
         {
          "c": "SQ",
@@ -923,7 +924,7 @@
         },
         {
          "c": "RDL",
-         "s": 2,
+         "s": 3,
          "lo": 6,
          "hi": 8,
          "rir": 3,
@@ -971,14 +972,22 @@
      "date": "2026-11-18",
      "s": [
       {
+       "id": "2026-11-18-c",
+       "t": "run",
+       "title": "Easy 6 km (ochtend)",
+       "detail": "HF ≤ 140 · 5:50–6:10/km · RPE 2\nDirect daarna de plyo (benen zijn dan warm).",
+       "min": 36,
+       "km": 6
+      },
+      {
        "id": "2026-11-18-a",
        "t": "plyo",
        "title": "Plyo",
-       "detail": "Na 10 min warm fietsen. Kwaliteit > volume.",
+       "detail": "Direct na de easy run. Kwaliteit > volume, volledig herstel tussen sets.",
        "ex": [
         {
          "c": "POGO",
-         "s": 2,
+         "s": 3,
          "lo": 15,
          "hi": 15,
          "rir": 0,
@@ -1014,8 +1023,8 @@
       {
        "id": "2026-11-18-b",
        "t": "bike",
-       "title": "KICKR Z2 75 min",
-       "detail": "10 min opbouw · 60 min @ 60–70% FTP (≈130–150 W) · HF < 140 · cadans 85–95 · 5 min uitrijden · RPE 3",
+       "title": "KICKR Z2 75 min (avond)",
+       "detail": "10 min opbouw · 60 min @ 60–70% FTP (≈130–150 W KICKR) · HF < 140 · cadans 85–95\nLaatste 10 min: 3 × 1 min 100 rpm, 1 min rustig. RPE 3.",
        "min": 75
       }
      ]
@@ -1026,10 +1035,10 @@
       {
        "id": "2026-11-19-a",
        "t": "run",
-       "title": "5 × 5 min @ drempel",
-       "detail": "WU 2,5 km + loopscholing (A-skip, B-skip, skippings 2×20 m) + 3 strides\n5 × 5 min @ 4:22–4:28/km · 90 s jog\nHF loopt op tot 165–172 in de laatste minuten · RPE 7, níét 9\nCD 2 km · totaal ~11–12 km\nEerste blok NIET sneller dan 4:22.",
-       "min": 60,
-       "km": 11.5,
+       "title": "5 × 6 min @ drempel",
+       "detail": "WU 2,5 km + loopscholing + 3 strides\n5 × 6 min @ 4:22–4:28/km · 90 s jog (vorige keer 5 min)\nHF mag oplopen tot 165–172 · RPE 7, niet 9\nCD 2 km · totaal ~12–13 km\nEerste blok NIET sneller dan 4:22.",
+       "min": 65,
+       "km": 12.5,
        "tgt": {
         "pace": [
          262,
@@ -1119,11 +1128,11 @@
        "id": "2026-11-20-a",
        "t": "hyrox",
        "title": "Hyrox engine (benen-zuinig)",
-       "detail": "WU 8 min ski/row\n4 rondes, RPE 6–7. Geen sled, geen lunges (lange duurloop morgen).",
+       "detail": "WU 8 min ski/row\n5 rondes (was 4), RPE 6–7. Geen sled, geen lunges (lange duurloop morgen).",
        "ex": [
         {
          "c": "SKI",
-         "s": 4,
+         "s": 5,
          "lo": 500,
          "hi": 500,
          "rir": 0,
@@ -1131,7 +1140,7 @@
         },
         {
          "c": "ROW",
-         "s": 4,
+         "s": 5,
          "lo": 500,
          "hi": 500,
          "rir": 0,
@@ -1139,7 +1148,7 @@
         },
         {
          "c": "FC",
-         "s": 4,
+         "s": 5,
          "lo": 40,
          "hi": 40,
          "rir": 0,
@@ -1148,7 +1157,7 @@
         },
         {
          "c": "WB",
-         "s": 4,
+         "s": 5,
          "lo": 15,
          "hi": 15,
          "rir": 0,
@@ -1157,7 +1166,7 @@
         },
         {
          "c": "BBJ",
-         "s": 4,
+         "s": 5,
          "lo": 10,
          "hi": 10,
          "rir": 0,
@@ -1166,14 +1175,6 @@
         }
        ],
        "min": 60
-      },
-      {
-       "id": "2026-11-20-b",
-       "t": "mobility",
-       "title": "Mobiliteit compleet (~20 min)",
-       "detail": "Start de routinespeler: de drie minst recent gedane gebieden achter elkaar, in de volgende variant.",
-       "min": 15,
-       "rt": "MOB_LANG"
       }
      ]
     },
@@ -1183,10 +1184,10 @@
       {
        "id": "2026-11-21-a",
        "t": "run",
-       "title": "Lange duur 20–22 km",
-       "detail": "Eerste 16 km @ 5:40–5:55 (HF ≤ 145)\nLaatste 4–5 km @ 5:00–5:10 (steady, HF ≤ 158)\nVoeding: 1 gel per 30 min vanaf 45 min → noteer gram/uur + maag.",
-       "min": 125,
-       "km": 21
+       "title": "Lange duur 22–24 km",
+       "detail": "Eerste 17–18 km @ 5:40–5:55 (HF ≤ 145)\nLaatste 5 km @ 5:00–5:10 (steady, HF ≤ 158)\nVoeding: 60–70 g KH/uur vanaf 45 min (bijv. Gel 100 elke 25–30 min) → noteer gram/uur + maag.",
+       "min": 135,
+       "km": 23
       }
      ]
     },
@@ -1197,7 +1198,7 @@
        "id": "2026-11-22-a",
        "t": "bike",
        "title": "Duurrit 2:00–2:30",
-       "detail": "Z2 @ 60–70% FTP (≈140–160 W buiten) · HF < 140 · cadans 85–95\nRug: rechtop, elk half uur 1 min uit het zadel. Afbreken bij uitstralende pijn.",
+       "detail": "Z2 @ 60–70% FTP (≈140–160 W buiten) · HF < 140 · cadans 85–95\nRug: rechtop, elk half uur 1 min uit het zadel. Maximaal 2:30 tot de huisarts groen licht geeft voor langer. Afbreken bij uitstralende pijn.",
        "min": 150
       },
       {
@@ -1270,8 +1271,8 @@
      ]
     }
    ],
-   "vert": 0,
-   "note": "Focus: herstel na de race (ma–wo), daarna squat/RDL licht terug en eerste drempelsessie.\nDrempel do: eerste blok niet sneller dan 4:22. De app beoordeelt je ronden; druk op de lap-knop per blok.\nLange duur za: eerste 16 km echt rustig (HF ≤ 145). Voeding loggen."
+   "vert": 500,
+   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38), ~11 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Lange duur za: eerste 17 km echt rustig, voeding loggen."
   },
   {
    "id": "2026-W48",
