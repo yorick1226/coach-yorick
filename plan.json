@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-15a",
+ "updated": "2026-11-15b",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -1026,6 +1026,55 @@
        "title": "KICKR Z2 75 min (avond)",
        "detail": "10 min opbouw · 60 min @ 60–70% FTP (≈130–150 W KICKR) · HF < 140 · cadans 85–95\nLaatste 10 min: 3 × 1 min 100 rpm, 1 min rustig. RPE 3.",
        "min": 75
+      },
+      {
+       "id": "2026-11-18-d",
+       "t": "strength",
+       "title": "Lower B licht (20–25 min, na de fiets)",
+       "detail": "Direct na de KICKR, benen zijn warm. Weinig spierpijn: geen nordics en geen excentrische step-ups deze week (drempel morgen).\nRIR 2–3.",
+       "ex": [
+        {
+         "c": "LP",
+         "s": 3,
+         "lo": 10,
+         "hi": 12,
+         "rir": 2,
+         "rest": 120
+        },
+        {
+         "c": "HT",
+         "s": 3,
+         "lo": 8,
+         "hi": 10,
+         "rir": 2,
+         "rest": 90
+        },
+        {
+         "c": "SCR",
+         "s": 3,
+         "lo": 12,
+         "hi": 15,
+         "rir": 1,
+         "rest": 60
+        },
+        {
+         "c": "ADD",
+         "s": 2,
+         "lo": 12,
+         "hi": 15,
+         "rir": 2,
+         "rest": 45
+        },
+        {
+         "c": "ABD",
+         "s": 2,
+         "lo": 12,
+         "hi": 15,
+         "rir": 2,
+         "rest": 45
+        }
+       ],
+       "min": 25
       }
      ]
     },
@@ -1200,79 +1249,12 @@
        "title": "Duurrit 2:00–2:30",
        "detail": "Z2 @ 60–70% FTP (≈140–160 W buiten) · HF < 140 · cadans 85–95\nRug: rechtop, elk half uur 1 min uit het zadel. Maximaal 2:30 tot de huisarts groen licht geeft voor langer. Afbreken bij uitstralende pijn.",
        "min": 150
-      },
-      {
-       "id": "2026-11-22-b",
-       "t": "strength",
-       "title": "Lower B (30–35 min)",
-       "detail": "Na de rit of in de avond. RIR 2–3, geen nieuwe spierpijn opzoeken.",
-       "ex": [
-        {
-         "c": "LP",
-         "s": 3,
-         "lo": 10,
-         "hi": 12,
-         "rir": 2,
-         "rest": 120
-        },
-        {
-         "c": "SU",
-         "s": 3,
-         "lo": 8,
-         "hi": 10,
-         "rir": 2,
-         "rest": 90,
-         "note": "Gecontroleerd zakken in 3 tellen (excentrisch → afdalen)."
-        },
-        {
-         "c": "NH",
-         "s": 3,
-         "lo": 4,
-         "hi": 6,
-         "rir": 2,
-         "rest": 120,
-         "note": "Zak zo langzaam mogelijk."
-        },
-        {
-         "c": "HT",
-         "s": 3,
-         "lo": 8,
-         "hi": 10,
-         "rir": 2,
-         "rest": 90
-        },
-        {
-         "c": "SCR",
-         "s": 3,
-         "lo": 12,
-         "hi": 15,
-         "rir": 1,
-         "rest": 60
-        },
-        {
-         "c": "ADD",
-         "s": 2,
-         "lo": 12,
-         "hi": 15,
-         "rir": 2,
-         "rest": 45
-        },
-        {
-         "c": "ABD",
-         "s": 2,
-         "lo": 12,
-         "hi": 15,
-         "rir": 2,
-         "rest": 45
-        }
-       ],
-       "min": 35
       }
      ]
     }
    ],
    "vert": 500,
-   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38), ~11 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Lange duur za: eerste 17 km echt rustig, voeding loggen."
+   "note": "Week 46: 15 km Zevenheuvelen in 1:09:30 (4:37/km, HF gem. 167, max 177), tweede helft sneller dan de eerste en laatste km 4:13. Rustige duurloop do HF 143: goed. Gemist: fiets wo, Upper B vr.\nDeze week: ~50 km lopen (was 38), ~11 uur totaal. De extra belasting zit in volume, niet in harder lopen: de race kost 3–4 dagen herstel, dus de eerste kwaliteit is pas donderdag.\nRug: wat zei de huisarts? Tot ik dat weet: squat en RDL op RIR 3 en bij onderrug ≥4 de rugvriendelijke wissel.\nDrempel do: eerste blok niet sneller dan 4:22. Zondag alleen de fietsrit; Lower B staat woensdag na de fiets (licht).\nLange duur za: eerste 17 km echt rustig, voeding loggen."
   },
   {
    "id": "2026-W48",
