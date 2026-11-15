@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-15d",
+ "updated": "2026-11-15e",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -2232,7 +2232,7 @@
  "bodyGoal": "78–79 kg, geleidelijk (geen cut)",
  "routines": {
   "RUG": {
-   "n": "Rug-basis",
+   "n": "Rug & core A (McGill)",
    "min": 7,
    "tag": "rug",
    "note": "Rustig, pijn max 3/10. Bij meer pijn: stoppen. Advies van de huisarts gaat voor.",
@@ -2585,7 +2585,7 @@
   },
   "MOB_HEUP_A": {
    "n": "Mobiliteit · Heup A",
-   "min": 6,
+   "min": 9,
    "tag": "mob",
    "items": [
     {
@@ -2599,19 +2599,21 @@
     },
     {
      "k": "couch",
-     "sec": 40,
-     "side": true
+     "sec": 45,
+     "side": true,
+     "sets": 2
     },
     {
      "k": "fig4",
-     "sec": 30,
-     "side": true
+     "sec": 40,
+     "side": true,
+     "sets": 2
     }
    ]
   },
   "MOB_HEUP_B": {
    "n": "Mobiliteit · Heup B",
-   "min": 6,
+   "min": 9,
    "tag": "mob",
    "items": [
     {
@@ -2626,18 +2628,24 @@
     },
     {
      "k": "hfreach",
-     "reps": "8×",
+     "reps": "6×",
      "side": true
     },
     {
      "k": "frog",
      "reps": "10×"
+    },
+    {
+     "k": "hfkneel",
+     "sets": 2,
+     "sec": 45,
+     "side": true
     }
    ]
   },
   "MOB_HEUP_C": {
    "n": "Mobiliteit · Heup C",
-   "min": 6,
+   "min": 8,
    "tag": "mob",
    "items": [
     {
@@ -2656,14 +2664,15 @@
     },
     {
      "k": "pigeon",
-     "sec": 40,
-     "side": true
+     "sec": 45,
+     "side": true,
+     "sets": 2
     }
    ]
   },
   "MOB_ENKEL_A": {
    "n": "Mobiliteit · Enkel & kuit A",
-   "min": 6,
+   "min": 8,
    "tag": "mob",
    "items": [
     {
@@ -2673,8 +2682,9 @@
     },
     {
      "k": "soleus",
-     "sec": 30,
-     "side": true
+     "sec": 45,
+     "side": true,
+     "sets": 2
     },
     {
      "k": "tibraise",
@@ -2690,7 +2700,7 @@
   },
   "MOB_ENKEL_B": {
    "n": "Mobiliteit · Enkel & kuit B",
-   "min": 6,
+   "min": 8,
    "tag": "mob",
    "items": [
     {
@@ -2710,12 +2720,18 @@
      "k": "slbalance",
      "sec": 30,
      "side": true
+    },
+    {
+     "k": "wallcalf",
+     "sets": 2,
+     "sec": 45,
+     "side": true
     }
    ]
   },
   "MOB_ENKEL_C": {
    "n": "Mobiliteit · Enkel & kuit C",
-   "min": 6,
+   "min": 9,
    "tag": "mob",
    "items": [
     {
@@ -2735,6 +2751,12 @@
     {
      "k": "deepsq",
      "sec": 45
+    },
+    {
+     "k": "soleus",
+     "sets": 2,
+     "sec": 45,
+     "side": true
     }
    ]
   },
@@ -2817,7 +2839,7 @@
   },
   "MOB_ACHTER_A": {
    "n": "Mobiliteit · Hamstring & achterketen A",
-   "min": 6,
+   "min": 9,
    "tag": "mob",
    "items": [
     {
@@ -2827,8 +2849,9 @@
     },
     {
      "k": "doorham",
-     "sec": 40,
-     "side": true
+     "sec": 45,
+     "side": true,
+     "sets": 2
     },
     {
      "k": "dogpedal",
@@ -2836,14 +2859,15 @@
     },
     {
      "k": "fig4sup",
-     "sec": 30,
-     "side": true
+     "sec": 40,
+     "side": true,
+     "sets": 2
     }
    ]
   },
   "MOB_ACHTER_B": {
    "n": "Mobiliteit · Hamstring & achterketen B",
-   "min": 6,
+   "min": 12,
    "tag": "mob",
    "items": [
     {
@@ -2858,19 +2882,26 @@
     },
     {
      "k": "wallcalf",
-     "sec": 30,
-     "side": true
+     "sec": 45,
+     "side": true,
+     "sets": 2
     },
     {
      "k": "legswing",
      "reps": "10× elk",
+     "side": true
+    },
+    {
+     "k": "doorham",
+     "sets": 2,
+     "sec": 45,
      "side": true
     }
    ]
   },
   "MOB_ACHTER_C": {
    "n": "Mobiliteit · Hamstring & achterketen C",
-   "min": 6,
+   "min": 8,
    "tag": "mob",
    "items": [
     {
@@ -2890,44 +2921,121 @@
     {
      "k": "9090",
      "reps": "10×"
+    },
+    {
+     "k": "hfkneel",
+     "sets": 2,
+     "sec": 45,
+     "side": true
+    }
+   ]
+  },
+  "RUG_B": {
+   "n": "Rug & core B (Pilates-stijl)",
+   "min": 7,
+   "tag": "rug",
+   "note": "Rustig, pijn max 3/10. Bij meer pijn: stoppen. Advies van de huisarts gaat voor.",
+   "items": [
+    {
+     "k": "catcow",
+     "reps": "8×"
+    },
+    {
+     "k": "deadbug",
+     "sets": 2,
+     "reps": "6× per kant"
+    },
+    {
+     "k": "bridgemarch",
+     "sets": 2,
+     "reps": "8× per kant"
+    },
+    {
+     "k": "clam",
+     "sets": 2,
+     "reps": "12×",
+     "side": true
+    },
+    {
+     "k": "heelslide",
+     "reps": "8× per kant"
+    }
+   ]
+  },
+  "RUG_C": {
+   "n": "Rug & core C (stabiliteit staand)",
+   "min": 7,
+   "tag": "rug",
+   "note": "Rustig, pijn max 3/10. Bij meer pijn: stoppen. Advies van de huisarts gaat voor. Press-up alleen als die de pijn vermindert.",
+   "items": [
+    {
+     "k": "catcow",
+     "reps": "8×"
+    },
+    {
+     "k": "birddog",
+     "sets": 2,
+     "reps": "6× · 5 s vast",
+     "side": true
+    },
+    {
+     "k": "sideplank",
+     "sets": 2,
+     "sec": 25,
+     "side": true,
+     "rest": 10
+    },
+    {
+     "k": "suitcase",
+     "sets": 2,
+     "sec": 30,
+     "side": true,
+     "rest": 10
+    },
+    {
+     "k": "pressup",
+     "reps": "8× rustig"
     }
    ]
   }
  },
  "dailyRoutines": [
   [
-   "RUG",
+   "RUGX",
    "MOB"
   ],
   [
-   "RUG",
+   "RUGX",
    "MOB"
   ],
   [
-   "RUG",
+   "RUGX",
    "MOB"
   ],
   [
-   "RUG",
+   "RUGX",
    "MOB"
   ],
   [
-   "RUG",
+   "RUGX",
    "MOB"
   ],
   [
-   "RUG",
+   "RUGX",
    "MOB"
   ],
   [
-   "RUG",
+   "RUGX",
    "MOB"
   ]
  ],
  "recoveryTips": {
-  "sauna": "Sauna 1–3× per week, 2–3 rondes van 8–12 min, ná training of op een rustdag (niet vlak voor kwaliteit). Drink 0,5–1 l extra met zout. Voelt goed voor ontspanning; het bewijs voor sneller herstel is beperkt.",
-  "boots": "Compressieboots 20–30 min na een lange duurloop of zware benen. Prettig voor het gevoel; het effect op prestatie is waarschijnlijk klein.",
-  "sleep": "Slaap is de grootste herstelfactor: mik op 7,5–9 uur, vaste bedtijd."
+  "gun": "Massagegun 5–8 min op de spieren die je net gebruikte (niet op de onderrug of wervels). Massage is in een meta-analyse de meest effectieve methode tegen spierpijn en vermoeidheid (Dupuy 2018).",
+  "boots": "Compressieboots 20–30 min: compressie vermindert vooral het gevoel van vermoeidheid (Dupuy 2018). Prestatiewinst is niet aangetoond.",
+  "sauna": "Sauna na een rustige of Z2-training, 2–3× per week, 2–3 rondes van 10–15 min, 0,5–1 l extra drinken met zout. Bij hardlopers gaf 3 weken sauna na de training meer plasmavolume en een betere duurprestatie, maar in een kleine studie (6 lopers; Scoon 2007).",
+  "cold": "Geen ijsbad na krachttraining: regelmatig koud water na kracht remt spiergroei (Roberts 2015).",
+  "sleep": "Slaap is de grootste herstelfactor: mik op 7,5–9 uur en een vaste bedtijd. Extra slaap verbeterde bij sporters sprint en reactietijd (Mah 2011).",
+  "static": "Statisch rekken: 5–10 min per spiergroep per week geeft de meeste winst in bewegingsuitslag; meer helpt nauwelijks (Ingram 2025). Lange holds (>60 s per spier) niet vlak vóór snelheid, plyo of zware kracht."
  },
  "mobex": {
   "catcow": {
@@ -3009,7 +3117,8 @@
     "Knie tegen de muur of bank, scheen omhoog langs de muur.",
     "Andere voet voor je (uitvalspas).",
     "Bil van het achterste been aanspannen, ribben omlaag. Sla over als de rug trekt."
-   ]
+   ],
+   "tg": "heupbuiger"
   },
   "fig4": {
    "n": "Figure-4 / pigeon",
@@ -3018,7 +3127,8 @@
     "Op je rug: enkel op de andere knie, trek dat bovenbeen naar je toe.",
     "Of pigeon: voorste scheen dwars op de grond, achterste been gestrekt.",
     "Rustig ademen, niet doordrukken."
-   ]
+   ],
+   "tg": "bil"
   },
   "pigeon": {
    "n": "Pigeon stretch",
@@ -3027,7 +3137,8 @@
     "Voorste scheen schuin op de grond, achterste been gestrekt naar achter.",
     "Heupen recht naar voren, zak rustig naar beneden.",
     "Kussen onder de bil als het te diep is."
-   ]
+   ],
+   "tg": "bil"
   },
   "hipcar": {
    "n": "Hip CARs (staand)",
@@ -3072,7 +3183,8 @@
     "Zak zo diep mogelijk, hielen plat (eventueel iets onder de hielen).",
     "Ellebogen duwen knieën naar buiten, borst rechtop.",
     "Schuif rustig van links naar rechts; houd iets vast als steun."
-   ]
+   ],
+   "tg": "heup/enkel"
   },
   "airplane": {
    "n": "Hip airplane (ondersteund)",
@@ -3108,7 +3220,8 @@
     "Handen tegen de muur, achterste voet plat.",
     "Buig de achterste knie licht, zak naar beneden.",
     "Je voelt het laag in de kuit."
-   ]
+   ],
+   "tg": "kuit"
   },
   "tibraise": {
    "n": "Tibialis raises",
@@ -3144,7 +3257,8 @@
     "Kniel met de wreef plat op de grond.",
     "Zit naar achter op je hielen, eventueel knieën licht optillen.",
     "Voorkant scheen en enkel strekken."
-   ]
+   ],
+   "tg": "scheen"
   },
   "heeltoe": {
    "n": "Hiel- en teenloop",
@@ -3216,7 +3330,8 @@
     "Onderarm tegen de deurpost, elleboog op schouderhoogte.",
     "Stap rustig naar voren.",
     "Schouder blijft laag."
-   ]
+   ],
+   "tg": "borst"
   },
   "wallslide": {
    "n": "Wall slides",
@@ -3261,7 +3376,8 @@
     "In child's pose, handen naar één kant lopen.",
     "Voel de zijkant en lat.",
     "Rustig ademen."
-   ]
+   ],
+   "tg": "lat"
   },
   "shcar": {
    "n": "Shoulder CARs",
@@ -3279,7 +3395,8 @@
     "Op handen en knieën, handen naar voren lopen.",
     "Borst naar de grond, heupen boven knieën.",
     "Of: ellebogen op een bank, borst zakt."
-   ]
+   ],
+   "tg": "lat"
   },
   "scappu": {
    "n": "Scapula push-ups",
@@ -3306,7 +3423,8 @@
     "Lig in een deuropening, één been omhoog tegen de deurpost.",
     "Andere been plat op de grond.",
     "Schuif dichterbij als het makkelijk wordt."
-   ]
+   ],
+   "tg": "hamstring"
   },
   "dogpedal": {
    "n": "Downward dog pedal",
@@ -3342,7 +3460,8 @@
     "Voorvoet tegen de muur, hiel op de grond.",
     "Leun met gestrekte knie naar de muur.",
     "Rug recht."
-   ]
+   ],
+   "tg": "kuit"
   },
   "aslr": {
    "n": "Actieve beenheffing",
@@ -3369,7 +3488,8 @@
     "Op je rug, enkel op de andere knie.",
     "Trek het onderste been naar je toe.",
     "Rustig ademen."
-   ]
+   ],
+   "tg": "bil"
   },
   "askip": {
    "n": "Loopscholing (A-skip, B-skip, hakken-billen)",
@@ -3460,6 +3580,79 @@
     "Armen lang naar voren.",
     "Rustig ademen."
    ]
+  },
+  "hfkneel": {
+   "n": "Heupbuiger-stretch (halve knielstand)",
+   "q": "half kneeling hip flexor stretch",
+   "how": [
+    "Halve knielstand, achterste knie op een kussen.",
+    "Span de bil van het achterste been aan en kantel je bekken (stuit naar onder).",
+    "Schuif een klein stukje naar voren tot je rekt aan de voorkant van de heup. Geen holle rug."
+   ],
+   "tg": "heupbuiger"
+  },
+  "deadbug": {
+   "n": "Dead bug",
+   "q": "dead bug exercise",
+   "how": [
+    "Op je rug, armen omhoog, knieën 90° boven de heupen.",
+    "Onderrug zacht tegen de grond. Strek langzaam tegenovergestelde arm en been uit.",
+    "Uitademen tijdens het strekken; terug en wisselen."
+   ]
+  },
+  "clam": {
+   "n": "Clamshell",
+   "q": "clamshell exercise glute",
+   "how": [
+    "Op je zij, knieën 45° gebogen, voeten op elkaar.",
+    "Til de bovenste knie op zonder het bekken te laten kantelen.",
+    "Langzaam zakken."
+   ]
+  },
+  "bridgemarch": {
+   "n": "Glute bridge march",
+   "q": "glute bridge march",
+   "how": [
+    "Brug omhoog, heupen blijven hoog en recht.",
+    "Til om de beurt een voet een paar cm op.",
+    "Bekken mag niet zakken of kantelen."
+   ]
+  },
+  "suitcase": {
+   "n": "Suitcase hold (één hand)",
+   "q": "suitcase carry hold",
+   "how": [
+    "Pak een zware dumbbell of tas in één hand.",
+    "Sta rechtop, schouders recht, romp niet laten hellen.",
+    "Houd vast en adem rustig; dan andere kant."
+   ]
+  },
+  "pallof": {
+   "n": "Pallof press (band of kabel)",
+   "q": "pallof press",
+   "how": [
+    "Sta zijwaarts naast een kabel of band op borsthoogte.",
+    "Duw je handen recht voor je borst uit en houd 2 s vast.",
+    "Romp draait niet mee."
+   ]
+  },
+  "pressup": {
+   "n": "Prone press-up (McKenzie)",
+   "q": "mckenzie prone press up",
+   "how": [
+    "Op je buik, handen onder je schouders.",
+    "Duw je bovenlijf omhoog, bekken en billen blijven ontspannen op de grond.",
+    "Alleen doen als het de pijn vermindert of centraliseert; anders overslaan."
+   ]
+  },
+  "heelslide": {
+   "n": "Heel slides met neutrale rug",
+   "q": "heel slides core",
+   "how": [
+    "Op je rug, knieën gebogen, buik licht aangespannen.",
+    "Schuif één hiel langzaam weg tot het been gestrekt is en terug.",
+    "Onderrug blijft stil."
+   ]
   }
  },
  "mobFocus": {
@@ -3537,5 +3730,11 @@
    "q": "couch stretch test",
    "goal": "0 cm"
   }
- ]
+ ],
+ "staticGoal": {
+  "heupbuiger": 8,
+  "kuit": 8,
+  "hamstring": 8,
+  "bil": 8
+ }
 }

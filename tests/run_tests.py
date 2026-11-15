@@ -121,10 +121,10 @@ def features(pg, shots=True):
     pg.click('[data-dailyedit="2026-11-17"]'); pg.type('[data-dly="hrv"]', "48"); pg.reload(); pg.wait_for_selector("#tabs")
     ok(store(pg)["daily"]["2026-11-17"].get("hrv") == 48, "getypte waarde bewaard zonder veld te verlaten (app sluiten)")
     # Routines
-    tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart="RUG"]').count() == 1 and pg.locator('#rtcard .rtrow [data-rtstart^="MOB_"]').count() >= 1, "dagroutines (rug + gekozen mobiliteit)")
+    tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart^="RUG"]').count() == 1 and pg.locator('#rtcard .rtrow [data-rtstart^="MOB_"]').count() >= 1, "dagroutines (rug + gekozen mobiliteit)")
     mob = pg.evaluate("chooseMob('2026-11-17')"); ok(mob and mob["id"].startswith("MOB_") and mob["why"], f"mobiliteit op maat gekozen: {mob}")
     ok(pg.evaluate("rtDef('MOB_LANG','2026-11-17').parts.length") == 3, "Mobiliteit compleet = 3 gebieden")
-    pg.click('#rtcard [data-rtstart="RUG"]'); ok(pg.is_visible("#rp") and "Cat-cow" in pg.inner_text("#rp"), "routinespeler opent")
+    pg.click('#rtcard [data-rtstart^="RUG"]'); ok(pg.is_visible("#rp") and "Cat-cow" in pg.inner_text("#rp"), "routinespeler opent")
     pg.click('[data-rp="next"]'); ok("McGill" in pg.inner_text("#rp") and "Klaar maken" in pg.inner_text("#rp"), "timed oefening met aftellen")
     ok(pg.locator('#rp a[href*="youtube.com/results"]').count() == 1 and "handen onder je onderrug" in pg.inner_text("#rp").lower(), "uitleg + video in speler")
     for _ in range(40):
@@ -132,6 +132,9 @@ def features(pg, shots=True):
         pg.click('[data-rp="next"]')
     ok(not pg.is_visible("#rp") and store(pg)["rt"].get("2026-11-17", {}).get("RUG"), "routine afgerond en afgevinkt")
     ok(pg.locator('[data-rtkey^="WU_"]').count() >= 1, "warming-up bij training")
+    ok(pg.evaluate("[chooseRug('2026-11-18'), chooseRug('2026-11-19')]")[0] == "RUG_B", "rug & core roteert (A → B)")
+    ok("Statisch rekken deze week" in pg.inner_text("#rtcard") and "Herstel vandaag" in pg.inner_text("#rtcard"), "statisch-rekken-teller en herstel op maat")
+    ok(pg.evaluate("(() => { const k = dayKind(dayItems('2026-11-21')); return k.long && !k.q; })()"), "dagtype lange duur herkend")
     pg.evaluate("{ const y = S.daily['2026-11-17'] || (S.daily['2026-11-17'] = {}); y.pains = Object.assign({}, y.pains, {'Onderrug':5}); save(); render(); }")
     ok("Onderrug 5/8" in pg.inner_text("#rtcard"), "rugadvies bij onderrugpijn")
     bs = pg.locator('[data-backswap]')

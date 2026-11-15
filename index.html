@@ -186,7 +186,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '2.9.0';
+const APP_VERSION = '3.0.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -642,6 +642,7 @@ function chooseMob(d){ const F = PLAN.mobFocus||{}; const x = S.rt[d]||{};
   if(has([...Y, ...T], i => ['WU_LONG','WU_RACE','WU_LOWER'].includes(wk(i)))) { add('HEUP', 2, 'zware benen'); add('ACHTER', 2, 'zware benen'); }
   if(has([...Y, ...T], i => i.s.t==='bike' && (i.s.min||0) >= 90)) { add('HEUP', 2, 'lang fietsen: heupbuigers'); add('THOR', 1, 'lang fietsen'); }
   if(backPain(d) >= 4){ add('ACHTER', -4, ''); add('THOR', 1, 'rugvriendelijk'); }
+  { const sw = staticWeek(mondayOf(d)), g = PLAN.staticGoal||{}; for(const [f, tgs] of Object.entries(FOCUS_TG)){ const low = tgs.filter(t => g[t] && (sw[t]||0) < g[t]/2); if(low.length) add(f, 2, low.join('/')+' nog weinig gerekt deze week'); } }
   const f = Object.keys(sc).sort((a,b) => sc[b]-sc[a])[0]; if(!f) return null;
   return {id: mobNext(f, d), focus: f, why: why[f]}; }
 function rtDef(id, d){ d = d || today();
@@ -665,35 +666,57 @@ function wuFor(s){ if(s.rt || s.t==='rest' || s.t==='mobility' || s.t==='swim') 
   if(s.t==='plyo') return ['WU_PLYO', null]; if(s.t==='hyrox') return ['WU_HYROX','CD_RUN']; if(s.t==='bike') return ['WU_BIKE', null]; return null; }
 function dailyList(d){ const dow = (parseD(d).getDay()+6)%7; let l = ((PLAN.dailyRoutines||[])[dow] || []).slice();
   if(dayItems(d).some(i => i.s.rt && /^MOB/.test(i.s.rt))) l = l.filter(x => !/^MOB/.test(x));
-  return l.map(x => x==='MOB' ? (chooseMob(d)||{}).id : x).filter(Boolean); }
+  return l.map(x => x==='MOB' ? (chooseMob(d)||{}).id : x==='RUGX' ? chooseRug(d) : x).filter(Boolean); }
 function rtChip(id, key, date, lbl){ const r = rtDef(id, date); if(!r) return ''; const on = rtDone(date, key);
   return '<button class="rtchip'+(on?' on':'')+'" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+date+'">'+(on?'✓ ':'▶ ')+lbl+' '+r.min+'′</button>'; }
 function backPain(d){ return ((dailyOf(d).pains)||{})['Onderrug'] || 0; }
+/* rug & core: drie varianten die rouleren (bij onderrugpijn ≥4 altijd McGill) */
+const RUGV = ['RUG','RUG_B','RUG_C'];
+function chooseRug(d){ const x = S.rt[d]||{}; const done = RUGV.find(k => x[k]); if(done) return done; if(backPain(d) >= 4) return 'RUG';
+  let n = 0; for(const [dt,y] of Object.entries(S.rt||{})) if(dt < d && RUGV.some(k => y[k])) n++; return RUGV[n % RUGV.length]; }
+/* statisch rekken per doelspier, in minuten per kant, per week (doel 5–10 min: Ingram 2025) */
+function staticWeek(mon){ const out = {}; for(let i=0;i<7;i++){ const dd = addDays(mon,i); for(const k of Object.keys(S.rt[dd]||{})){ if(k.includes('@') || k==='MOB_LANG') continue; const r = RT()[k]; if(!r || !r.items) continue; const lvl = mobLevel(k, dd);
+    for(const it of r.items){ const m = (PLAN.mobex||{})[it.k]; if(!m || !m.tg || !it.sec) continue; out[m.tg] = (out[m.tg]||0) + (it.sets||1)*(it.sec + (/^MOB_/.test(k) ? 10*lvl : 0))/60; } } }
+  return out; }
+const FOCUS_TG = {HEUP:['heupbuiger','bil'], ENKEL:['kuit'], ACHTER:['hamstring','bil'], THOR:[]};
+function dayKind(list){ const w = it => (wuFor(it.s)||[])[0] || '';
+  return {q: list.some(i => ['WU_RUNQ','WU_PLYO','WU_RACE'].includes(w(i))), lower: list.some(i => w(i)==='WU_LOWER' || i.s.t==='hyrox' || (i.s.ex||[]).some(e => ['SQ','RDL','LP','BSS'].includes(e.c))),
+    long: list.some(i => ['WU_LONG','WU_RACE'].includes(w(i))), easy: list.some(i => ['WU_RUNE','WU_BIKE'].includes(w(i))), upper: list.some(i => w(i)==='WU_UPPER'), n: list.filter(i => !['rest','mobility'].includes(i.s.t)).length}; }
+function weekCount(d, key){ const mon = mondayOf(d); let n = 0; for(let i=0;i<7;i++) if((S.rt[addDays(mon,i)]||{})[key]) n++; return n; }
 function routinesCard(d, items){
-  const bp = backPain(d); let h = '<div class="card" id="rtcard"><h3>Routines <span class="small">tik ▶ voor de speler, ✓ = gedaan</span></h3>';
+  const bp = backPain(d); const act = items.filter(i => !isSkipped(i.s.id)); const K = dayKind(act); const tips = PLAN.recoveryTips || {};
+  let h = '<div class="card" id="rtcard"><h3>Herstel & mobiliteit <span class="small">▶ = speler, ✓ = gedaan</span></h3>';
   const row = (id, key, why) => { const r = rtDef(id, d); if(!r) return ''; const on = rtDone(d, key);
     return '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"><b>'+esc(r.n)+'</b> <span class="small">'+r.min+' min'+(r.lvl?' · niveau '+(r.lvl+1):'')+(why?' · '+esc(why):'')+'</span>'
       +'<details><summary class="small">Oefeningen bekijken</summary>'+rtList(r)+'</details></div><button class="btn sm pri" data-rtstart="'+id+'" data-rtkey="'+key+'" data-rtdate="'+d+'">▶ Start</button></div>'; };
-  const cm = chooseMob(d);
-  for(const id of dailyList(d)) h += row(id, id, id==='RUG' ? 'ochtend of na lang zitten' : (cm && cm.id===id ? cm.why.join(' · ') : ''));
+  const tick = (key, icon, title, why) => { const on = rtDone(d, key); return '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"><b>'+icon+' '+esc(title)+'</b> <span class="small">'+esc(why)+'</span></div></div>'; };
+  const cm = chooseMob(d); const late = K.q || K.lower;
+  for(const id of dailyList(d)){
+    if(/^RUG/.test(id)) h += row(id, id, 'ochtend of na lang zitten');
+    else h += row(id, id, (late ? 'na de training of ’s avonds' : 'ochtend of wanneer het uitkomt')+(cm && cm.id===id ? ' · '+cm.why.join(' · ') : '')); }
+  if(late) h += '<div class="small" style="margin-top:4px">Vandaag snelheid, plyo of kracht: de lange stretches pas ná die training. '+esc((tips.static||'').split('. ')[0])+'.</div>';
+  const sw = staticWeek(mondayOf(d)); const goal = PLAN.staticGoal || {};
+  if(Object.keys(goal).length) h += '<div class="small" style="margin-top:6px">Statisch rekken deze week (min per kant, doel '+Object.values(goal)[0]+'): '+Object.keys(goal).map(t => t+' '+fmtN(sw[t]||0)).join(' · ')+'</div>';
   const lt = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
   if(!lt || diffD(d, lt.date) >= 28) h += '<div class="rtrow"><span style="font-size:22px;width:44px;text-align:center">📏</span><div class="nm"><b>Mobiliteitstest</b> <span class="small">5 min · elke 4 weken · '+(lt?'laatste '+fmtDay(lt.date):'nulmeting nog doen')+'</span></div><button class="btn sm" data-mobtest="1">Open</button></div>';
-  if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: doe alleen cat-cow, curl-up en bird dog; side plank op je knieën. Wandelen mag. In krachtsessies: RDL en squat wisselen (knop in de sessie). Volg het advies van de huisarts.</div>';
+  if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: rug & core A (McGill), side plank op je knieën, geen hamstringstretch. Wandelen mag. In krachtsessies: RDL en squat wisselen (knop in de sessie). Volg het advies van de huisarts.</div>';
   else if(bp) h += '<div class="small" style="margin-top:6px">Onderrug '+bp+'/8 gemeld: rustig, pijn tijdens de oefeningen max 3/10.</div>';
-  /* herstel: wat past vandaag */
-  const y = addDays(d, -1); const yIts = weekItems(weekByStart(mondayOf(y))).filter(i => i.date===y);
-  const heavy = [...items, ...yIts].some(i => { const w = wuFor(i.s); return (w && (w[0]==='WU_LONG' || w[0]==='WU_RACE' || w[0]==='WU_LOWER')) || i.s.t==='hyrox'; });
-  const ad = advice(d); const tips = PLAN.recoveryTips || {}; const sug = [];
-  if(ad && ad.lvl!=='groen') sug.push(['REC_DOWN', 'advies '+ad.lvl]);
-  if(heavy) sug.push(['REC_ROLL', 'zware benen gisteren/vandaag']);
-  if(sug.length || heavy){ h += '<div style="margin-top:10px"><b style="font-size:15px">Herstel vandaag</b></div>'; for(const [id, why] of sug) h += row(id, id, why);
-    if(heavy && tips.boots) h += '<div class="small" style="margin-top:4px">🦵 '+esc(tips.boots)+'</div>'; }
-  const restDay = !items.some(i => !['rest','mobility'].includes(i.s.t) && !isSkipped(i.s.id));
-  if(restDay && tips.sauna) h += '<div class="small" style="margin-top:6px">🧖 '+esc(tips.sauna)+'</div>';
-  h += '<details style="margin-top:8px"><summary class="small">Meer herstel en routines</summary>';
-  for(const id of ['REC_ROLL','REC_DOWN'].filter(x => !sug.some(z=>z[0]===x))) h += row(id, id, '');
+  /* herstel op maat van de dag */
+  const Y = dayItems(addDays(d,-1)); const KY = dayKind(Y); const ad = advice(d); const x = dailyOf(d);
+  const plan = [];
+  if(K.long) plan.push(['row','CD_LONG@x','',''], ['tick','X_BOOTS','🦵','Compressieboots 20–30 min', 'na de lange duur'], ['tick','X_GUN','💆','Massagegun kuiten, quads, bilspieren', '5–8 min, ’s avonds']);
+  else if(K.lower || KY.long) plan.push(['tick','X_GUN','💆','Massagegun benen', K.lower ? 'na de krachttraining, 5–8 min · geen ijsbad' : 'dag na de lange duur, 5–8 min']);
+  if(KY.long && !K.long) plan.push(['tick','X_BOOTS','🦵','Compressieboots 20–30 min', 'dag na de lange duur']);
+  const saunaN = weekCount(d, 'X_SAUNA');
+  if(!K.q && !K.long && (K.easy || K.upper || K.n===0) && (saunaN < 3 || rtDone(d,'X_SAUNA'))) plan.push(['tick','X_SAUNA','🧖','Sauna na de training', 'deze week '+saunaN+'/2–3 · 2–3 rondes, extra drinken']);
+  if((ad && ad.lvl!=='groen') || K.n >= 2 || K.long) plan.push(['row','REC_DOWN', ad && ad.lvl!=='groen' ? 'advies '+ad.lvl : (K.n>=2 ? 'dubbele trainingsdag' : 'zware dag')]);
+  if(plan.length){ h += '<div style="margin-top:10px"><b style="font-size:15px">Herstel vandaag</b></div>';
+    for(const it of plan){ if(it[0]==='row'){ if(it[1]==='CD_LONG@x') continue; h += row(it[1], it[1], it[2]); } else h += tick(it[1], it[2], it[3], it[4]); } }
+  if((x.sl!=null && x.sl < 75) || K.long || K.n >= 2) h += '<div class="small" style="margin-top:6px">😴 '+esc(tips.sleep||'')+'</div>';
+  h += '<details style="margin-top:8px"><summary class="small">Meer herstel, extra mobiliteit en de onderbouwing</summary>';
+  for(const id of ['REC_ROLL','REC_DOWN'].filter(z => !plan.some(q => q[1]===z))) h += row(id, id, '');
   for(const f of Object.keys(PLAN.mobFocus||{})){ const id = mobNext(f, d); if(!dailyList(d).includes(id) && !(cm && cm.focus===f)) h += row(id, id, 'extra'); }
-  for(const k of ['sauna','boots','sleep']) if(tips[k] && !(k==='sauna'&&restDay) && !(k==='boots'&&heavy)) h += '<div class="small" style="margin-top:6px">'+({sauna:'🧖 ',boots:'🦵 ',sleep:'😴 '})[k]+esc(tips[k])+'</div>';
+  for(const k of ['static','gun','boots','sauna','cold','sleep']) if(tips[k]) h += '<div class="small" style="margin-top:6px">• '+esc(tips[k])+'</div>';
   h += '</details></div>'; return h; }
 /* routinespeler */
 function rpStart(id, key, date){ const r = rtDef(id, date); if(!r) return; unlockAudio();
@@ -1143,9 +1166,10 @@ function weekText(start){
     if(st.intv.length) L.push('- Intervallen: '+st.intv.map(x => fmtDay(x.date)+': '+x.iv.txt).join(' | '));
     L.push('- Pijn: '+(Object.keys(pains).length ? Object.entries(pains).map(([k,v])=>k+' max '+v).join(', ') : 'geen gemeld'));
     { let rp = 0, rd = 0, mp = 0, md = 0, wp = 0, wd = 0, rec = 0; for(let i=0;i<7;i++){ const dd = addDays(start,i); if(dd > today()) break; const dl = dailyList(dd); const x = S.rt[dd]||{};
-        if(dl.includes('RUG')){ rp++; if(x.RUG) rd++; } for(const k of dl.filter(k => /^MOB/.test(k))){ mp++; if(x[k]) md++; }
+        if(dl.some(k => /^RUG/.test(k))){ rp++; if(RUGV.some(k => x[k])) rd++; } for(const k of dl.filter(k => /^MOB/.test(k))){ mp++; if(x[k]) md++; }
         for(const it of weekItems(w).filter(z => z.date===dd)){ if(it.s.rt){ mp++; if(x[it.s.rt]) md++; } const wc = wuFor(it.s); if(wc && (S.done[it.s.id]||{}).d){ wp++; if(x[wc[0]+'@'+it.s.id]) wd++; } }
-        rec += Object.keys(x).filter(k => /^REC/.test(k)).length; }
+        rec += Object.keys(x).filter(k => /^(REC|X_)/.test(k)).length; }
+      { const sw = staticWeek(start), g = PLAN.staticGoal||{}; if(Object.keys(g).length) L.push('- Statisch rekken (min/kant, doel '+Object.values(g)[0]+'): '+Object.keys(g).map(t => t+' '+fmtN(sw[t]||0)).join(', ')); }
       if(rp) L.push('- Routines: rug '+rd+'/'+rp+' · mobiliteit '+md+'/'+mp+' · warming-ups '+wd+'/'+wp+' (bij afgevinkte trainingen) · herstel '+rec+'×'); }
     if(st.rd.length||st.sl.length) L.push('- Oura gem.: readiness '+(avg(st.rd)??'–')+', slaap '+(avg(st.sl)??'–'));
     const cf = availConflicts(weekByStart(addDays(start,7))||{id:''}); if(cf.length) L.push('- Conflicten volgende week: '+cf.join(' '));
