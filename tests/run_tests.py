@@ -90,7 +90,7 @@ def fill_prev(pg):
     tab(pg, "week"); ensure_open(pg, "2026-11-17-a"); pg.click('[data-cardio="2026-11-17-a"]')
     pg.fill("#c_km", "10"); pg.fill("#c_time", "50:00"); pg.fill("#c_hr", "150"); pg.click('[data-rpe="3"]'); pg.click("#c_save")
     tab(pg, "check"); pg.click('[data-ck="cijfer"][data-cv="7"]')
-    pg.fill('[data-ct="pijn"]', "kuit links 2/10"); pg.dispatch_event('[data-ct="pijn"]', "change")
+    if pg.locator('[data-ct="pijn"]').count(): pg.fill('[data-ct="pijn"]', "kuit links 2/10"); pg.dispatch_event('[data-ct="pijn"]', "change")
     pg.click('[data-ck="richting"][data-cvs="Zo laten"]')
     tab(pg, "meer"); pg.fill("#s_ftp", "228"); pg.click("#s_save")
 

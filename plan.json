@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-15h",
+ "updated": "2026-11-16a",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -20,6 +20,10 @@
   {
    "date": "2026-11-15",
    "name": "Zevenheuvelenloop 15 km"
+  },
+  {
+   "date": "2026-11-28",
+   "name": "3 Días Trail Ibiza – halve marathon (23,5 km, ±690 hm)"
   },
   {
    "date": "2027-01-24",
@@ -1251,8 +1255,8 @@
    "id": "2026-W48",
    "start": "2026-11-23",
    "status": "concept",
-   "phase": "Basis 1 · week 2/3",
-   "focus": "Opbouw. FTP-test. Eerste verticale prikkel (incline loopband).",
+   "phase": "Basis 1 · week 2/3 · raceweek Ibiza",
+   "focus": "Trailrace za 28 nov (23,5 km, ±690 hm). Mini-taper: volume omlaag, kort scherp houden. FTP-test schuift naar week 49.",
    "days": [
     {
      "date": "2026-11-23",
@@ -1337,22 +1341,16 @@
       {
        "id": "2026-11-24-a",
        "t": "run",
-       "title": "5 × 1200 m @ 4:08–4:14",
-       "detail": "WU 2,5 km + loopscholing + 3 strides\nPlyo in de warming-up: pogo 2×15, snap-down 3×3\n5 × 1200 m @ 4:08–4:14/km · 2 min jog\nCD 2 km · totaal ~12 km · RPE 8 in de laatste herhaling",
-       "min": 60,
-       "km": 12,
-       "tgt": {
-        "pace": [
-         248,
-         254
-        ]
-       }
+       "title": "Heuvels: 8 × 90 s bergop",
+       "detail": "WU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8% @ ~12 km/u, of een brug/heuvel), wandel/jog terug (± 2 min)\nCD 2 km\nTrail-specifiek: kracht bergop zonder veel volume.",
+       "min": 55,
+       "km": 10
       },
       {
        "id": "2026-11-24-b",
        "t": "strength",
-       "title": "Lower A",
-       "detail": "≥ 3 uur na de run.",
+       "title": "Lower A (RIR 2–3)",
+       "detail": "Laatste zware benen vóór Ibiza. Geen nieuwe oefeningen, geen falen.",
        "ex": [
         {
          "c": "SQ",
@@ -1414,17 +1412,9 @@
       {
        "id": "2026-11-25-a",
        "t": "bike",
-       "title": "KICKR rampentest (FTP)",
-       "detail": "10 min warm-up @ 50% · ramp +20 W/min vanaf 100 W tot je niet meer kunt · FTP ≈ 75% van je beste minuut\nNoteer de waarde in Meer → Instellingen.",
-       "min": 40
-      },
-      {
-       "id": "2026-11-25-b",
-       "t": "mobility",
-       "title": "Mobiliteit compleet (~20 min)",
-       "detail": "Start de routinespeler: de drie minst recent gedane gebieden achter elkaar, in de volgende variant.",
-       "min": 15,
-       "rt": "MOB_LANG"
+       "title": "Zwift Z2 60 min",
+       "detail": "Z2 @ 130–160 W · HF < 140 · cadans 85–95 · RPE 3\nFTP-test schuift naar week 49 (niet maximaal 3 dagen voor een race).",
+       "min": 60
       }
      ]
     },
@@ -1434,21 +1424,15 @@
       {
        "id": "2026-11-26-a",
        "t": "run",
-       "title": "2 × 15 min @ 4:25–4:32",
-       "detail": "WU 2,5 km\n2 × 15 min @ 4:25–4:32 · 3 min jog · HF ≤ 170\nCD 2 km · totaal ~13 km · RPE 7",
-       "min": 65,
-       "km": 13,
-       "tgt": {
-        "pace": [
-         265,
-         272
-        ]
-       }
+       "title": "Easy 6 km + 4 strides",
+       "detail": "HF ≤ 145 · 5:40–6:00/km\n4 × 20 s soepel op ~4:00/km-gevoel. Benen wakker houden.",
+       "min": 38,
+       "km": 6
       },
       {
        "id": "2026-11-26-b",
        "t": "strength",
-       "title": "Upper B + core",
+       "title": "Upper B licht (RIR 2–3)",
        "ex": [
         {
          "c": "PU",
@@ -1516,7 +1500,8 @@
          "rest": 60
         }
        ],
-       "min": 60
+       "min": 60,
+       "detail": "Alleen bovenlijf en core, geen carries met zware benen."
       }
      ]
     },
@@ -1525,46 +1510,11 @@
      "s": [
       {
        "id": "2026-11-27-a",
-       "t": "hyrox",
-       "title": "Hyrox: ski–sled–wall ball + runs",
-       "detail": "WU 10 min\n3 rondes, daarna 1 km lopen. Sled op relay-gewicht, techniek eerst.",
-       "ex": [
-        {
-         "c": "SKI",
-         "s": 3,
-         "lo": 1000,
-         "hi": 1000,
-         "rir": 0,
-         "rest": 0
-        },
-        {
-         "c": "SLP",
-         "s": 3,
-         "lo": 25,
-         "hi": 25,
-         "rir": 0,
-         "rest": 0,
-         "note": "Relay/Open gewicht"
-        },
-        {
-         "c": "SLL",
-         "s": 3,
-         "lo": 25,
-         "hi": 25,
-         "rir": 0,
-         "rest": 0
-        },
-        {
-         "c": "WB",
-         "s": 3,
-         "lo": 25,
-         "hi": 25,
-         "rir": 0,
-         "rest": 120,
-         "note": "Daarna 1 km lopen @ 4:30–4:40, dan volgende ronde."
-        }
-       ],
-       "min": 60
+       "t": "run",
+       "title": "Reisdag: shake-out 20 min of rust",
+       "min": 20,
+       "km": 3,
+       "detail": "Op Ibiza: 15–20 min heel rustig + 3 korte versnellingen. Lukt het niet door het reizen: rust. Goed eten en drinken, tas met verplichte uitrusting klaarzetten."
       }
      ]
     },
@@ -1573,11 +1523,12 @@
      "s": [
       {
        "id": "2026-11-28-a",
-       "t": "run",
-       "title": "Lange duur 22–24 km",
-       "detail": "Easy @ 5:40–5:55 · HF ≤ 145\nVoeding 60–70 g/u (gels/drink) → noteren",
-       "min": 135,
-       "km": 23
+       "t": "race",
+       "title": "3 Días Trail Ibiza – halve marathon",
+       "km": 23.5,
+       "hm": 690,
+       "min": 160,
+       "detail": "Cala Sant Vicent → Santa Eulària. 23,5 km · ±690 hm.\nEerste klim RPE 6–7, steil (> 12%) power-hiken, dalen gecontroleerd.\nVoeding 60–70 g KH/uur vanaf 30 min, 500 ml/uur + zout.\nLog na afloop: RPE, voeding (g/u) en maag."
       }
      ]
     },
@@ -1587,82 +1538,16 @@
       {
        "id": "2026-11-29-a",
        "t": "run",
-       "title": "Incline loopband 40 min (powerhike)",
-       "detail": "10 min easy op 1%\n4 × 5 min powerhike @ 12–15% helling, 5,0–5,5 km/u, 2 min op 1%\nHF 135–155 · stokken-arminzet nadoen\nDit is je eerste vertical-blok: rustig, geen spierpijn opzoeken.",
-       "min": 40,
+       "title": "Herstel: wandelen 45–60 min (of 20 min heel rustig joggen)",
+       "min": 50,
        "km": 4,
-       "hm": 230
-      },
-      {
-       "id": "2026-11-29-b",
-       "t": "strength",
-       "title": "Lower B",
-       "ex": [
-        {
-         "c": "LP",
-         "s": 3,
-         "lo": 10,
-         "hi": 12,
-         "rir": 2,
-         "rest": 120
-        },
-        {
-         "c": "SU",
-         "s": 3,
-         "lo": 8,
-         "hi": 10,
-         "rir": 2,
-         "rest": 90,
-         "note": "Gecontroleerd zakken in 3 tellen (excentrisch → afdalen)."
-        },
-        {
-         "c": "NH",
-         "s": 3,
-         "lo": 4,
-         "hi": 6,
-         "rir": 2,
-         "rest": 120,
-         "note": "Zak zo langzaam mogelijk."
-        },
-        {
-         "c": "HT",
-         "s": 3,
-         "lo": 8,
-         "hi": 10,
-         "rir": 2,
-         "rest": 90
-        },
-        {
-         "c": "SCR",
-         "s": 3,
-         "lo": 12,
-         "hi": 15,
-         "rir": 1,
-         "rest": 60
-        },
-        {
-         "c": "ADD",
-         "s": 2,
-         "lo": 12,
-         "hi": 15,
-         "rir": 2,
-         "rest": 45
-        },
-        {
-         "c": "ABD",
-         "s": 2,
-         "lo": 12,
-         "hi": 15,
-         "rir": 2,
-         "rest": 45
-        }
-       ],
-       "min": 35
+       "detail": "Benen laten herstellen; reisdag. Doe je de 10 km-etappe van zondag mee? Laat het weten, dan pas ik dit aan."
       }
      ]
     }
    ],
-   "vert": 250
+   "vert": 900,
+   "note": "Ibiza is een B-race en tegelijk een mooie Mozart-generale: klimmen, dalen, voeding.\nMini-taper: geen zware benen na dinsdag, geen Hyrox, vrijdag reisdag.\nRacetactiek: eerste klim RPE 6–7, steile stukken (> 12%) power-hiken, dalen gecontroleerd (kleine passen), laatste 5 km mag alles eruit.\nVerwachting ruwweg 2:30–2:50, sterk afhankelijk van terrein en warmte. Voeding: 60–70 g KH/uur vanaf 30 min, 500 ml drinken/uur + zout.\nCheck: verplichte uitrusting (zie organisatie), schoenen die je kent, geen nieuwe gels."
   },
   {
    "id": "2026-W49",

@@ -6,9 +6,9 @@ METHOD:PUBLISH
 X-WR-CALNAME:Training 2026-W48
 BEGIN:VEVENT
 UID:2026-11-23-a@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261123
 DTEND;VALUE=DATE:20261124
 SUMMARY:[concept] Lopen: Easy 8 km + 6 strides
@@ -17,9 +17,9 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-23-b@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261123
 DTEND;VALUE=DATE:20261124
 SUMMARY:[concept] Kracht: Upper A
@@ -31,134 +31,110 @@ TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-24-a@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261124
 DTEND;VALUE=DATE:20261125
-SUMMARY:[concept] Lopen: 5 × 1200 m @ 4:08–4:14
-DESCRIPTION:WU 2\,5 km + loopscholing + 3 strides\nPlyo in de warming-up: 
- pogo 2×15\, snap-down 3×3\n5 × 1200 m @ 4:08–4:14/km · 2 min jog\nCD
-  2 km · totaal ~12 km · RPE 8 in de laatste herhaling
+SUMMARY:[concept] Lopen: Heuvels: 8 × 90 s bergop
+DESCRIPTION:WU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8
+ % @ ~12 km/u\, of een brug/heuvel)\, wandel/jog terug (± 2 min)\nCD 2 km\
+ nTrail-specifiek: kracht bergop zonder veel volume.
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-24-b@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261124
 DTEND;VALUE=DATE:20261125
-SUMMARY:[concept] Kracht: Lower A
-DESCRIPTION:≥ 3 uur na de run.\nBack squat 4×4–6 @RIR2\nRomanian dead
- lift 3×6–8 @RIR2\nBulgarian split squat (per been\, dumbbells totaal) 3
- ×6–8 @RIR2\nStaande calf raise 4×8–12 @RIR1\nTibialis raise 2×15–
- 20 @RIR1\nCopenhagen plank (sec per kant) 2×20–30 @RIR2
+SUMMARY:[concept] Kracht: Lower A (RIR 2–3)
+DESCRIPTION:Laatste zware benen vóór Ibiza. Geen nieuwe oefeningen\, gee
+ n falen.\nBack squat 4×4–6 @RIR2\nRomanian deadlift 3×6–8 @RIR2\nBul
+ garian split squat (per been\, dumbbells totaal) 3×6–8 @RIR2\nStaande c
+ alf raise 4×8–12 @RIR1\nTibialis raise 2×15–20 @RIR1\nCopenhagen pla
+ nk (sec per kant) 2×20–30 @RIR2
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-25-a@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261125
 DTEND;VALUE=DATE:20261126
-SUMMARY:[concept] Fiets: KICKR rampentest (FTP)
-DESCRIPTION:10 min warm-up @ 50% · ramp +20 W/min vanaf 100 W tot je niet
-  meer kunt · FTP ≈ 75% van je beste minuut\nNoteer de waarde in Meer 
- → Instellingen.
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-11-25-b@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
-DTSTART;VALUE=DATE:20261125
-DTEND;VALUE=DATE:20261126
-SUMMARY:[concept] Mobiliteit: Mobiliteit compleet (~20 min)
-DESCRIPTION:Start de routinespeler: de drie minst recent gedane gebieden a
- chter elkaar\, in de volgende variant.
+SUMMARY:[concept] Fiets: Zwift Z2 60 min
+DESCRIPTION:Z2 @ 130–160 W · HF < 140 · cadans 85–95 · RPE 3\nFTP-t
+ est schuift naar week 49 (niet maximaal 3 dagen voor een race).
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-26-a@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261126
 DTEND;VALUE=DATE:20261127
-SUMMARY:[concept] Lopen: 2 × 15 min @ 4:25–4:32
-DESCRIPTION:WU 2\,5 km\n2 × 15 min @ 4:25–4:32 · 3 min jog · HF ≤ 1
- 70\nCD 2 km · totaal ~13 km · RPE 7
+SUMMARY:[concept] Lopen: Easy 6 km + 4 strides
+DESCRIPTION:HF ≤ 145 · 5:40–6:00/km\n4 × 20 s soepel op ~4:00/km-gev
+ oel. Benen wakker houden.
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-26-b@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261126
 DTEND;VALUE=DATE:20261127
-SUMMARY:[concept] Kracht: Upper B + core
-DESCRIPTION:Pull-up (+ extra kg) 4×5–8 @RIR2\nShoulder press (staand/zi
- ttend) 3×6–8 @RIR2\nSingle-arm cable row (per kant) 3×10–12 @RIR2\nR
- ear delt fly 3×12–15 @RIR1\nIncline dumbbell curl 2×10–12 @RIR1\nHam
- mer curl 2×10–12 @RIR1\nSuitcase carry (meter per kant) 3×30–40 @RIR
- 2\nHanging knee raise 3×10–15 @RIR2
+SUMMARY:[concept] Kracht: Upper B licht (RIR 2–3)
+DESCRIPTION:Alleen bovenlijf en core\, geen carries met zware benen.\nPull
+ -up (+ extra kg) 4×5–8 @RIR2\nShoulder press (staand/zittend) 3×6–8 
+ @RIR2\nSingle-arm cable row (per kant) 3×10–12 @RIR2\nRear delt fly 3×
+ 12–15 @RIR1\nIncline dumbbell curl 2×10–12 @RIR1\nHammer curl 2×10
+ –12 @RIR1\nSuitcase carry (meter per kant) 3×30–40 @RIR2\nHanging kne
+ e raise 3×10–15 @RIR2
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-27-a@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261127
 DTEND;VALUE=DATE:20261128
-SUMMARY:[concept] Hyrox: Hyrox: ski–sled–wall ball + runs
-DESCRIPTION:WU 10 min\n3 rondes\, daarna 1 km lopen. Sled op relay-gewicht
- \, techniek eerst.\nSkiErg (meter) 3×1000\nSled push (meter) 3×25\nSled 
- pull (meter) 3×25\nWall balls 3×25
+SUMMARY:[concept] Lopen: Reisdag: shake-out 20 min of rust
+DESCRIPTION:Op Ibiza: 15–20 min heel rustig + 3 korte versnellingen. Luk
+ t het niet door het reizen: rust. Goed eten en drinken\, tas met verplicht
+ e uitrusting klaarzetten.
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-28-a@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261128
 DTEND;VALUE=DATE:20261129
-SUMMARY:[concept] Lopen: Lange duur 22–24 km
-DESCRIPTION:Easy @ 5:40–5:55 · HF ≤ 145\nVoeding 60–70 g/u (gels/dr
- ink) → noteren
+SUMMARY:[concept] Wedstrijd: 3 Días Trail Ibiza – halve marathon
+DESCRIPTION:Cala Sant Vicent → Santa Eulària. 23\,5 km · ±690 hm.\nEe
+ rste klim RPE 6–7\, steil (> 12%) power-hiken\, dalen gecontroleerd.\nVo
+ eding 60–70 g KH/uur vanaf 30 min\, 500 ml/uur + zout.\nLog na afloop: R
+ PE\, voeding (g/u) en maag.
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-29-a@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
+DTSTAMP:20261116T111008Z
+LAST-MODIFIED:20261116T111008Z
+SEQUENCE:913790
 DTSTART;VALUE=DATE:20261129
 DTEND;VALUE=DATE:20261130
-SUMMARY:[concept] Lopen: Incline loopband 40 min (powerhike)
-DESCRIPTION:10 min easy op 1%\n4 × 5 min powerhike @ 12–15% helling\, 5
- \,0–5\,5 km/u\, 2 min op 1%\nHF 135–155 · stokken-arminzet nadoen\nDi
- t is je eerste vertical-blok: rustig\, geen spierpijn opzoeken.
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-11-29-b@coach
-DTSTAMP:20261116T105320Z
-LAST-MODIFIED:20261116T105320Z
-SEQUENCE:913773
-DTSTART;VALUE=DATE:20261129
-DTEND;VALUE=DATE:20261130
-SUMMARY:[concept] Kracht: Lower B
-DESCRIPTION:Leg press 3×10–12 @RIR2\nStep-up (per been\, dumbbells tota
- al) 3×8–10 @RIR2\nNordic hamstring (excentrisch) 3×4–6 @RIR2\nHip th
- rust 3×8–10 @RIR2\nZittende calf raise (soleus) 3×12–15 @RIR1\nHip a
- dduction (machine) 2×12–15 @RIR2\nHip abduction (machine) 2×12–15 @R
- IR2
+SUMMARY:[concept] Lopen: Herstel: wandelen 45–60 min (of 20 min heel rus
+ tig joggen)
+DESCRIPTION:Benen laten herstellen\; reisdag. Doe je de 10 km-etappe van z
+ ondag mee? Laat het weten\, dan pas ik dit aan.
 TRANSP:TRANSPARENT
 END:VEVENT
 END:VCALENDAR
