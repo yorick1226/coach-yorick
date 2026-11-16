@@ -17,7 +17,8 @@ def fold(line):
 
 def main():
     plan = json.loads((ROOT/"plan.json").read_text())
-    ex = plan["exercises"]; allev = []; stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    ex = plan["exercises"]; allev = []; now = dt.datetime.now(dt.timezone.utc); stamp = now.strftime("%Y%m%dT%H%M%SZ")
+    seq = int(now.timestamp() // 60) - 29000000  # stijgt bij elke build → agenda's nemen wijzigingen over
     (ROOT/"ics").mkdir(exist_ok=True); n = 0
     for w in plan["weeks"]:
         if not w["days"]: continue
@@ -30,10 +31,10 @@ def main():
                 desc = s.get("detail","")
                 if s.get("ex"):
                     desc += ("\n" if desc else "") + "\n".join(f"{ex.get(e['c'],{}).get('n',e['c'])} {e['s']}×{e['lo']}" + (f"–{e['hi']}" if e['hi']!=e['lo'] else "") + (f" @RIR{e['rir']}" if e['rir'] else "") for e in s["ex"])
-                L += ["BEGIN:VEVENT", f"UID:{s['id']}@coach", f"DTSTAMP:{stamp}",
+                L += ["BEGIN:VEVENT", f"UID:{s['id']}@coach", f"DTSTAMP:{stamp}", f"LAST-MODIFIED:{stamp}", f"SEQUENCE:{seq}",
                       f"DTSTART;VALUE=DATE:{day:%Y%m%d}", f"DTEND;VALUE=DATE:{day+dt.timedelta(days=1):%Y%m%d}",
                       f"SUMMARY:{esc(title)}", f"DESCRIPTION:{esc(desc)}", "TRANSP:TRANSPARENT", "END:VEVENT"]
-        allev += L[n0:]
+        if w["status"] != "concept": allev += L[n0:]   # abonnement: alleen definitieve weken
         L.append("END:VCALENDAR")
         (ROOT/"ics"/f"{w['id']}.ics").write_text("\r\n".join(fold(l) for l in L) + "\r\n", encoding="utf-8"); n += 1
     A = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//coach//NL","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Training (Coach)",
