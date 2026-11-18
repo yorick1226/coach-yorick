@@ -215,7 +215,7 @@ svg text{fill:var(--mut);font-size:10px}
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.0.0';
+const APP_VERSION = '4.0.1';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -853,7 +853,7 @@ function rToday(){
   h += '<div class="day today"><h2>Training '+(isT?'vandaag':fmtDay(d))+'</h2>';
   if(!w) h += '<div class="card mut">Geen plan voor deze week.</div>';
   else if(!items.length) h += '<div class="card mut">Niets gepland. Rust, of de routines hieronder.</div>';
-  for(const it of items){ const st = S.done[it.s.id]||{}; h += sessCard(it, m, {open: !(st.d || m.by[it.s.id] || st.skip)}); }
+  for(const it of items){ const st = S.done[it.s.id]||{}; h += sessCard(it, m, {}); }
   h += '</div>' + routinesCard(d, items) + '<div>';
   for(const a of m.extra.filter(x => x.date===d)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
   h += '</div>';

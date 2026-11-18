@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-18a",
+ "updated": "2026-11-18b",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -2094,10 +2094,10 @@
       {
        "id": "2026-11-27-a",
        "t": "run",
-       "title": "Reisdag: shake-out 20 min of rust",
+       "title": "Reisdag (vroege vlucht): shake-out 15–20 min of rust",
        "min": 20,
        "km": 3,
-       "detail": "Op Ibiza: 15–20 min heel rustig + 3 korte versnellingen. Lukt het niet door het reizen: rust. Goed eten en drinken, tas met verplichte uitrusting klaarzetten."
+       "detail": "Na aankomst: 15–20 min heel rustig + 3 × 15 s versnellen. Moe van het vroege reizen: gewoon rust, dat kost niets.\nVeel drinken, normaal + koolhydraatrijk eten, uitrusting en gels klaarleggen, startlocatie Cala Sant Vicent en vervoer checken."
       }
      ]
     },
@@ -2110,8 +2110,8 @@
        "title": "3 Días Trail Ibiza – halve marathon",
        "km": 23.5,
        "hm": 690,
-       "min": 160,
-       "detail": "Cala Sant Vicent → Santa Eulària. 23,5 km · ±690 hm.\nEerste klim RPE 6–7, steil (> 12%) power-hiken, dalen gecontroleerd.\nVoeding 60–70 g KH/uur vanaf 30 min, 500 ml/uur + zout.\nLog na afloop: RPE, voeding (g/u) en maag."
+       "min": 150,
+       "detail": "Cala Sant Vicent → Santa Eulària. 23,5 km · ±690 hm · voluit.\nStart: eerste 20–30 min RPE 7, niet meegaan met de snelle start. Steil (> 12%) = power-hiken.\nVanaf halverwege opschalen, laatste 5–6 km RPE 9–10.\nVoeding 60–80 g KH/uur vanaf 20–30 min, 500 ml/uur + zout.\nLog na afloop: RPE, voeding (g/u), maag en hoe je quads aanvoelen."
       }
      ]
     },
@@ -2121,22 +2121,22 @@
       {
        "id": "2026-11-29-a",
        "t": "run",
-       "title": "Herstel: wandelen 45–60 min (of 20 min heel rustig joggen)",
+       "title": "Herstel: wandelen 45–60 min",
        "min": 50,
        "km": 4,
-       "detail": "Benen laten herstellen; reisdag. Doe je de 10 km-etappe van zondag mee? Laat het weten, dan pas ik dit aan."
+       "detail": "Op Ibiza: rustig wandelen, eventueel zwemmen/dobberen in zee. Niet hardlopen: na een voluit trail met 690 hm afdalen zijn je quads stuk, ook als het meevalt.\nMobiliteit heup/kuit 10 min licht, geen diep rekken."
       }
      ]
     }
    ],
    "vert": 900,
-   "note": "Ibiza is een B-race en tegelijk een mooie Mozart-generale: klimmen, dalen, voeding.\nMini-taper: geen zware benen na dinsdag, geen Hyrox, vrijdag reisdag.\nRacetactiek: eerste klim RPE 6–7, steile stukken (> 12%) power-hiken, dalen gecontroleerd (kleine passen), laatste 5 km mag alles eruit.\nVerwachting ruwweg 2:30–2:50, sterk afhankelijk van terrein en warmte. Voeding: 60–70 g KH/uur vanaf 30 min, 500 ml drinken/uur + zout.\nCheck: verplichte uitrusting (zie organisatie), schoenen die je kent, geen nieuwe gels."
+   "note": "Ibiza (alleen de halve marathon) gaat voluit: een echte trail-test 4 maanden na Val d'Aran. Reis vr vroeg heen, ma avond terug.\nMini-taper: geen zware benen na dinsdag, geen Hyrox.\nVoluit ≠ vanaf de start knallen: eerste klim RPE 7 (HF rond/onder ~170), steil (> 12%) power-hiken, vanaf halverwege opschalen, laatste 5–6 km alles eruit. Dalen: snel maar beheerst, kleine passen; daar win je weinig en verlies je veel (val, quads kapot).\nVerwachting ruwweg 2:15–2:45 (onzeker: hangt sterk af van hoe technisch het parcours is en van de warmte).\nVoeding: 60–80 g KH/uur vanaf 20–30 min (bv. Gel 100 elke ~25 min, laatste CAF rond uur 1:30), 500 ml/uur + zout. Niets nieuws op racedag; schoenen die je kent."
   },
   {
    "id": "2026-W49",
    "start": "2026-11-30",
    "status": "concept",
-   "phase": "Basis 1 · week 3/3",
+   "phase": "Basis 1 · week 3/3 · herstel na Ibiza",
    "focus": "Piekweek van blok 1. Daarna deload.",
    "days": [
     {
@@ -2144,75 +2144,9 @@
      "s": [
       {
        "id": "2026-11-30-a",
-       "t": "run",
-       "title": "Easy 9 km + 6 strides",
-       "detail": "HF ≤ 145",
-       "min": 55,
-       "km": 9
-      },
-      {
-       "id": "2026-11-30-b",
-       "t": "strength",
-       "title": "Upper A",
-       "ex": [
-        {
-         "c": "BP",
-         "s": 3,
-         "lo": 6,
-         "hi": 8,
-         "rir": 2,
-         "rest": 150
-        },
-        {
-         "c": "IDB",
-         "s": 3,
-         "lo": 8,
-         "hi": 10,
-         "rir": 2,
-         "rest": 120
-        },
-        {
-         "c": "CSR",
-         "s": 3,
-         "lo": 8,
-         "hi": 10,
-         "rir": 2,
-         "rest": 120
-        },
-        {
-         "c": "LAT",
-         "s": 3,
-         "lo": 12,
-         "hi": 15,
-         "rir": 1,
-         "rest": 60
-        },
-        {
-         "c": "FLY",
-         "s": 2,
-         "lo": 10,
-         "hi": 12,
-         "rir": 1,
-         "rest": 60
-        },
-        {
-         "c": "TPD",
-         "s": 2,
-         "lo": 10,
-         "hi": 12,
-         "rir": 1,
-         "rest": 60
-        },
-        {
-         "c": "PAL",
-         "s": 2,
-         "lo": 10,
-         "hi": 12,
-         "rir": 2,
-         "rest": 45
-        }
-       ],
-       "min": 60
+       "t": "rest",
+       "title": "Reisdag: rust of wandelen 30–45 min",
+       "detail": "Avond terugvliegen. Overdag wandelen mag, verder niets."
       }
      ]
     },
@@ -2222,74 +2156,125 @@
       {
        "id": "2026-12-01-a",
        "t": "run",
-       "title": "8 × 800 m @ 3:58–4:05",
-       "detail": "WU 2,5 km + loopscholing\nPlyo in warming-up: zie plyo-sessie Wo (licht)\n8 × 800 m @ 3:58–4:05/km · 400 m jog (2:30)\nCD 2 km · totaal ~12,5 km · RPE 8",
-       "min": 60,
-       "km": 12.5,
-       "tgt": {
-        "pace": [
-         238,
-         245
-        ]
-       }
+       "title": "Easy 6 km (herstel)",
+       "km": 6,
+       "min": 38,
+       "detail": "HF ≤ 140 · 5:50–6:15/km · RPE 2. Nog flinke spierpijn? Dan 45 min fietsen Z1–Z2 i.p.v. lopen."
       },
       {
        "id": "2026-12-01-b",
        "t": "strength",
-       "title": "Lower A",
-       "detail": "≥ 3 uur na de run.",
-       "ex": [
+       "title": "Upper A",
+       "min": 60,
+       "detail": "Bovenlijf normaal zwaar, benen hebben rust.",
+       "bl": [
         {
-         "c": "SQ",
-         "s": 4,
-         "lo": 4,
-         "hi": 6,
-         "rir": 2,
-         "rest": 180,
-         "note": "Top-sets. Eerst 2–3 opwarmsets. Rug moet neutraal blijven."
-        },
-        {
-         "c": "RDL",
+         "g": "borst",
+         "lbl": "Borst · zwaar",
          "s": 3,
          "lo": 6,
          "hi": 8,
          "rir": 2,
-         "rest": 150
+         "rest": 150,
+         "opts": [
+          "BP",
+          "DBB",
+          "MCP",
+          "SMI"
+         ]
         },
         {
-         "c": "BSS",
+         "g": "rug",
+         "lbl": "Rug · roeien",
          "s": 3,
-         "lo": 6,
-         "hi": 8,
+         "lo": 8,
+         "hi": 10,
          "rir": 2,
-         "rest": 120
+         "rest": 120,
+         "opts": [
+          "CSR",
+          "SRW",
+          "BBR",
+          "TBR",
+          "MROW"
+         ]
         },
         {
-         "c": "CR",
-         "s": 4,
+         "g": "borst",
+         "lbl": "Borst · schuin",
+         "s": 2,
          "lo": 8,
          "hi": 12,
-         "rir": 1,
-         "rest": 75
-        },
-        {
-         "c": "TIB",
-         "s": 2,
-         "lo": 15,
-         "hi": 20,
-         "rir": 1,
-         "rest": 45
-        },
-        {
-         "c": "CPL",
-         "s": 2,
-         "lo": 20,
-         "hi": 30,
          "rir": 2,
-         "rest": 45
+         "rest": 90,
+         "opts": [
+          "IDB",
+          "IBB",
+          "SMI",
+          "CCO",
+          "DIP"
+         ]
+        },
+        {
+         "g": "schouders",
+         "lbl": "Schouders · zijkant",
+         "s": 3,
+         "lo": 12,
+         "hi": 15,
+         "rir": 1,
+         "rest": 60,
+         "opts": [
+          "LAT",
+          "CLR"
+         ]
+        },
+        {
+         "g": "triceps",
+         "lbl": "Triceps",
+         "s": 2,
+         "lo": 10,
+         "hi": 12,
+         "rir": 1,
+         "rest": 60,
+         "opts": [
+          "TPD",
+          "OTE",
+          "SKC",
+          "CGB"
+         ]
+        },
+        {
+         "g": "biceps",
+         "lbl": "Biceps",
+         "s": 2,
+         "lo": 10,
+         "hi": 12,
+         "rir": 1,
+         "rest": 60,
+         "opts": [
+          "IDC",
+          "HAM",
+          "BBC",
+          "CBC",
+          "PRC"
+         ]
+        },
+        {
+         "g": "core",
+         "lbl": "Core · anti-rotatie",
+         "s": 2,
+         "lo": 10,
+         "hi": 12,
+         "rir": 2,
+         "rest": 45,
+         "opts": [
+          "PAL",
+          "DBG",
+          "ABW",
+          "CCR"
+         ]
         }
-       ],
-       "min": 60
+       ]
       }
      ]
     },
@@ -2298,52 +2283,103 @@
      "s": [
       {
        "id": "2026-12-02-a",
-       "t": "plyo",
-       "title": "Plyo",
-       "detail": "Na 10 min warm fietsen.",
-       "ex": [
-        {
-         "c": "POGO",
-         "s": 3,
-         "lo": 15,
-         "hi": 15,
-         "rir": 0,
-         "rest": 60
-        },
-        {
-         "c": "LPOG",
-         "s": 2,
-         "lo": 12,
-         "hi": 12,
-         "rir": 0,
-         "rest": 60
-        },
-        {
-         "c": "BOX",
-         "s": 3,
-         "lo": 3,
-         "hi": 3,
-         "rir": 0,
-         "rest": 75
-        },
-        {
-         "c": "BND",
-         "s": 3,
-         "lo": 1,
-         "hi": 1,
-         "rir": 0,
-         "rest": 75,
-         "note": "3 × 20 m bounds, maximaal maar soepel."
-        }
-       ],
-       "min": 20
+       "t": "bike",
+       "title": "KICKR Z2 75 min",
+       "min": 75,
+       "detail": "60–70% FTP (≈ 130–160 W) · HF < 140 · cadans 85–95 · RPE 3. Spoelt de benen door zonder impact."
       },
       {
        "id": "2026-12-02-b",
-       "t": "bike",
-       "title": "KICKR Z2 90 min",
-       "detail": "60–70% FTP · HF < 140 · cadans 85–95",
-       "min": 90
+       "t": "strength",
+       "title": "Lower A licht (RIR 3)",
+       "min": 45,
+       "detail": "Eerste benensessie na de race: alles RIR 3, geen nordics. Doet trap aflopen nog pijn: alleen kuiten, scheen en adductoren.",
+       "bl": [
+        {
+         "g": "quads",
+         "lbl": "Quads · zwaar",
+         "s": 3,
+         "lo": 5,
+         "hi": 6,
+         "rir": 3,
+         "rest": 180,
+         "opts": [
+          "SQ",
+          "FSQ",
+          "HSQ",
+          "SMS"
+         ]
+        },
+        {
+         "g": "hamstrings",
+         "lbl": "Heup · hinge",
+         "s": 3,
+         "lo": 6,
+         "hi": 8,
+         "rir": 3,
+         "rest": 150,
+         "opts": [
+          "RDL",
+          "GBB",
+          "HT"
+         ]
+        },
+        {
+         "g": "quads",
+         "lbl": "Eenbenig",
+         "s": 3,
+         "lo": 6,
+         "hi": 8,
+         "rir": 3,
+         "rest": 120,
+         "opts": [
+          "BSS",
+          "RLU",
+          "SU"
+         ]
+        },
+        {
+         "g": "kuiten",
+         "lbl": "Kuiten",
+         "s": 3,
+         "lo": 8,
+         "hi": 12,
+         "rir": 3,
+         "rest": 75,
+         "opts": [
+          "CR",
+          "SLCR",
+          "LPC"
+         ]
+        },
+        {
+         "g": "scheen",
+         "lbl": "Scheen",
+         "s": 2,
+         "lo": 15,
+         "hi": 20,
+         "rir": 3,
+         "rest": 45,
+         "opts": [
+          "TIB"
+         ]
+        },
+        {
+         "g": "adductoren",
+         "lbl": "Adductoren",
+         "s": 2,
+         "lo": 20,
+         "hi": 30,
+         "rir": 3,
+         "rest": 45,
+         "opts": [
+          "CPL",
+          "ADD",
+          "CAD"
+         ],
+         "note": "Copenhagen in seconden per kant"
+        }
+       ]
       }
      ]
     },
@@ -2353,89 +2389,145 @@
       {
        "id": "2026-12-03-a",
        "t": "run",
-       "title": "3 × 12 min @ 4:25–4:30",
-       "detail": "WU 2,5 km\n3 × 12 min @ 4:25–4:30 · 2 min jog\nCD 2 km · totaal ~14 km · RPE 7",
-       "min": 70,
-       "km": 14,
+       "title": "3 × 10 min @ 4:25–4:32",
+       "km": 12,
+       "min": 65,
        "tgt": {
         "pace": [
          265,
-         270
+         272
         ]
-       }
+       },
+       "detail": "WU 2,5 km + 4 strides\n3 × 10 min @ 4:25–4:32/km · 2 min jog\nCD 2 km · totaal ~12 km · RPE 7\nGecontroleerde drempel, geen race. Benen nog zwaar: 2 × 10 min."
       },
       {
        "id": "2026-12-03-b",
        "t": "strength",
        "title": "Upper B + core",
-       "ex": [
+       "min": 60,
+       "bl": [
         {
-         "c": "PU",
+         "g": "rug",
+         "lbl": "Rug · verticaal",
          "s": 4,
          "lo": 5,
          "hi": 8,
          "rir": 2,
          "rest": 150,
-         "note": "Haal je 8 reps bij RIR 2: extra kg aan de riem."
+         "opts": [
+          "PU",
+          "CHU",
+          "LPD"
+         ]
         },
         {
-         "c": "OHP",
+         "g": "schouders",
+         "lbl": "Schouders · drukken",
          "s": 3,
          "lo": 6,
-         "hi": 8,
+         "hi": 10,
          "rir": 2,
-         "rest": 150
+         "rest": 120,
+         "opts": [
+          "OHP",
+          "DBS",
+          "MSP",
+          "ARN"
+         ]
         },
         {
-         "c": "SAR",
+         "g": "rug",
+         "lbl": "Rug · eenarmig/kabel",
          "s": 3,
          "lo": 10,
          "hi": 12,
          "rir": 2,
-         "rest": 75
+         "rest": 90,
+         "opts": [
+          "SAR",
+          "DBR",
+          "SRW",
+          "MROW",
+          "SAP"
+         ]
         },
         {
-         "c": "RDF",
+         "g": "borst",
+         "lbl": "Borst · licht",
+         "s": 2,
+         "lo": 10,
+         "hi": 15,
+         "rir": 2,
+         "rest": 90,
+         "opts": [
+          "DBB",
+          "DIP",
+          "PSH",
+          "CCO",
+          "PDK"
+         ]
+        },
+        {
+         "g": "schouders",
+         "lbl": "Schouders · achterkant",
          "s": 3,
          "lo": 12,
          "hi": 15,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "RDF",
+          "FP",
+          "RPD"
+         ]
         },
         {
-         "c": "IDC",
+         "g": "biceps",
+         "lbl": "Biceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "HAM",
+          "BBC",
+          "CBC",
+          "PRC",
+          "IDC"
+         ]
         },
         {
-         "c": "HAM",
+         "g": "triceps",
+         "lbl": "Triceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "OTE",
+          "TPD",
+          "SKC"
+         ]
         },
         {
-         "c": "SC",
+         "g": "core",
+         "lbl": "Core · dragen/buik",
          "s": 3,
-         "lo": 30,
-         "hi": 40,
+         "lo": 8,
+         "hi": 12,
          "rir": 2,
-         "rest": 60
-        },
-        {
-         "c": "HKR",
-         "s": 3,
-         "lo": 10,
-         "hi": 15,
-         "rir": 2,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "SC",
+          "HKR",
+          "ABW",
+          "CCR",
+          "SPL"
+         ]
         }
-       ],
-       "min": 60
+       ]
       }
      ]
     },
@@ -2446,45 +2538,8 @@
        "id": "2026-12-04-a",
        "t": "hyrox",
        "title": "Hyrox: row–lunge–carry–wall ball + 800s",
-       "detail": "WU 10 min\n4 rondes",
-       "ex": [
-        {
-         "c": "ROW",
-         "s": 4,
-         "lo": 500,
-         "hi": 500,
-         "rir": 0,
-         "rest": 0
-        },
-        {
-         "c": "SBL",
-         "s": 4,
-         "lo": 25,
-         "hi": 25,
-         "rir": 0,
-         "rest": 0,
-         "note": "20 kg zandzak"
-        },
-        {
-         "c": "FC",
-         "s": 4,
-         "lo": 50,
-         "hi": 50,
-         "rir": 0,
-         "rest": 0,
-         "note": "2 × 24 kg"
-        },
-        {
-         "c": "WB",
-         "s": 4,
-         "lo": 20,
-         "hi": 20,
-         "rir": 0,
-         "rest": 90,
-         "note": "Na elke ronde 800 m lopen @ 4:20–4:30."
-        }
-       ],
-       "min": 65
+       "min": 60,
+       "detail": "WU 10 min\n4 rondes: 800 m lopen @ ~4:45/km · 500 m RowErg · 20 walking lunges · 2 × 25 m farmers carry · 15 wall balls\n2 min rust tussen rondes · RPE 7. Richting Hyrox relay 24 jan."
       }
      ]
     },
@@ -2494,10 +2549,10 @@
       {
        "id": "2026-12-05-a",
        "t": "run",
-       "title": "Lange duur 26 km",
-       "detail": "Easy @ 5:40–5:55, HF ≤ 145 · laatste 5 km @ 5:00–5:10\nVoeding 70 g/u → noteren",
-       "min": 150,
-       "km": 26
+       "title": "Lange duur 22 km",
+       "km": 22,
+       "min": 130,
+       "detail": "Easy @ 5:40–5:55, HF ≤ 145 · laatste 3 km @ 5:05–5:15\nVoeding 70 g/u vanaf 30 min → noteren (oefenen voor Mozart)."
       }
      ]
     },
@@ -2508,22 +2563,14 @@
        "id": "2026-12-06-a",
        "t": "bike",
        "title": "Duurrit 2:30",
-       "detail": "Z2 · rug-check elk half uur",
-       "min": 150
-      },
-      {
-       "id": "2026-12-06-b",
-       "t": "run",
-       "title": "Incline loopband 30 min",
-       "detail": "3 × 6 min powerhike @ 15% · 2 min vlak",
-       "min": 30,
-       "km": 3,
-       "hm": 240
+       "min": 150,
+       "detail": "Z2 · 60–70% FTP · HF < 140 · cadans 85–95 · 60–70 g KH/uur."
       }
      ]
     }
    ],
-   "vert": 300
+   "vert": 300,
+   "note": "Absorbeerweek na Ibiza. Ma reisdag (avond terug), eerste 3 dagen alleen rustig; kwaliteit pas donderdag en alleen als de quads geen spierpijn meer geven bij trap aflopen.\nZondag 1 training. FTP-test schuift naar week 50 (benen eerst fris)."
   },
   {
    "id": "2026-W50",
