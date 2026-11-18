@@ -150,6 +150,10 @@ function rMeer(){
   const st = S.settings; const wk = mondayOf(today());
   const base = location.href.replace(/[#?].*$/,'').replace(/[^/]*$/,'');
   let h = '<div class="card"><button class="btn" style="width:100%;margin-bottom:8px;text-align:left" data-tab="check">Weekcheck-in en beschikbaarheid</button><button class="btn" style="width:100%;margin-bottom:8px;text-align:left" data-tab="log">Krachtsessie loggen</button><button class="btn" style="width:100%;text-align:left" data-manual="1">Duursessie handmatig loggen</button></div>';
+  { const on = !!st.oura; h += '<div class="card" id="ouracard"><h3>Oura</h3>';
+    if(!st.sheetUrl) h += '<div class="mut">Werkt via je Google Sheet-script: vul eerst onder Instellingen de web-app-URL in.</div>';
+    else h += '<div class="mut">'+(on ? 'Verbonden. Readiness, slaap, HRV en rust-HF komen elke ochtend vanzelf in je ochtendcheck'+(st.ouraLast?' (laatst opgehaald '+new Date(st.ouraLast).toLocaleString('nl-NL',{weekday:'short',hour:'2-digit',minute:'2-digit'})+')':'')+'. Zelf ingevulde waarden worden nooit overschreven.' : 'Niet verbonden. Na verbinden vult de app je ochtendcheck zelf in.')+'</div><div class="row"><button class="btn '+(on?'':'pri')+'" data-oura="1">'+(on?'Opnieuw verbinden':'Verbind Oura')+'</button>'+(on?'<button class="btn" data-ourapull="1">Nu ophalen</button>':'')+'</div>';
+    h += '</div>'; }
   h += '<div class="card"><h3>Week exporteren</h3><div class="mut">Zondag: plak dit in de chat (of gebruik de knop op Check-in).</div>';
   h += '<div class="row"><select id="x_week">'+[-1,0].map(o => { const s = addDays(wk, o*7); return '<option value="'+s+'"'+(o===0?' selected':'')+'>Week '+weekIdOf(s).split('-W')[1]+' ('+fmtDay(s)+')</option>'; }).join('')+'</select></div>';
   h += '<div class="row"><button class="btn pri" id="x_text">Kopieer weektekst</button><button class="btn" id="x_json">Kopieer back-upcode</button></div>';

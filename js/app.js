@@ -42,7 +42,7 @@ document.addEventListener('click', ev => {
   if(ds.rp){ ({stop: rpClose, prev: rpPrev, next: rpNext, pause: rpPause})[ds.rp](); return; }
   if(ds.backswap){ const sid = ds.backswap; const s0 = sessById(sid).s; for(const [a,b] of [['RDL','HT'],['SQ','LP']]) for(const e of sessEx(s0)) if(cOf(sid, e)===a) S.swaps[sid+'|'+e.c] = b;
     enqueue('sessmod', sid, sessById(sid).date, {swaps:Object.fromEntries(Object.entries(S.swaps).filter(([k])=>k.startsWith(sid+'|'))), extra:S.extra[sid]||[], exskip:Object.fromEntries(Object.entries(S.exskip).filter(([k])=>k.startsWith(sid+'|')))}); toast('Gewisseld naar rugvriendelijke varianten'); rerender(); return; }
-  if(ds.dailyedit){ ui.dailyEdit[ds.dailyedit] = true; rerender(); return; }
+  if(ds.dailyedit){ ui.dailyEdit[ds.dailyedit] = true; if(ds.painopen) ui.painOpen = true; rerender(); return; }
   if(ds.dailydone){ ui.dailyEdit[ds.dailydone] = false; ui.painOpen = false; window.scrollTo(0,0); render(); return; }
   if(ds.painopen){ ui.painOpen = true; rerender(); return; }
   if(ds.ploc){ const d = ui.day || today(); const x = S.daily[d] || (S.daily[d] = {}); const p = Object.assign({}, x.pains||{}); if(p[ds.ploc]!=null) delete p[ds.ploc]; else p[ds.ploc] = 2; setPains(d, p); rerender(); return; }
@@ -61,6 +61,8 @@ document.addEventListener('click', ev => {
   if(ds.logger){ go(() => { ui.sid = ds.logger; ui.tab = 'log'; }); return; }
   if(ds.pick){ ui.sid = null; rLog(); return; }
   if(ds.cardio){ const f = sessById(ds.cardio); go(() => { ui.prefill = {sid:ds.cardio, date:f.date, sport:({bike:'bike',swim:'swim'})[f.s.t]||'run'}; ui.tab='duur'; }); return; }
+  if(ds.oura){ location.href = ouraAuthUrl(); return; }
+  if(ds.ourapull){ ouraPull(true).then(d => toast(d ? (d.days||[]).length+' dagen uit Oura' : 'Ophalen mislukt')); return; }
   if(ds.manual){ go(() => { ui.prefill = null; ui.tab = 'duur'; }); return; }
   if(ds.seen){ S.settings.seenPlan = PLAN.version+'/'+PLAN.updated; save(); rerender(); return; }
   if(ds.kgd){ const inp = document.querySelector('[data-kg="'+ds.kgd+'"]'); const inc = EXN(ds.kgd).inc || 1; const v = (num(inp.value)||0) + inc*Number(ds.dir);
@@ -175,7 +177,14 @@ document.addEventListener('touchend', ev => { if(sx===null) return; const dx = e
   if(PLAN && S.settings.seenPlan===null && !S.sets.length && !Object.keys(S.done).length){ S.settings.seenPlan = PLAN.version+'/'+PLAN.updated; save(); }
   /* #ib=YB1:… : importlink voor lichaamsmetingen. De hash gaat nooit naar de server en wordt direct gewist. */
   const hm = location.hash.match(/^#ib=(.+)$/); if(hm){ history.replaceState(null, '', location.pathname); if(importBody(decodeURIComponent(hm[1]))){ ui.tab = 'inzicht'; ui.ins = 'lichaam'; } }
-  render(); scheduleSync();
+  { const q = new URLSearchParams(location.search); const code = q.get('code');
+    if(code && q.get('state') && q.get('state')===sessionStorage.getItem('ouraState')){ history.replaceState(null, '', location.pathname); ui.tab = 'meer';
+      if(!S.settings.sheetUrl) toast('Eerst je Google Sheet-URL invullen onder Meer'); else {
+        toast('Oura verbinden…'); fetch(S.settings.sheetUrl+(S.settings.sheetUrl.includes('?')?'&':'?')+'oura_code='+encodeURIComponent(code)).then(r => r.json())
+          .then(d => { if(d.ok){ S.settings.oura = true; save(); toast('Oura verbonden ✓'); ouraPull(true); } else toast('Oura mislukt: '+(d.error||'onbekend')); rerender(); })
+          .catch(() => toast('Oura verbinden mislukt (geen verbinding met je script)')); } }
+    else if(q.get('error')){ history.replaceState(null, '', location.pathname); toast('Oura: '+q.get('error')); } }
+  render(); scheduleSync(); ouraPull();
   try { if(navigator.storage && navigator.storage.persist){ ui.persist = await navigator.storage.persisted() || await navigator.storage.persist(); } } catch(e){}
   if('serviceWorker' in navigator){
     const had = !!navigator.serviceWorker.controller;

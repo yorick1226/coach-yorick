@@ -1,7 +1,7 @@
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.1.0';
+const APP_VERSION = '4.2.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -65,6 +65,22 @@ const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','V
   swim:['Swim'], strength:['WeightTraining'], hyrox:['Workout','HighIntensityIntervalTraining','Crossfit','WeightTraining'], mobility:['WeightTraining','Yoga']};
 const RUNS = ['Run','TrailRun','VirtualRun'];
 
+/* ---------- Oura (via eigen Google Apps Script; client-secret staat alleen in het script) ---------- */
+const OURA_CLIENT_ID = 'fd8a9b7a-c1bb-4291-90e1-217c981b902a';
+const APP_URL = 'https://yorick1226.github.io/coach-yorick/';
+function ouraAuthUrl(){ const st = Math.random().toString(36).slice(2); sessionStorage.setItem('ouraState', st);
+  return 'https://cloud.ouraring.com/oauth/authorize?response_type=code&client_id='+OURA_CLIENT_ID+'&redirect_uri='+encodeURIComponent(APP_URL)+'&scope='+encodeURIComponent('daily heartrate')+'&state='+st; }
+/* vult de ochtendcheck aan met Oura-waarden; zelf ingevulde waarden worden nooit overschreven */
+function applyOura(days){ let n = 0;
+  for(const o of days||[]){ if(!o.day) continue; const x = S.daily[o.day] || (S.daily[o.day] = {}); let ch = false;
+    for(const [k, v] of [['rd',o.rd],['sl',o.sl],['hrv',o.hrv!=null?Math.round(o.hrv):null],['rhr',o.rhr]]) if(v!=null && x[k]==null){ x[k] = v; ch = true; }
+    if(o.temp!=null) x.temp = o.temp;
+    if(ch){ x.src = 'oura'; x.ts = Date.now(); enqueue('daily', o.day, o.day, x); n++; } }
+  return n; }
+async function ouraPull(force){ const url = S.settings.sheetUrl; if(!url || !S.settings.oura || !navigator.onLine) return;
+  const last = Number(sessionStorage.getItem('ouraPull')||0); if(!force && Date.now()-last < 20*60000) return; sessionStorage.setItem('ouraPull', Date.now());
+  try { const d = await (await fetch(url+(url.includes('?')?'&':'?')+'oura=1&days=21')).json(); S.settings.ouraLast = Date.now();
+    const n = applyOura(d.days); save(); if(n && typeof rerender==='function') rerender(); return d; } catch(e){ return null; } }
 /* ---------- opslag ---------- */
 function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, body:[], rt:{}, mob:[], sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
   settings:{ftp:null,lthr:null,tpace:null,sheetUrl:'',lastBackup:null,seenPlan:null}, queue:[]}; }
@@ -275,7 +291,7 @@ function tick(){
 function stopTimer(){ document.body.classList.remove('timeron'); tEnd = 0; sessionStorage.removeItem('tEnd'); $('timer').classList.remove('show','end'); }
 async function keepAwake(on){ try { if(on && 'wakeLock' in navigator && !wake){ wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', ()=> wake = null); }
   else if(!on && wake){ await wake.release(); wake = null; } } catch(e){} }
-document.addEventListener('visibilitychange', ()=> { if(document.visibilityState==='visible' && ui.tab==='log') keepAwake(true); });
+document.addEventListener('visibilitychange', ()=> { if(document.visibilityState==='visible'){ if(ui.tab==='log') keepAwake(true); ouraPull(); } });
 
 /* ---------- zones (berekend) ---------- */
 function hrZone(hr){ const l = Number(setting('lthr')); if(!hr || !l) return null; const p = hr/l*100;

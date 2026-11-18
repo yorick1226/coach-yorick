@@ -214,7 +214,8 @@ function rpeTodo(d){ const out = [];
   return out; }
 function dailyCard(d, isT){ const x = dailyOf(d); const filled = x.rd!=null || x.sl!=null; let h = '';
   if(filled && !ui.dailyEdit[d]){ const ad0 = advice(d); const tone = ad0 ? ({groen:'g',oranje:'o',rood:'r'})[ad0.lvl] : '';
-    h += '<div class="card" id="dailysum" style="display:flex;align-items:center;gap:8px"><div style="flex:1"><span class="small">Ochtendcheck</span><br>Readiness <b>'+(x.rd??'–')+'</b> · Slaap <b>'+(x.sl??'–')+'</b>'+(x.legs!=null?' · benen '+x.legs:'')+(x.pains?' · pijn: '+esc(Object.keys(x.pains).join(', ')):'')+(ad0?' <span class="pill '+tone+'">'+ad0.lvl+'</span>':'')+'</div><button class="btn sm" data-dailyedit="'+d+'">Wijzig</button></div>';
+    h += '<div class="card" id="dailysum" style="display:flex;align-items:center;gap:8px"><div style="flex:1"><span class="small">Ochtendcheck'+(x.src==='oura'?' · uit Oura':'')+'</span><br>Readiness <b>'+(x.rd??'–')+'</b> · Slaap <b>'+(x.sl??'–')+'</b>'+(x.legs!=null?' · benen '+x.legs:'')+(x.pains?' · pijn: '+esc(Object.keys(x.pains).join(', ')):'')+(ad0?' <span class="pill '+tone+'">'+ad0.lvl+'</span>':'')+'</div><button class="btn sm" data-dailyedit="'+d+'">Wijzig</button></div>';
+    if(isT && x.legs==null) h += '<div class="card legs" id="legsask" style="margin-top:-4px"><span class="small">Benen vandaag?</span><div class="chips xs">'+[1,2,3,4,5].map(v=>'<button class="chip" data-dlyc="legs" data-v="'+v+'">'+v+'</button>').join('')+'</div><button class="btn link" data-painopen="1" data-dailyedit="'+d+'">Pijn?</button></div>';
     if(ad0 && ad0.lvl!=='groen') h += '<div class="banner '+ad0.lvl+'" id="advice">'+ad0.txt+'</div>';
     return h; }
   h += '<div class="card" id="daily"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>Ochtendcheck</b><span class="small">'+(isT?'uit Oura · 20 sec':fmtDay(d))+'</span></div>';
