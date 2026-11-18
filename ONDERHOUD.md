@@ -131,3 +131,12 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - Sjablonen staan in `plan.blockTemplates` (UA, UB, LA, LB). Oefeningen hebben `eq` (bb/db/m/c/bw/sm/kb/bal). Dumbbells: kg = per dumbbell.
 - `setTargets` = harde sets/week; `groupTargets()` verlaagt benen ×0,75 bij ≥ 50 km lopen gepland en ×0,6 in een wedstrijdweek.
 - Inzicht: tabbladen Overzicht/Lopen/Fietsen/Kracht/Lichaam (`ui.ins`), KPI-tegels bovenaan.
+
+## v4.1.0 (18 nov 2026) — structuur, logger, coachlaag
+- Code staat nu in `css/app.css` en `js/{core,views,insight,checkin,app}.js` (gewone scripts, gedeelde globale scope; volgorde in index.html is belangrijk). Nieuwe bestanden ook in `CORE` van sw.js zetten.
+- 4 tabbladen: Vandaag, Plan (`week`), Voortgang (`inzicht`), Meer. Logger (`log`), duur (`duur`) en check-in (`check`) zijn schermen zonder tab; openen via kaarten/Meer.
+- Logger: setrijen (`setTable`, `ui.rv[sid|code]` = openstaande rijen). ✓ = set loggen, setnummer = opwarmset, kg-wijziging loopt door naar volgende rijen. Schijvencalculator bij barbell.
+- Rusttimer is een balk boven de tabbalk.
+- `coachAdvice()` (Voortgang), `planVsDone()` (uitgeklapte duursessie), RPE-vraag op Vandaag na een Strava-sessie (`rpeTodo`, overslaan = `done.norpe`).
+- Kleuren via CSS-variabelen; lichte modus volgt de systeeminstelling. Geen hex-kleuren meer in JS/CSS buiten :root.
+- Release-regel: tests draaien maakt `tests/out/ui_{light,dark}_*.png`; bekijk die vóór elke push.

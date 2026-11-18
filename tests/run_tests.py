@@ -17,11 +17,14 @@ def openlog(pg, sid):
     if pg.locator(f'[data-logger="{sid}"]').count() == 0 and pg.locator(f'[data-open="{sid}"]').count(): pg.click(f'[data-open="{sid}"]')
     pg.click(f'[data-logger="{sid}"]')
 def instab(pg, k): pg.click(f'[data-ins="{k}"]'); pg.wait_for_timeout(50)
-def extract_js(html): return "\n".join(re.findall(r"<script>(.*?)</script>", html, re.S))
+def extract_js(html, root=None):
+    parts = re.findall(r"<script>(.*?)</script>", html, re.S)
+    if root: parts += [(root/src).read_text() for src in re.findall(r'<script src="([^"]+)"></script>', html)]
+    return "\n".join(parts)
 def static_checks(cur: pathlib.Path, prev: pathlib.Path):
     print("Syntax & plan")
     html = (cur/"index.html").read_text()
-    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as f: f.write(extract_js(html)); js = f.name
+    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as f: f.write(extract_js(html, cur)); js = f.name
     for p in (js, str(cur/"sw.js")):
         r = subprocess.run(["node", "--check", p], capture_output=True, text=True)
         ok(r.returncode == 0, f"node --check {os.path.basename(p)} {r.stderr.strip()[:200]}")
@@ -33,7 +36,7 @@ def static_checks(cur: pathlib.Path, prev: pathlib.Path):
     ok(len(ids) == len(set(ids)), "sessie-id's uniek")
     ok(all(re.fullmatch(r"\d{4}-\d{2}-\d{2}-[a-z]", i) for i in ids), "sessie-id's hebben formaat datum-letter")
     ok(all(s["id"].startswith(d["date"]) for w in plan["weeks"] for d in w["days"] for s in d["s"]), "sessie-id hoort bij zijn dag")
-    used = {e["c"] for w in plan["weeks"] for d in w["days"] for s in d["s"] for e in s.get("ex", [])}
+    used = {e["c"] for w in plan["weeks"] for d in w["days"] for s in d["s"] for e in s.get("ex", [])} | {c for w in plan["weeks"] for d in w["days"] for s in d["s"] for b in s.get("bl", []) for c in b["opts"]}
     alts = {a for v in plan["exercises"].values() for a in v.get("alt", [])}
     ok((used | alts) <= set(plan["exercises"]), f"alle gebruikte oefening- en alternatiefcodes bestaan {sorted((used|alts) - set(plan['exercises']))}")
     starts = [w["start"] for w in plan["weeks"]]
@@ -44,7 +47,7 @@ def static_checks(cur: pathlib.Path, prev: pathlib.Path):
     pids = {s["id"]: d["date"] for w in pplan["weeks"] for d in w["days"] for s in d["s"]}
     cids = {s["id"]: d["date"] for w in plan["weeks"] for d in w["days"] for s in d["s"]}
     ok(all(cids.get(k, v) == v for k, v in pids.items()), "bestaande sessie-id's niet naar andere datum verhuisd")
-    phtml = (prev/"index.html").read_text()
+    phtml = extract_js((prev/"index.html").read_text(), prev); html = extract_js(html, cur)
     key = lambda h: re.search(r"const KEY = '([^']+)'", h).group(1)
     ok(key(html) == key(phtml), f"opslagsleutel ongewijzigd ({key(html)})")
     qs = lambda h: re.search(r"const QSETS = \{(.*?)\n\};", h, re.S).group(1)
@@ -72,7 +75,14 @@ class Srv:
     def url(self): return f"http://127.0.0.1:{self.port}/"
 
 def store(pg): return json.loads(pg.evaluate("localStorage.getItem('yorick-coach')") or "{}")
-def tab(pg, t): pg.click(f'[data-tab="{t}"]')
+def tab(pg, t):
+    if pg.locator(f'#tabs [data-tab="{t}"]').count(): pg.click(f'#tabs [data-tab="{t}"]')
+    else: pg.evaluate(f"go(() => {{ ui.tab = '{t}'; if('{t}'==='log' && !ui.sid) ui.sid = null; }})")
+def logrow(pg, sid, code, kg=None, reps=None, k=0):
+    key = f"{sid}|{code}|{k}"
+    if kg is not None: pg.fill(f'[data-rkg="{key}"]', str(kg))
+    if reps is not None: pg.fill(f'[data-rreps="{key}"]', str(reps))
+    pg.click(f'[data-rset="{code}"][data-k="{k}"]')
 def focus(pg, c):
     """Oefening in de logger openklappen (focusmodus vanaf v2.3)."""
     if pg.locator(f'[data-exfocus="{c}"]').count(): pg.click(f'[data-exfocus="{c}"]')
@@ -119,6 +129,9 @@ def features(pg, shots=True):
     ok(pg.locator(".strip button").count() == 7, "weekstrip zichtbaar")
     pg.click('[data-strip="2026-11-18"]'); ok("wo 18 nov" in pg.inner_text("#htitle"), "weekstrip: tik naar andere dag")
     pg.click('[data-strip="2026-11-17"]'); ok("Vandaag" in pg.inner_text("#htitle"), "terug naar vandaag")
+    rq = pg.locator('[id^="rpeask_"]'); ok(rq.count() >= 1, "RPE-vraag na Strava-sessie op Vandaag")
+    if rq.count():
+        sid = rq.first.get_attribute("id")[7:]; pg.click(f'#rpeask_{sid} [data-v="6"]'); ok(store(pg)["done"][sid]["rpe"] == 6 and pg.locator(f"#rpeask_{sid}").count() == 0, "RPE met één tik opgeslagen, vraag verdwijnt")
     ok(pg.locator('[data-srpe="2026-11-17-a"]').count() == 0, "afgeronde sessie op Vandaag ingeklapt (compact)")
     ensure_open(pg, "2026-11-17-a"); pg.click('[data-info="rpe"]'); ok(pg.locator(".info").count() >= 1, "uitleg RPE via ⓘ")
     pg.click('[data-dailydone="2026-11-17"]'); ok(pg.locator("#dailysum").count() == 1, "Klaar klapt ochtendcheck in")
@@ -173,9 +186,9 @@ def features(pg, shots=True):
     pg.click('[data-menu="2026-11-21-a"]'); pg.click('[data-alt="2026-11-21-a"][data-i="0"]')
     ok(store(pg)["done"]["2026-11-21-a"].get("alt", "").startswith("Ingekort"), "alternatief gekozen voor lange duurloop")
     ok("Alternatief: Ingekort" in pg.inner_text("#s_2026-11-21-a"), "alternatief zichtbaar op de kaart")
-    openlog(pg, "2026-11-17-b"); pg.wait_for_selector('[data-rep="POGO"]')
-    ok(pg.locator('[data-kg="POGO"]').count() == 0 and pg.locator('[data-kg="BOX"]').count() == 0, "geen kg-veld bij plyo")
-    focus(pg, "BOX"); pg.click('[data-rep="BOX"][data-r="3"]'); bx = [x for x in store(pg)["sets"] if x["code"] == "BOX"][-1]
+    openlog(pg, "2026-11-17-b"); pg.wait_for_selector('[data-rset="POGO"]')
+    ok(pg.locator('[data-rkg^="2026-11-17-b|POGO"]').count() == 0, "geen kg-veld bij plyo")
+    focus(pg, "BOX"); ok(pg.locator('[data-rkg^="2026-11-17-b|BOX"]').count() == 0, "geen kg-kolom bij box jump"); logrow(pg, "2026-11-17-b", "BOX", reps=3); bx = [x for x in store(pg)["sets"] if x["code"] == "BOX"][-1]
     ok(bx.get("kg") is None and bx["reps"] == 3, "box jump gelogd zonder kg")
     tab(pg, "week")
     ok("sessies" in pg.inner_text("#stats"), "compacte weekcijfers zichtbaar")
@@ -191,6 +204,8 @@ def features(pg, shots=True):
     ok("done" in pg.get_attribute("#s_2026-11-10-a", "class"), "Strava-sessie automatisch als gedaan getoond")
     ensure_open(pg, "2026-11-10-a"); ok("10,01 km" in pg.inner_text("#s_2026-11-10-a"), "Strava gekoppeld aan geplande sessie (di 10 nov)"); pg.click('[data-laps="2026-11-10-a"]'); ok("4:38" in pg.inner_text("#s_2026-11-10-a"), "rondetijden uit Strava zichtbaar")
     ok("werkronden" in pg.inner_text("#s_2026-11-10-a"), "intervalbeoordeling op basis van ronden + doeltempo")
+    ok(pg.locator("#s_2026-11-10-a .cmp").count() == 1 and "Gedaan" in pg.inner_text("#s_2026-11-10-a .cmp"), "gepland ↔ uitgevoerd per run")
+    ok(pg.locator("#tabs button").count() == 4, "4 tabbladen: Vandaag, Plan, Voortgang, Meer")
     pg.click("#prev"); ok("Vóór de start van het plan" in pg.inner_text("#view") and "Benen loslopen" in pg.inner_text("#view"), "week vóór het plan toont Strava-activiteiten")
     pg.click("#next"); pg.click("#next")
     ok(pg.locator("#coachnote").count() == 1, "coachnotitie zichtbaar in de week")
@@ -199,25 +214,26 @@ def features(pg, shots=True):
     st = pg.inner_text("#stats"); exp = pg.evaluate("(() => { const w = weekByStart('2026-11-16'); const ks = weekItems(w).filter(i => ['run','race'].includes(i.s.t)).map(i => i.s.km||0); const lr = (sessById('2026-11-21-a').s.km||0); return ks.reduce((a,b)=>a+b,0) - lr*0.35; })()")
     ok(("/"+f"{exp:.1f}".replace(".", ",")) in st, f"geplande km gecorrigeerd voor alternatief (lange duur → 65%, verwacht {exp:.1f}) [{st.splitlines()[1] if len(st.splitlines())>1 else st}]")
     # Logger: komma, RIR, wissel
-    pg.click("#next"); openlog(pg, "2026-11-24-b"); pg.wait_for_selector('[data-kg="SQ"]')
-    ok("Vorige keer" in pg.inner_text("#ex_B0") and "60" in pg.inner_text("#ex_B0"), "‘vorige keer’ + suggestie in volgende sessie (blok kiest laatst gebruikte oefening)")
+    pg.click("#next"); openlog(pg, "2026-11-24-b"); pg.wait_for_selector('[data-rkg="2026-11-24-b|SQ|0"]')
+    ok("60×6" in pg.inner_text("#ex_B0"), "‘vorige keer’ + suggestie in volgende sessie (blok kiest laatst gebruikte oefening)")
     ok("quads · zwaar" in pg.inner_text("#ex_B0").lower() and "RPE" in pg.inner_text("#ex_B0") and "rust" in pg.inner_text("#ex_B0") and pg.locator('#ex_B0 [data-pickex][data-for="B0"]').count() >= 3, "spiergroepblok: reps, RIR/RPE, rust en snelle oefeningkeuze")
     ok("kg totaal" in pg.inner_text("#ex_B0"), "kg-label barbell: totaal incl. stang")
     ok(pg.locator("details[data-gsopen]").count() == 1, "spiergroepen-deze-week in logger")
-    pg.fill('[data-kg="SQ"]', "62,5"); pg.dispatch_event('[data-kg="SQ"]', "change")
-    pg.click('[data-rir="2026-11-24-b|SQ"][data-v="1"]'); pg.click('[data-rep="SQ"][data-r="5"]')
+    ok(pg.input_value('[data-rkg="2026-11-24-b|SQ|0"]') != "" and pg.input_value('[data-rreps="2026-11-24-b|SQ|0"]') != "", "setrij vooraf ingevuld (vorige keer / suggestie)")
+    pg.fill('[data-rkg="2026-11-24-b|SQ|0"]', "62,5"); ok(pg.input_value('[data-rkg="2026-11-24-b|SQ|1"]') == "62,5", "kg wijzigen neemt volgende sets mee")
+    ok("per kant" in pg.inner_text("#ex_B0"), "schijvencalculator bij barbell")
+    pg.click('[data-rir="2026-11-24-b|SQ"][data-v="1"]'); logrow(pg, "2026-11-24-b", "SQ", reps=5)
     last = [s for s in store(pg)["sets"] if s["sid"] == "2026-11-24-b"][-1]
     ok(last["kg"] == 62.5 and last["rir"] == 1, f"komma-invoer 62,5 en RIR 1 opgeslagen ({last.get('kg')}, {last.get('rir')})")
     ok("timeron" in (pg.get_attribute("body", "class") or ""), "extra ruimte onder de timer zodat niets wegvalt")
     nb = len([x for x in store(pg)["sets"] if x["sid"] == "2026-11-24-b" and x["code"] == "SQ"])
-    pg.click('[data-wu="2026-11-24-b|SQ"]'); pg.fill('[data-kg="SQ"]', "40"); pg.dispatch_event('[data-kg="SQ"]', "change"); pg.click('[data-rep="SQ"][data-r="5"]')
+    pg.click('[data-rwu="2026-11-24-b|SQ|0"]'); logrow(pg, "2026-11-24-b", "SQ", kg="40", reps=5)
     w = [x for x in store(pg)["sets"] if x["sid"] == "2026-11-24-b" and x["code"] == "SQ"][-1]
-    ok(w.get("wu") is True and "rir" not in w and "W1:" in pg.inner_text("#ex_B0") and "1/" in pg.inner_text("#ex_B0"), "opwarmset gelogd, telt niet mee als werkset")
+    ok(w.get("wu") is True and "rir" not in w and "W1" in pg.inner_text("#ex_B0") and pg.locator("#ex_B0 .sr.ok").count() == 2, "opwarmset gelogd, telt niet mee als werkset")
     ok(pg.evaluate("prevGroup('SQ','x','2026-12-31').every(x => !x.wu)"), "opwarmset telt niet mee in ‘vorige keer’")
-    pg.click('[data-wu="2026-11-24-b|SQ"]')
     focus(pg, "B1"); pg.locator('#ex_B1 [data-pickex="HT"][data-for="B1"]').click()
     ok("Hip thrust" in pg.inner_text("#ex_B1"), "oefening gekozen binnen blok met één tik (RDL → hip thrust)")
-    pg.fill('[data-kg="HT"]', "80"); pg.dispatch_event('[data-kg="HT"]', "change"); pg.click('[data-rep="HT"][data-r="8"]')
+    logrow(pg, "2026-11-24-b", "HT", kg="80", reps=8)
     ht = [s for s in store(pg)["sets"] if s["code"] == "HT"][-1]; ok(ht["pc"] == "B1", "set gelogd onder gekozen oefening, met verwijzing naar het blok")
     # vrij wisselen via zoeken, toevoegen, eigen oefening, overslaan
     focus(pg, "B2"); pg.click('[data-swapopen="B2"]'); ok("Andere spiergroepen" in pg.inner_text(".picker"), "kiezer toont eerst de spiergroep van het blok"); pg.fill('[data-exsearch]', "leg pr")
@@ -225,11 +241,11 @@ def features(pg, shots=True):
     pg.locator('.exlist [data-pickex="LP"]').click(); ok("Leg press" in pg.inner_text("#ex_B2"), "wissel naar willekeurige oefening via zoeken")
     pg.click('[data-addopen="1"]'); pg.fill('[data-exsearch]', "face"); pg.locator('.exlist [data-pickex="FP"]').click()
     ok(pg.locator("#ex_FP").count() == 1, "oefening toegevoegd aan sessie")
-    pg.fill('[data-kg="FP"]', "20"); pg.dispatch_event('[data-kg="FP"]', "change"); pg.click('[data-rep="FP"][data-r="12"]')
+    logrow(pg, "2026-11-24-b", "FP", kg="20", reps=12)
     fp = [x for x in store(pg)["sets"] if x["code"] == "FP"][-1]; ok(fp["kg"] == 20 and fp["reps"] == 12, "set gelogd op toegevoegde oefening")
     pg.click('[data-addopen="1"]'); pg.click(".picker details summary"); pg.fill('[data-newname]', "Sled drag"); pg.select_option('[data-newunit]', "m"); pg.click('[data-newex="1"]')
     cust = store(pg)["custom"]; code = next((k for k, v in cust.items() if v["n"] == "Sled drag"), None)
-    ok(code and code.startswith("U_") and pg.locator(f"#ex_{code}").count() == 1 and pg.locator(f'[data-kg="{code}"]').count() == 0, "eigen oefening aangemaakt (zonder kg bij meters)")
+    ok(code and code.startswith("U_") and pg.locator(f"#ex_{code}").count() == 1 and pg.locator(f'[data-rkg^="2026-11-24-b|{code}"]').count() == 0, "eigen oefening aangemaakt (zonder kg bij meters)")
     focus(pg, "B3"); pg.click('[data-exskip="B3"]'); ok(store(pg)["exskip"].get("2026-11-24-b|B3") is True and "overgeslagen" in pg.inner_text("#ex_B3"), "oefening overgeslagen")
     focus(pg, "B2"); pg.click('[data-swapopen="B2"]'); pg.locator('.exlist [data-pickex="BSS"]').click(); ok("kg per dumbbell" in pg.inner_text("#ex_B2"), "dumbbell: kg per dumbbell")
     if shots: pg.screenshot(path=str(OUT/"logger.png"))
@@ -245,6 +261,7 @@ def features(pg, shots=True):
     pg.fill("#c_kh", "75"); pg.click('[data-maag="4"]'); pg.click("#c_save")
     tab(pg, "inzicht"); instab(pg, "overzicht"); ok(pg.locator(".kpi").count() == 4 and pg.locator("[data-ins]").count() == 5, "inzicht: KPI-tegels + 5 tabbladen")
     ok(pg.locator("#blockrep").count() == 1 and "BLOKRAPPORT" in pg.inner_text("#blockrep") and "Naleving" in pg.inner_text("#blockrep"), "blokrapport zichtbaar")
+    ok(pg.locator("#coachadv").count() == 1 and len(pg.inner_text("#coachadv")) > 20, "coachadvies bovenaan Voortgang")
     instab(pg, "lopen"); ins = pg.inner_text("#view")
     ok("Richting Mozart" in ins and "Voedingslog" in ins and "75" in ins, "inzicht: Mozart-voortgang + voedingslog")
     ok(pg.locator("svg").count() >= 3, "trendgrafieken getekend")
@@ -360,7 +377,17 @@ def browser_tests(cur, prev):
         pg2.goto(srv.url); pg2.wait_for_selector("#tabs"); pg2.evaluate("navigator.serviceWorker.ready"); pg2.reload(); pg2.wait_for_selector(".card")
         ctx2.set_offline(True); pg2.reload(); pg2.wait_for_selector(".card", timeout=5000)
         ok("Plan kon niet" not in pg2.inner_text("#view"), "app + plan laden offline uit cache")
-        ctx2.close(); b.close()
+        ctx2.close()
+        print("Visuele check: lichte en donkere modus (screenshots in tests/out/)")
+        for scheme in ("light", "dark"):
+            c3 = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, service_workers="block", color_scheme=scheme); p3 = c3.new_page(); p3.clock.set_fixed_time(FIXED)
+            p3.goto(srv.url); p3.wait_for_selector("#tabs")
+            for t_ in ("vandaag", "week", "inzicht", "meer"):
+                p3.click(f'#tabs [data-tab="{t_}"]'); p3.wait_for_timeout(150); p3.screenshot(path=str(OUT/f"ui_{scheme}_{t_}.png"))
+            bg = p3.evaluate("getComputedStyle(document.body).backgroundColor")
+            ok((bg == "rgb(243, 244, 246)") == (scheme == "light"), f"{scheme} modus volgt systeeminstelling ({bg})")
+            c3.close()
+        b.close()
         print("WebKit (Safari-engine)")
         try:
             wb = p.webkit.launch()
