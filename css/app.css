@@ -223,3 +223,6 @@ svg text{fill:var(--mut);font-size:10px}
 .presc span{font-size:13px;padding:5px 8px}
 
 .adapt b{color:inherit}
+/* geen in- en uitzoomen op iOS: invoervelden minimaal 16px, geen dubbeltik-zoom */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+input,select,textarea{font-size:max(16px,1em)}

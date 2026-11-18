@@ -321,7 +321,16 @@ def features(pg, shots=True):
     tab(pg, "week"); openlog(pg, "2026-11-19-b")
     ok(pg.is_visible("#back"), "terug-knop zichtbaar na openen logger"); pg.click("#back"); pg.wait_for_timeout(300)
     ok(pg.get_attribute('[data-tab="week"]', "class") and "on" in pg.get_attribute('[data-tab="week"]', "class"), "terug-knop brengt je terug naar Week")
-    tab(pg, "inzicht"); pg.click("#back"); pg.wait_for_timeout(300); ok("on" in (pg.get_attribute('[data-tab="week"]', "class") or ""), "terug werkt ook na wisselen van tabblad")
+    tab(pg, "inzicht"); ok(not pg.is_visible("#back"), "hoofdtabblad = startpunt: geen terugknop")
+    tab(pg, "meer"); pg.click('#view [data-tab="check"]'); ok(pg.is_visible("#back"), "terugknop op subscherm (check-in)")
+    tab(pg, "week"); ok(not pg.is_visible("#back"), "terugknop verdwijnt na tik op tabbalk")
+    for t_ in ("vandaag", "week", "inzicht", "meer"): tab(pg, t_); ok(not pg.is_visible("#back"), f"geen terugknop op {t_}")
+    tab(pg, "vandaag"); pg.locator('#view [data-strip][data-mode="day"]').nth(0).click(); pg.locator('#view [data-strip][data-mode="day"]').nth(3).click()
+    ok(not pg.is_visible("#back"), "dagen wisselen op Vandaag geeft geen blijvende terugknop")
+    if pg.locator('[data-strip="2026-11-17"]').count(): pg.click('#view button[data-strip="2026-11-17"]:has-text("Terug naar vandaag")') if pg.locator('#view button[data-strip="2026-11-17"]:has-text("Terug naar vandaag")').count() else None
+    ok(not pg.is_visible("#back"), "terug naar vandaag: geen terugknop")
+    vp = pg.get_attribute('meta[name="viewport"]', "content"); fs = pg.evaluate("Math.min(...[...document.querySelectorAll('input,select,textarea')].map(e => parseFloat(getComputedStyle(e).fontSize)))")
+    ok("maximum-scale=1" in vp and fs >= 16, f"geen auto-zoom op iOS (kleinste invoertekst {fs}px)")
     # Back-up, herstel, ongedaan maken
     tab(pg, "meer"); pg.click("#x_json"); code = pg.input_value("#x_out"); ok(code.startswith("YC1:"), "back-upcode gemaakt")
     ok(store(pg)["settings"]["lastBackup"], "laatste back-up vastgelegd")
