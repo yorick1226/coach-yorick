@@ -146,3 +146,7 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - App: knop "Verbind Oura" (Meer) → Oura-login → terug naar de app met `?code=` → app geeft de code aan het script (`?oura_code=`) → script wisselt in en bewaart tokens. Daarna haalt de app bij openen (max 1× per 20 min) `?oura=1` op; `applyOura()` vult alleen lege velden.
 - Script: `installOuraTrigger()` éénmalig uitvoeren; haalt elk half uur tussen 05 en 12 u op. Redirect-URI in de Oura-app moet exact `https://yorick1226.github.io/coach-yorick/` zijn.
 - Scopes die de app vraagt: `daily heartrate`.
+
+## v4.3.0 — dag aanpassen + fitheid/vermoeidheid
+- `adaptPlan(d, lvl)` (core.js): bij oranje/rood ochtendadvies voorstel per open sessie; knop "Pas vandaag aan" zet `done.alt` + `done.auto`; "Terug naar plan" wist die. Alleen voor vandaag; al gedane (of Strava-gekoppelde) sessies blijven staan.
+- `loadSeries()/loadCard()` (insight.js): minuten × RPE (Foster); zonder RPE geschat uit gem. HF / drempel-HF. CTL 42 d, ATL 7 d. Vorm = (CTL−ATL)/CTL: < −0,3 zwaar, < −0,1 opbouw, < 0,15 in balans, anders fris. Alleen trend.

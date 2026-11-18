@@ -23,6 +23,28 @@ function lineSvg(series){
     const l = sr.pts[sr.pts.length-1]; s += '<text x="'+(X(l[0])+5)+'" y="'+(Y(l[1])+4)+'">'+fmtN(l[1])+'</text>'; }
   return s+'</svg>';
 }
+/* Fitheid/vermoeidheid (Banister-achtig impuls-responsmodel) op sessie-RPE × minuten (Foster).
+   RPE onbekend → schatting uit gem. HF t.o.v. drempel-HF, anders per sport. Trend, geen voorspeller van blessures. */
+function estRpe(a){ const l = Number(setting('lthr')) || (PLAN && PLAN.athlete && PLAN.athlete.lthr) || 173;
+  if(a.hr){ const r = a.hr/l; return r < 0.8 ? 3 : r < 0.87 ? 4 : r < 0.92 ? 5 : r < 0.97 ? 7 : 8; }
+  return /Ride/.test(a.sport||'') ? 3 : a.sport==='WeightTraining' ? 5 : RUNS.includes(a.sport) ? 4 : 4; }
+function loadSeries(days){ const t = today(), start = addDays(t, -days-60), L = {}; const add = (d, v) => { if(d >= start && d <= t) L[d] = (L[d]||0) + v; };
+  const sidOf = {}; for(let m = mondayOf(start); m <= t; m = addDays(m, 7)){ const w = weekByStart(m); if(!w) continue; const mw = matchWeek(w); for(const [sid, a] of Object.entries(mw.by)) if(a && a.id) sidOf[a.id] = sid; }
+  for(const a of (STRAVA.activities||[])){ const min = (a.sec||a.el||0)/60; if(!min) continue; const sid = sidOf[a.id]; const rpe = sid && S.done[sid] && S.done[sid].rpe; add(a.date, min*(rpe || estRpe(a))); }
+  for(const c of S.cardio) if(!c.del && !c.sid && c.sec) add(c.date, c.sec/60*(c.rpe||4));
+  for(const [sid, v] of Object.entries(S.done)){ if(!v.d || v.skip) continue; const f = sessById(sid); if(!f || Object.values(sidOf).includes(sid)) continue; const min = num(v.min) || f.s.min || 0; if(min) add(f.date, min*(v.rpe||5)); }
+  const k1 = 1-Math.exp(-1/42), k2 = 1-Math.exp(-1/7); let ctl = 0, atl = 0; const out = [];
+  for(let d = start; d <= t; d = addDays(d, 1)){ const x = L[d]||0; ctl += (x-ctl)*k1; atl += (x-atl)*k2; out.push({d, x, ctl, atl}); }
+  return out.slice(-days); }
+function loadCard(){ const s = loadSeries(84); if(!s.length || !s.some(x => x.x)) return ''; const L = s[s.length-1]; const tsb = L.ctl - L.atl, r = L.ctl ? tsb/L.ctl : 0;
+  const st = r < -0.3 ? ['Zwaar belast', 'var(--bad)', 'Vermoeidheid ligt ruim boven je fitheid. Prima voor een korte overload-week, maar niet langer dan 1–2 weken achter elkaar.']
+    : r < -0.1 ? ['Opbouw', 'var(--warn)', 'Je traint meer dan je gewend bent: zo bouw je fitheid op. Let op slaap en rustige dagen.']
+    : r < 0.15 ? ['In balans', 'var(--acc)', 'Belasting en herstel in evenwicht.'] : ['Fris', 'var(--blue)', 'Minder belast dan je gewend bent: goed vóór een wedstrijd, maar langer zo = fitheid zakt.'];
+  const pts = k => s.filter((x, i) => i % 3 === 0 || i === s.length-1).map((x, i) => [i, Math.round(x[k])]);
+  return '<div class="card" id="loadcurve"><h3>Fitheid & vermoeidheid</h3><div class="kv" style="border:0;padding:0"><span>Vorm nu</span><b style="color:'+st[1]+'">'+st[0]+'</b></div><div class="small">'+st[2]+'</div>'
+    + lineSvg([{pts:pts('ctl'), c:'#22c55e'}, {pts:pts('atl'), c:'#f59e0b'}])
+    + '<div class="small"><span style="color:#22c55e">■</span> fitheid (42-daags gem.) <span style="color:#f59e0b">■</span> vermoeidheid (7-daags gem.) · laatste 12 weken</div>'
+    + '<details><summary class="small">Hoe wordt dit berekend?</summary><div class="small">Belasting per sessie = minuten × RPE (sessie-RPE, Foster). Zonder RPE schat de app RPE uit je gemiddelde hartslag t.o.v. je drempel-HF. Fitheid en vermoeidheid zijn voortschrijdende gemiddelden over 42 en 7 dagen (impuls-responsmodel, Banister). Bruikbaar als trend; dat zulke modellen blessures of prestaties precies voorspellen is niet goed aangetoond. Hoe vaker je RPE invult, hoe beter het klopt.</div></details></div>'; }
 const e1 = x => x.reps<=12 && x.kg ? x.kg*(1+x.reps/30) : null;
 /* Prognose uit je beste recente wedstrijd (Riegel, T2 = T1 × (D2/D1)^1,06). Tot de halve marathon goed gekalibreerd;
    marathon met exponent 1,07 en toch vaak te snel voor recreanten (Vickers & Vertosick 2016). */
@@ -69,6 +91,7 @@ function rInsight(){
     const over = avg(x=>x.km) > 0 && cur.km > avg(x=>x.km)*1.3;
     h += '<div class="kpis">'+tile('Lopen deze week', fmtN(cur.km)+' km', (weekByStart(thisMon) ? 'plan '+fmtN(weekStats(weekByStart(thisMon)).runPlan)+' · ' : '')+'gem. '+fmtN(avg(x=>x.km)), over?'var(--warn)':'')+tile('Trainingstijd', fmtH(cur.sec), 'gem. '+fmtH(avg(x=>x.sec)))+tile('Fietsen', fmtN(rh)+' u', 'gem. '+fmtN(rhA)+' u')+tile('Harde krachtsets', String(hs), 'deze week')+'</div>';
     { const ca = coachAdvice(); if(ca.length) h += '<div class="card" id="coachadv"><div class="coachline">'+ic('progress',18)+'<div><b>Coach</b>'+ca.map(x => '<div class="advice1" style="margin-top:4px">'+x+'</div>').join('')+'</div></div></div>'; }
+    h += loadCard();
     if(nr) h += '<div class="card nextrace"><span class="small">Volgende wedstrijd</span><b>'+esc(nr.name)+'</b><span class="small">'+fmtDay(nr.date)+' · over '+nd+' dagen</span></div>'; }
   sec('lopen'); h += perfCard();
   h += '<div class="card" id="mozart"><h3>Richting Mozart <span class="small">nog '+days+' dagen</span></h3>';

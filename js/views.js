@@ -212,11 +212,16 @@ function rpeTodo(d){ const out = [];
     for(const it of weekItems(w).filter(i => i.date===dd && ['run','bike','race','hyrox','swim'].includes(i.s.t))){ const st = S.done[it.s.id]||{};
       if(m.by[it.s.id] && !st.rpe && !st.skip && !st.norpe) out.push(it); } }
   return out; }
+function adaptBtn(d, lvl){ if(d!==today() || lvl==='groen') return '';
+  const done = Object.entries(S.done).filter(([sid, v]) => v.auto && sid.startsWith(d));
+  if(done.length) return '<div class="row" style="margin-top:8px"><span style="flex:3;color:inherit">✓ Aangepast: '+done.map(([sid]) => esc(sessById(sid).s.title)).join(', ')+'</span><button class="btn sm" data-unadapt="'+d+'">Terug naar plan</button></div>';
+  const pl = adaptPlan(d, lvl); if(!pl.length) return '';
+  return '<div class="adapt"><div class="small" style="color:inherit;margin-top:8px">Voorstel:</div>'+pl.map(p => '<div class="small" style="color:inherit">· <b>'+esc(p.it.s.title)+'</b> → '+esc(p.alt)+'</div>').join('')+'<div class="row" style="margin-top:6px"><button class="btn sm pri" data-adapt="'+d+'" data-lvl="'+lvl+'">Pas vandaag aan</button></div></div>'; }
 function dailyCard(d, isT){ const x = dailyOf(d); const filled = x.rd!=null || x.sl!=null; let h = '';
   if(filled && !ui.dailyEdit[d]){ const ad0 = advice(d); const tone = ad0 ? ({groen:'g',oranje:'o',rood:'r'})[ad0.lvl] : '';
     h += '<div class="card" id="dailysum" style="display:flex;align-items:center;gap:8px"><div style="flex:1"><span class="small">Ochtendcheck'+(x.src==='oura'?' · uit Oura':'')+'</span><br>Readiness <b>'+(x.rd??'–')+'</b> · Slaap <b>'+(x.sl??'–')+'</b>'+(x.legs!=null?' · benen '+x.legs:'')+(x.pains?' · pijn: '+esc(Object.keys(x.pains).join(', ')):'')+(ad0?' <span class="pill '+tone+'">'+ad0.lvl+'</span>':'')+'</div><button class="btn sm" data-dailyedit="'+d+'">Wijzig</button></div>';
     if(isT && x.legs==null) h += '<div class="card legs" id="legsask" style="margin-top:-4px"><span class="small">Benen vandaag?</span><div class="chips xs">'+[1,2,3,4,5].map(v=>'<button class="chip" data-dlyc="legs" data-v="'+v+'">'+v+'</button>').join('')+'</div><button class="btn link" data-painopen="1" data-dailyedit="'+d+'">Pijn?</button></div>';
-    if(ad0 && ad0.lvl!=='groen') h += '<div class="banner '+ad0.lvl+'" id="advice">'+ad0.txt+'</div>';
+    if(ad0 && ad0.lvl!=='groen') h += '<div class="banner '+ad0.lvl+'" id="advice">'+ad0.txt+adaptBtn(d, ad0.lvl)+'</div>';
     return h; }
   h += '<div class="card" id="daily"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>Ochtendcheck</b><span class="small">'+(isT?'uit Oura · 20 sec':fmtDay(d))+'</span></div>';
   h += '<div class="dck" style="margin-top:6px"><label>Readiness<input type="text" inputmode="numeric" data-dly="rd" value="'+esc(x.rd??'')+'" placeholder="0–100"></label><label>Slaapscore<input type="text" inputmode="numeric" data-dly="sl" value="'+esc(x.sl??'')+'" placeholder="0–100"></label></div>';
@@ -227,7 +232,7 @@ function dailyCard(d, isT){ const x = dailyOf(d); const filled = x.rd!=null || x
   else { h += '<div class="row" style="margin-top:8px">'+hrvD+'</div>'; h += '<label class="f">Pijn? Tik de plek</label><div class="chips sm">'+PAIN_LOCS.map(l => '<button class="chip'+(pains[l]!=null?' on':'')+'" style="font-size:14px" data-ploc="'+esc(l)+'">'+esc(l)+'</button>').join('')+'</div>';
     for(const l of Object.keys(pains)) h += '<div style="margin-top:8px"><span class="small">'+esc(l)+' · hoe erg (1–8)?</span><div class="chips xs">'+[1,2,3,4,5,6,7,8].map(v => '<button class="chip'+(pains[l]===v?' on':'')+'" data-pscore="'+esc(l)+'" data-v="'+v+'">'+v+'</button>').join('')+'</div></div>'; }
   const ad = advice(d);
-  if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+'</div>';
+  if(ad) h += '<div class="banner '+ad.lvl+'" id="advice" style="margin-top:10px;margin-bottom:0"><b>'+ad.lvl.toUpperCase()+'</b>'+(ad.why.length?' · '+esc(ad.why.join(', ')):'')+'<br>'+ad.txt+adaptBtn(d, ad.lvl)+'</div>';
   if(filled) h += '<div class="row"><button class="btn pri" data-dailydone="'+d+'">Klaar ✓</button></div>';
   return h+'</div>'; }
 function rToday(){

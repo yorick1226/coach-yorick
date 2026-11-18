@@ -1,7 +1,7 @@
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.2.1';
+const APP_VERSION = '4.3.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -60,6 +60,26 @@ function altOptions(s){
     race: []
   })[s.t] || [];
 }
+/* "Pas vandaag aan": zet open sessies van een dag om naar de rustige variant, op basis van het ochtendadvies */
+const QUAL_RX = /×|drempel|heuvel|interval|tempo|vo2|strides?\b.*×|fartlek|progress/i;
+function isQuality(s){ return (s.t==='run' && (QUAL_RX.test(s.title) || (s.tgt && s.tgt.pace))) || s.t==='hyrox' || s.t==='plyo'; }
+function adaptPlan(d, lvl){ const out = []; const w = weekByStart(mondayOf(d)); const m = matchWeek(w);
+  for(const it of weekItems(w).filter(i => i.date===d)){ const s = it.s, st = S.done[s.id]||{};
+    if(st.d || m.by[s.id] || st.skip || st.alt || s.t==='race' || s.t==='rest' || s.t==='mobility') continue;
+    const long = s.t==='run' && (s.km||0) >= 18; let alt = null;
+    if(lvl==='oranje'){
+      if(s.t==='run' && isQuality(s)) alt = 'Ingekort: helft van de hoofdset, zelfde tempo';
+      else if(long) alt = 'Ingekort: 60–70% van de afstand, zelfde rustige tempo';
+      else if(s.t==='hyrox') alt = 'Mini: 2 rondes i.p.v. 4';
+      else if(s.t==='plyo') alt = 'Alleen pogo’s 2×15 + 3 box jumps'; }
+    else if(lvl==='rood'){
+      if(s.t==='run') alt = long ? 'Easy 45–60 min, HF ≤ 145' : isQuality(s) ? 'Easy 30–40 min, HF ≤ 145' : 'KICKR 45–60 min Z2 i.p.v. lopen';
+      else if(s.t==='hyrox') alt = 'Easy 30–45 min fietsen Z1–Z2 i.p.v. Hyrox';
+      else if(s.t==='strength') alt = 'Mini: eerste 3 oefeningen, 2 werksets, zelfde gewicht';
+      else if(s.t==='plyo') alt = 'Overslaan, alleen warming-up + loopscholing';
+      else if(s.t==='bike' && /interval|×|ftp|vo2|drempel/i.test(s.title)) alt = 'Ingekort: 45 min Z2'; }
+    if(alt) out.push({it, alt}); }
+  return out; }
 const MAIN_LIFTS = ['SQ','RDL','BSS','HT','BP','OHP','PU','LP'];
 const SPORTMAP = {run:['Run','TrailRun','VirtualRun'], race:['Run','TrailRun','VirtualRun'], bike:['Ride','VirtualRide','GravelRide','MountainBikeRide'],
   swim:['Swim'], strength:['WeightTraining'], hyrox:['Workout','HighIntensityIntervalTraining','Crossfit','WeightTraining'], mobility:['WeightTraining','Yoga']};

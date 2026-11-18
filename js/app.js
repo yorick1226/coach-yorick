@@ -63,6 +63,8 @@ document.addEventListener('click', ev => {
   if(ds.cardio){ const f = sessById(ds.cardio); go(() => { ui.prefill = {sid:ds.cardio, date:f.date, sport:({bike:'bike',swim:'swim'})[f.s.t]||'run'}; ui.tab='duur'; }); return; }
   if(ds.oura){ location.href = ouraAuthUrl(); return; }
   if(ds.ourapull){ ouraPull(true).then(d => toast(d ? (d.days||[]).length+' dagen uit Oura' : 'Ophalen mislukt')); return; }
+  if(ds.adapt){ const pl = adaptPlan(ds.adapt, ds.lvl); for(const p of pl) setDone(p.it.s.id, {alt:p.alt, auto:ds.lvl, skip:null}); toast(pl.length+' sessie(s) aangepast'); rerender(); return; }
+  if(ds.unadapt){ for(const [sid, v] of Object.entries(S.done)) if(v.auto && sid.startsWith(ds.unadapt)) setDone(sid, {alt:null, auto:null}); toast('Terug naar het plan'); rerender(); return; }
   if(ds.manual){ go(() => { ui.prefill = null; ui.tab = 'duur'; }); return; }
   if(ds.seen){ S.settings.seenPlan = PLAN.version+'/'+PLAN.updated; save(); rerender(); return; }
   if(ds.kgd){ const inp = document.querySelector('[data-kg="'+ds.kgd+'"]'); const inc = EXN(ds.kgd).inc || 1; const v = (num(inp.value)||0) + inc*Number(ds.dir);

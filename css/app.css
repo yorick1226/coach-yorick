@@ -221,3 +221,5 @@ svg text{fill:var(--mut);font-size:10px}
 .day h2::first-letter{text-transform:uppercase}
 .pill{background:var(--card2);color:var(--mut)}
 .presc span{font-size:13px;padding:5px 8px}
+
+.adapt b{color:inherit}
