@@ -79,7 +79,7 @@ nav.tabs button span{display:flex;justify-content:center;margin-bottom:2px}
 nav.tabs button.on{color:var(--acc)}
 a{color:var(--blue)}
 #rp a.btn{text-decoration:none;color:var(--tx)}
-#tabs button.dot{position:relative}#tabs button.dot::after{content:'';position:absolute;top:6px;right:22%;width:8px;height:8px;border-radius:50%;background:var(--warn)}
+#tabs button.badge{position:relative}#tabs button.badge::after{content:"";position:absolute;top:7px;left:calc(50% + 9px);width:8px;height:8px;border-radius:50%;background:var(--warn)}
 #rp{position:fixed;inset:0;z-index:30;background:var(--bg);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
 #rp.show{display:flex}
 #rp .rpt{font-size:14px;color:var(--mut);display:flex;justify-content:space-between;align-items:center}
@@ -221,4 +221,3 @@ svg text{fill:var(--mut);font-size:10px}
 .day h2::first-letter{text-transform:uppercase}
 .pill{background:var(--card2);color:var(--mut)}
 .presc span{font-size:13px;padding:5px 8px}
-#tabs button.dot::after{right:36%}

@@ -156,7 +156,7 @@ def features(pg, shots=True):
     ok(pg.evaluate("document.querySelectorAll('.sess .glance, .sess .rtchips').length") == 0, "ingeklapte trainingskaart toont alleen type, titel, afstand/duur")
     pg.evaluate("for(const b of document.querySelectorAll('[data-open]')) ui.open[b.dataset.open] = true; render()")
     ok(pg.locator('[data-rtkey^="WU_"]').count() >= 1, "warming-up bij training (uitgeklapt)")
-    ok(pg.locator(".banner.oranje", has_text="back-up").count() == 0 and "dot" in (pg.get_attribute('#tabs [data-tab="meer"]', "class") or ""), "back-upmelding als stip op Meer, niet op Vandaag")
+    ok(pg.locator(".banner.oranje", has_text="back-up").count() == 0 and "badge" in (pg.get_attribute('#tabs [data-tab="meer"]', "class") or ""), "back-upmelding als stip op Meer, niet op Vandaag")
     ok(pg.evaluate("[chooseRug('2026-11-18'), chooseRug('2026-11-19')]")[0] == "RUG_B", "rug & core roteert (A → B)")
     ok("Rekken deze week" in pg.inner_text("#rtcard") and "Massagegun" in pg.inner_text("#rtcard") and pg.locator("#rtcard > .rtrow").count() <= 6, "compacte herstelkaart: max 6 regels, rekteller, herstel op maat")
     ok(pg.evaluate("(() => { const k = dayKind(dayItems('2026-11-21')); return k.long && !k.q; })()"), "dagtype lange duur herkend")

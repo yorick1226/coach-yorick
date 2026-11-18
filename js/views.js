@@ -71,7 +71,7 @@ function sessCard(it, m, opt){
 /* ---------- views ---------- */
 function render(){
   { const par = {log:'vandaag', duur:'inzicht', check:'meer'}[ui.tab] || ui.tab; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab===par)); }
-  { const lb = S.settings.lastBackup; const mb = document.querySelector('#tabs [data-tab="meer"]'); if(mb) mb.classList.toggle('dot', !lb || (Date.now()-lb) > 14*864e5); }
+  { const lb = S.settings.lastBackup; const mb = document.querySelector('#tabs [data-tab="meer"]'); if(mb) mb.classList.toggle('badge', !lb || (Date.now()-lb) > 14*864e5); }
   const nav = ['week','check'].includes(ui.tab);
   $('prev').style.visibility = $('next').style.visibility = nav ? 'visible' : 'hidden';
   keepAwake(ui.tab==='log');
