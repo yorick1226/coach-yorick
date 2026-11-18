@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-16a",
+ "updated": "2026-11-18a",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -78,7 +78,8 @@
    "alt": [
     "DBB",
     "MCP"
-   ]
+   ],
+   "eq": "bb"
   },
   "IDB": {
    "n": "Incline dumbbell press",
@@ -87,7 +88,8 @@
    "alt": [
     "IBB",
     "MCP"
-   ]
+   ],
+   "eq": "db"
   },
   "OHP": {
    "n": "Shoulder press (staand/zittend)",
@@ -95,7 +97,8 @@
    "g": "schouders",
    "alt": [
     "DBS"
-   ]
+   ],
+   "eq": "bb"
   },
   "FLY": {
    "n": "Cable/machine fly",
@@ -103,22 +106,26 @@
    "g": "borst",
    "alt": [
     "PDK"
-   ]
+   ],
+   "eq": "c"
   },
   "LAT": {
    "n": "Lateral raise",
    "inc": 1,
-   "g": "schouders"
+   "g": "schouders",
+   "eq": "db"
   },
   "TPD": {
    "n": "Triceps pushdown",
    "inc": 2.5,
-   "g": "triceps"
+   "g": "triceps",
+   "eq": "c"
   },
   "OTE": {
    "n": "Overhead triceps extension",
    "inc": 2.5,
-   "g": "triceps"
+   "g": "triceps",
+   "eq": "c"
   },
   "PU": {
    "n": "Pull-up (+ extra kg)",
@@ -126,7 +133,8 @@
    "g": "rug",
    "alt": [
     "LPD"
-   ]
+   ],
+   "eq": "bw"
   },
   "LPD": {
    "n": "Lat pulldown",
@@ -134,7 +142,8 @@
    "g": "rug",
    "alt": [
     "PU"
-   ]
+   ],
+   "eq": "c"
   },
   "CSR": {
    "n": "Chest-supported row",
@@ -143,7 +152,8 @@
    "alt": [
     "SRW",
     "DBR"
-   ]
+   ],
+   "eq": "db"
   },
   "SAR": {
    "n": "Single-arm cable row (per kant)",
@@ -152,27 +162,32 @@
    "alt": [
     "SRW",
     "DBR"
-   ]
+   ],
+   "eq": "c"
   },
   "RDF": {
    "n": "Rear delt fly",
    "inc": 1,
-   "g": "schouders"
+   "g": "schouders",
+   "eq": "db"
   },
   "FP": {
    "n": "Face pull",
    "inc": 2.5,
-   "g": "schouders"
+   "g": "schouders",
+   "eq": "c"
   },
   "IDC": {
    "n": "Incline dumbbell curl",
    "inc": 1,
-   "g": "biceps"
+   "g": "biceps",
+   "eq": "db"
   },
   "HAM": {
    "n": "Hammer curl",
    "inc": 1,
-   "g": "biceps"
+   "g": "biceps",
+   "eq": "db"
   },
   "SQ": {
    "n": "Back squat",
@@ -182,7 +197,8 @@
     "LP",
     "HSQ",
     "GSQ"
-   ]
+   ],
+   "eq": "bb"
   },
   "LP": {
    "n": "Leg press",
@@ -191,7 +207,8 @@
    "alt": [
     "HSQ",
     "SQ"
-   ]
+   ],
+   "eq": "m"
   },
   "RDL": {
    "n": "Romanian deadlift",
@@ -201,7 +218,8 @@
     "HT",
     "BEX",
     "HC"
-   ]
+   ],
+   "eq": "bb"
   },
   "HT": {
    "n": "Hip thrust",
@@ -210,25 +228,28 @@
    "alt": [
     "RDL",
     "BEX"
-   ]
+   ],
+   "eq": "bb"
   },
   "BSS": {
-   "n": "Bulgarian split squat (per been, dumbbells totaal)",
+   "n": "Bulgarian split squat (per been)",
    "inc": 2,
    "g": "quads",
    "alt": [
     "SU",
     "LUN"
-   ]
+   ],
+   "eq": "db"
   },
   "SU": {
-   "n": "Step-up (per been, dumbbells totaal)",
+   "n": "Step-up (per been)",
    "inc": 2,
    "g": "quads",
    "alt": [
     "BSS",
     "LUN"
-   ]
+   ],
+   "eq": "db"
   },
   "HC": {
    "n": "Hamstring curl",
@@ -237,7 +258,8 @@
    "alt": [
     "NH",
     "RDL"
-   ]
+   ],
+   "eq": "m"
   },
   "NH": {
    "n": "Nordic hamstring (excentrisch)",
@@ -246,7 +268,8 @@
    "g": "hamstrings",
    "alt": [
     "HC"
-   ]
+   ],
+   "eq": "bw"
   },
   "CR": {
    "n": "Staande calf raise",
@@ -255,7 +278,8 @@
    "alt": [
     "SCR",
     "LPC"
-   ]
+   ],
+   "eq": "m"
   },
   "SCR": {
    "n": "Zittende calf raise (soleus)",
@@ -264,57 +288,67 @@
    "alt": [
     "CR",
     "LPC"
-   ]
+   ],
+   "eq": "m"
   },
   "TIB": {
    "n": "Tibialis raise",
    "inc": 1,
-   "g": "scheen"
+   "g": "scheen",
+   "eq": "bw"
   },
   "ADD": {
    "n": "Hip adduction (machine)",
    "inc": 5,
-   "g": "adductoren"
+   "g": "adductoren",
+   "eq": "m"
   },
   "ABD": {
    "n": "Hip abduction (machine)",
    "inc": 5,
-   "g": "bilspieren"
+   "g": "bilspieren",
+   "eq": "m"
   },
   "SPS": {
    "n": "Spanish squat iso (sec)",
    "inc": 0,
    "u": "s",
-   "g": "quads"
+   "g": "quads",
+   "eq": "bw"
   },
   "CPL": {
    "n": "Copenhagen plank (sec per kant)",
    "inc": 0,
    "u": "s",
-   "g": "core"
+   "g": "core",
+   "eq": "bw"
   },
   "PAL": {
    "n": "Pallof press (per kant)",
    "inc": 2.5,
-   "g": "core"
+   "g": "core",
+   "eq": "c"
   },
   "DBG": {
    "n": "Dead bug (per kant)",
    "inc": 0,
    "u": "reps",
-   "g": "core"
+   "g": "core",
+   "eq": "bw"
   },
   "SC": {
    "n": "Suitcase carry (meter per kant)",
    "inc": 2,
    "u": "m",
-   "g": "core"
+   "g": "core",
+   "eq": "db"
   },
   "HKR": {
    "n": "Hanging knee raise",
    "inc": 0,
    "u": "reps",
-   "g": "core"
+   "g": "core",
+   "eq": "bw"
   },
   "POGO": {
    "n": "Pogo jumps",
@@ -370,18 +404,20 @@
    "g": "hyrox"
   },
   "FC": {
-   "n": "Farmers carry (meter, kg per hand)",
+   "n": "Farmers carry (meter)",
    "inc": 2,
    "u": "m",
    "time": true,
-   "g": "hyrox"
+   "g": "hyrox",
+   "eq": "db"
   },
   "WB": {
    "n": "Wall balls",
    "inc": 0,
    "u": "reps",
    "time": true,
-   "g": "hyrox"
+   "g": "hyrox",
+   "eq": "bal"
   },
   "BBJ": {
    "n": "Burpee broad jumps",
@@ -414,62 +450,395 @@
   "HSQ": {
    "n": "Hack squat",
    "inc": 5,
-   "g": "quads"
+   "g": "quads",
+   "eq": "m"
   },
   "GSQ": {
    "n": "Goblet squat",
    "inc": 2,
-   "g": "quads"
+   "g": "quads",
+   "eq": "db"
   },
   "BEX": {
    "n": "Back extension (+ kg)",
    "inc": 2.5,
-   "g": "hamstrings"
+   "g": "hamstrings",
+   "eq": "bw"
   },
   "LUN": {
-   "n": "Walking lunge (dumbbells totaal)",
+   "n": "Walking lunge",
    "inc": 2,
-   "g": "quads"
+   "g": "quads",
+   "eq": "db"
   },
   "LPC": {
    "n": "Calf raise op leg press",
    "inc": 5,
-   "g": "kuiten"
+   "g": "kuiten",
+   "eq": "m"
   },
   "DBB": {
    "n": "Dumbbell bench press",
    "inc": 2,
-   "g": "borst"
+   "g": "borst",
+   "eq": "db"
   },
   "MCP": {
    "n": "Machine chest press",
    "inc": 2.5,
-   "g": "borst"
+   "g": "borst",
+   "eq": "m"
   },
   "IBB": {
    "n": "Incline barbell press",
    "inc": 2.5,
-   "g": "borst"
+   "g": "borst",
+   "eq": "bb"
   },
   "DBS": {
    "n": "Dumbbell shoulder press",
    "inc": 2,
-   "g": "schouders"
+   "g": "schouders",
+   "eq": "db"
   },
   "SRW": {
    "n": "Seated cable row",
    "inc": 2.5,
-   "g": "rug"
+   "g": "rug",
+   "eq": "c"
   },
   "DBR": {
    "n": "Dumbbell row (per kant)",
    "inc": 2,
-   "g": "rug"
+   "g": "rug",
+   "eq": "db"
   },
   "PDK": {
    "n": "Pec deck",
    "inc": 2.5,
-   "g": "borst"
+   "g": "borst",
+   "eq": "m"
+  },
+  "SMI": {
+   "n": "Smith incline press",
+   "g": "borst",
+   "eq": "sm",
+   "inc": 2.5,
+   "alt": [
+    "IDB",
+    "IBB"
+   ]
+  },
+  "DIP": {
+   "n": "Dips (+ kg)",
+   "g": "borst",
+   "eq": "bw",
+   "inc": 2.5,
+   "alt": [
+    "DBB",
+    "CGB"
+   ]
+  },
+  "PSH": {
+   "n": "Push-up (+ vest)",
+   "g": "borst",
+   "eq": "bw",
+   "inc": 0,
+   "alt": [
+    "DBB"
+   ],
+   "u": "reps"
+  },
+  "CCO": {
+   "n": "Cable crossover (laag→hoog)",
+   "g": "borst",
+   "eq": "c",
+   "inc": 2.5,
+   "alt": [
+    "FLY",
+    "PDK"
+   ]
+  },
+  "BBR": {
+   "n": "Barbell row",
+   "g": "rug",
+   "eq": "bb",
+   "inc": 2.5,
+   "alt": [
+    "CSR",
+    "TBR"
+   ]
+  },
+  "TBR": {
+   "n": "T-bar row",
+   "g": "rug",
+   "eq": "m",
+   "inc": 2.5,
+   "alt": [
+    "BBR",
+    "CSR"
+   ]
+  },
+  "MROW": {
+   "n": "Machine row",
+   "g": "rug",
+   "eq": "m",
+   "inc": 2.5,
+   "alt": [
+    "SRW",
+    "CSR"
+   ]
+  },
+  "CHU": {
+   "n": "Chin-up (+ kg)",
+   "g": "rug",
+   "eq": "bw",
+   "inc": 2.5,
+   "alt": [
+    "PU",
+    "LPD"
+   ]
+  },
+  "SAP": {
+   "n": "Straight-arm pulldown",
+   "g": "rug",
+   "eq": "c",
+   "inc": 2.5,
+   "alt": [
+    "LPD"
+   ]
+  },
+  "ARN": {
+   "n": "Arnold press",
+   "g": "schouders",
+   "eq": "db",
+   "inc": 1,
+   "alt": [
+    "DBS",
+    "OHP"
+   ]
+  },
+  "MSP": {
+   "n": "Machine shoulder press",
+   "g": "schouders",
+   "eq": "m",
+   "inc": 2.5,
+   "alt": [
+    "DBS",
+    "OHP"
+   ]
+  },
+  "CLR": {
+   "n": "Cable lateral raise (per kant)",
+   "g": "schouders",
+   "eq": "c",
+   "inc": 1.25,
+   "alt": [
+    "LAT"
+   ]
+  },
+  "RPD": {
+   "n": "Reverse pec deck",
+   "g": "schouders",
+   "eq": "m",
+   "inc": 2.5,
+   "alt": [
+    "RDF",
+    "FP"
+   ]
+  },
+  "BBC": {
+   "n": "Barbell/EZ curl",
+   "g": "biceps",
+   "eq": "bb",
+   "inc": 1.25,
+   "alt": [
+    "IDC",
+    "CBC"
+   ]
+  },
+  "CBC": {
+   "n": "Cable curl",
+   "g": "biceps",
+   "eq": "c",
+   "inc": 1.25,
+   "alt": [
+    "BBC",
+    "HAM"
+   ]
+  },
+  "PRC": {
+   "n": "Preacher curl",
+   "g": "biceps",
+   "eq": "m",
+   "inc": 1.25,
+   "alt": [
+    "BBC",
+    "IDC"
+   ]
+  },
+  "SKC": {
+   "n": "Skull crusher (EZ)",
+   "g": "triceps",
+   "eq": "bb",
+   "inc": 1.25,
+   "alt": [
+    "OTE",
+    "TPD"
+   ]
+  },
+  "CGB": {
+   "n": "Close-grip bankdrukken",
+   "g": "triceps",
+   "eq": "bb",
+   "inc": 2.5,
+   "alt": [
+    "SKC",
+    "DIP"
+   ]
+  },
+  "FSQ": {
+   "n": "Front squat",
+   "g": "quads",
+   "eq": "bb",
+   "inc": 2.5,
+   "alt": [
+    "SQ",
+    "HSQ"
+   ]
+  },
+  "SMS": {
+   "n": "Smith squat",
+   "g": "quads",
+   "eq": "sm",
+   "inc": 2.5,
+   "alt": [
+    "SQ",
+    "HSQ"
+   ]
+  },
+  "LEX": {
+   "n": "Leg extension",
+   "g": "quads",
+   "eq": "m",
+   "inc": 2.5,
+   "alt": [
+    "LP",
+    "SPS"
+   ]
+  },
+  "RLU": {
+   "n": "Reverse lunge",
+   "g": "quads",
+   "eq": "db",
+   "inc": 1,
+   "alt": [
+    "BSS",
+    "SU"
+   ]
+  },
+  "SLC": {
+   "n": "Seated leg curl",
+   "g": "hamstrings",
+   "eq": "m",
+   "inc": 2.5,
+   "alt": [
+    "HC",
+    "NH"
+   ]
+  },
+  "SLR": {
+   "n": "Eenbeens RDL (per been)",
+   "g": "hamstrings",
+   "eq": "db",
+   "inc": 1,
+   "alt": [
+    "RDL",
+    "HC"
+   ]
+  },
+  "GHR": {
+   "n": "Glute-ham raise",
+   "g": "hamstrings",
+   "eq": "bw",
+   "inc": 0,
+   "alt": [
+    "NH",
+    "HC"
+   ],
+   "u": "reps"
+  },
+  "GBB": {
+   "n": "Glute bridge (barbell)",
+   "g": "bilspieren",
+   "eq": "bb",
+   "inc": 2.5,
+   "alt": [
+    "HT"
+   ]
+  },
+  "CKB": {
+   "n": "Cable kickback (per kant)",
+   "g": "bilspieren",
+   "eq": "c",
+   "inc": 1.25,
+   "alt": [
+    "HT",
+    "ABD"
+   ]
+  },
+  "SLCR": {
+   "n": "Eenbeens calf raise (per been)",
+   "g": "kuiten",
+   "eq": "db",
+   "inc": 1,
+   "alt": [
+    "CR",
+    "SCR"
+   ]
+  },
+  "CAD": {
+   "n": "Cable adduction (per kant)",
+   "g": "adductoren",
+   "eq": "c",
+   "inc": 1.25,
+   "alt": [
+    "ADD",
+    "CPL"
+   ]
+  },
+  "ABW": {
+   "n": "Ab wheel rollout",
+   "g": "core",
+   "eq": "bw",
+   "inc": 0,
+   "alt": [
+    "HKR",
+    "DBG"
+   ],
+   "u": "reps"
+  },
+  "CCR": {
+   "n": "Cable crunch",
+   "g": "core",
+   "eq": "c",
+   "inc": 2.5,
+   "alt": [
+    "HKR",
+    "ABW"
+   ]
+  },
+  "SPL": {
+   "n": "Side plank (sec per kant)",
+   "g": "core",
+   "eq": "bw",
+   "inc": 0,
+   "alt": [
+    "CPL",
+    "PAL"
+   ],
+   "u": "s",
+   "time": true
   }
  },
  "weeks": [
@@ -1044,75 +1413,132 @@
       {
        "id": "2026-11-19-b",
        "t": "strength",
-       "title": "Upper B + core",
-       "ex": [
+       "title": "Upper B",
+       "min": 60,
+       "bl": [
         {
-         "c": "PU",
+         "g": "rug",
+         "lbl": "Rug · verticaal",
          "s": 4,
          "lo": 5,
          "hi": 8,
          "rir": 2,
          "rest": 150,
-         "note": "Haal je 8 reps bij RIR 2: extra kg aan de riem."
+         "opts": [
+          "PU",
+          "CHU",
+          "LPD"
+         ]
         },
         {
-         "c": "OHP",
+         "g": "schouders",
+         "lbl": "Schouders · drukken",
          "s": 3,
          "lo": 6,
-         "hi": 8,
+         "hi": 10,
          "rir": 2,
-         "rest": 150
+         "rest": 120,
+         "opts": [
+          "OHP",
+          "DBS",
+          "MSP",
+          "ARN"
+         ]
         },
         {
-         "c": "SAR",
+         "g": "rug",
+         "lbl": "Rug · eenarmig/kabel",
          "s": 3,
          "lo": 10,
          "hi": 12,
          "rir": 2,
-         "rest": 75
+         "rest": 90,
+         "opts": [
+          "SAR",
+          "DBR",
+          "SRW",
+          "MROW",
+          "SAP"
+         ]
         },
         {
-         "c": "RDF",
+         "g": "borst",
+         "lbl": "Borst · licht",
+         "s": 2,
+         "lo": 10,
+         "hi": 15,
+         "rir": 2,
+         "rest": 90,
+         "opts": [
+          "DBB",
+          "DIP",
+          "PSH",
+          "CCO",
+          "PDK"
+         ]
+        },
+        {
+         "g": "schouders",
+         "lbl": "Schouders · achterkant",
          "s": 3,
          "lo": 12,
          "hi": 15,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "RDF",
+          "FP",
+          "RPD"
+         ]
         },
         {
-         "c": "IDC",
+         "g": "biceps",
+         "lbl": "Biceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "HAM",
+          "BBC",
+          "CBC",
+          "PRC",
+          "IDC"
+         ]
         },
         {
-         "c": "HAM",
+         "g": "triceps",
+         "lbl": "Triceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "OTE",
+          "TPD",
+          "SKC"
+         ]
         },
         {
-         "c": "SC",
+         "g": "core",
+         "lbl": "Core · dragen/buik",
          "s": 3,
-         "lo": 30,
-         "hi": 40,
+         "lo": 8,
+         "hi": 12,
          "rir": 2,
-         "rest": 60
-        },
-        {
-         "c": "HKR",
-         "s": 3,
-         "lo": 10,
-         "hi": 15,
-         "rir": 2,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "SC",
+          "HKR",
+          "ABW",
+          "CCR",
+          "SPL"
+         ]
         }
        ],
-       "min": 60
+       "detail": "Doel: rug breed + schouders sterk, borst 2e prikkel. Kies per blok zelf de oefening; houd reps, RIR en rust aan."
       }
      ]
     },
@@ -1189,47 +1615,78 @@
        "t": "strength",
        "title": "Lower B licht (30 min, middag/avond)",
        "min": 30,
-       "detail": "Na de lange duur, na eten en minstens 2–3 uur rust. Bewust licht: RIR 3, geen nordics en geen excentrische step-ups deze week (vermoeide hamstrings/quads). Zondag fiets je Z2, maandag is rustig.",
-       "ex": [
+       "detail": "Na de lange duur, na eten en minstens 2–3 uur rust. Alles RIR 3, geen nordics en geen excentrische step-ups.",
+       "bl": [
         {
-         "c": "LP",
+         "g": "quads",
+         "lbl": "Quads · volume",
          "s": 3,
          "lo": 10,
          "hi": 12,
          "rir": 3,
-         "rest": 120
+         "rest": 120,
+         "opts": [
+          "LP",
+          "HSQ",
+          "LEX",
+          "GSQ"
+         ]
         },
         {
-         "c": "HT",
+         "g": "hamstrings",
+         "lbl": "Hamstrings · curl",
+         "s": 3,
+         "lo": 8,
+         "hi": 12,
+         "rir": 3,
+         "rest": 90,
+         "opts": [
+          "HC",
+          "SLC"
+         ],
+         "note": "Geen nordics deze week (lange duur net gedaan)"
+        },
+        {
+         "g": "bilspieren",
+         "lbl": "Bilspieren",
          "s": 3,
          "lo": 8,
          "hi": 10,
          "rir": 3,
-         "rest": 90
+         "rest": 90,
+         "opts": [
+          "HT",
+          "GBB",
+          "CKB"
+         ]
         },
         {
-         "c": "SCR",
+         "g": "kuiten",
+         "lbl": "Kuiten · soleus",
          "s": 3,
          "lo": 12,
          "hi": 15,
-         "rir": 2,
-         "rest": 60
+         "rir": 3,
+         "rest": 60,
+         "opts": [
+          "SCR",
+          "LPC",
+          "SLCR"
+         ]
         },
         {
-         "c": "ADD",
+         "g": "adductoren",
+         "lbl": "Adductoren/abductoren",
          "s": 2,
          "lo": 12,
          "hi": 15,
-         "rir": 2,
-         "rest": 45
-        },
-        {
-         "c": "ABD",
-         "s": 2,
-         "lo": 12,
-         "hi": 15,
-         "rir": 2,
-         "rest": 45
+         "rir": 3,
+         "rest": 45,
+         "opts": [
+          "ADD",
+          "ABD",
+          "CAD"
+         ]
         }
        ]
       }
@@ -1273,65 +1730,116 @@
        "id": "2026-11-23-b",
        "t": "strength",
        "title": "Upper A",
-       "ex": [
+       "min": 60,
+       "bl": [
         {
-         "c": "BP",
+         "g": "borst",
+         "lbl": "Borst · zwaar",
          "s": 3,
          "lo": 6,
          "hi": 8,
          "rir": 2,
-         "rest": 150
+         "rest": 150,
+         "opts": [
+          "BP",
+          "DBB",
+          "MCP",
+          "SMI"
+         ]
         },
         {
-         "c": "IDB",
+         "g": "rug",
+         "lbl": "Rug · roeien",
          "s": 3,
          "lo": 8,
          "hi": 10,
          "rir": 2,
-         "rest": 120
+         "rest": 120,
+         "opts": [
+          "CSR",
+          "SRW",
+          "BBR",
+          "TBR",
+          "MROW"
+         ]
         },
         {
-         "c": "CSR",
-         "s": 3,
+         "g": "borst",
+         "lbl": "Borst · schuin",
+         "s": 2,
          "lo": 8,
-         "hi": 10,
+         "hi": 12,
          "rir": 2,
-         "rest": 120
+         "rest": 90,
+         "opts": [
+          "IDB",
+          "IBB",
+          "SMI",
+          "CCO",
+          "DIP"
+         ]
         },
         {
-         "c": "LAT",
+         "g": "schouders",
+         "lbl": "Schouders · zijkant",
          "s": 3,
          "lo": 12,
          "hi": 15,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "LAT",
+          "CLR"
+         ]
         },
         {
-         "c": "FLY",
+         "g": "triceps",
+         "lbl": "Triceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "TPD",
+          "OTE",
+          "SKC",
+          "CGB"
+         ]
         },
         {
-         "c": "TPD",
+         "g": "biceps",
+         "lbl": "Biceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
          "rir": 1,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "IDC",
+          "HAM",
+          "BBC",
+          "CBC",
+          "PRC"
+         ]
         },
         {
-         "c": "PAL",
+         "g": "core",
+         "lbl": "Core · anti-rotatie",
          "s": 2,
          "lo": 10,
          "hi": 12,
          "rir": 2,
-         "rest": 45
+         "rest": 45,
+         "opts": [
+          "PAL",
+          "DBG",
+          "ABW",
+          "CCR"
+         ]
         }
        ],
-       "min": 60
+       "detail": "Doel: borst + rug dik, armen. Kies per blok zelf de oefening."
       }
      ]
     },
@@ -1350,59 +1858,94 @@
        "id": "2026-11-24-b",
        "t": "strength",
        "title": "Lower A (RIR 2–3)",
-       "detail": "Laatste zware benen vóór Ibiza. Geen nieuwe oefeningen, geen falen.",
-       "ex": [
+       "detail": "Laatste zware benen vóór Ibiza. Geen falen, geen nieuwe oefeningen.",
+       "min": 60,
+       "bl": [
         {
-         "c": "SQ",
-         "s": 4,
-         "lo": 4,
+         "g": "quads",
+         "lbl": "Quads · zwaar",
+         "s": 3,
+         "lo": 5,
          "hi": 6,
-         "rir": 2,
+         "rir": 3,
          "rest": 180,
-         "note": "Top-sets. Eerst 2–3 opwarmsets. Rug moet neutraal blijven."
+         "opts": [
+          "SQ",
+          "FSQ",
+          "HSQ",
+          "SMS"
+         ]
         },
         {
-         "c": "RDL",
+         "g": "hamstrings",
+         "lbl": "Heup · hinge",
          "s": 3,
          "lo": 6,
          "hi": 8,
-         "rir": 2,
-         "rest": 150
+         "rir": 3,
+         "rest": 150,
+         "opts": [
+          "RDL",
+          "GBB",
+          "HT"
+         ]
         },
         {
-         "c": "BSS",
+         "g": "quads",
+         "lbl": "Eenbenig",
          "s": 3,
          "lo": 6,
          "hi": 8,
-         "rir": 2,
-         "rest": 120
+         "rir": 3,
+         "rest": 120,
+         "opts": [
+          "BSS",
+          "RLU",
+          "SU"
+         ]
         },
         {
-         "c": "CR",
-         "s": 4,
+         "g": "kuiten",
+         "lbl": "Kuiten",
+         "s": 3,
          "lo": 8,
          "hi": 12,
          "rir": 1,
-         "rest": 75
+         "rest": 75,
+         "opts": [
+          "CR",
+          "SLCR",
+          "LPC"
+         ]
         },
         {
-         "c": "TIB",
+         "g": "scheen",
+         "lbl": "Scheen",
          "s": 2,
          "lo": 15,
          "hi": 20,
          "rir": 1,
-         "rest": 45
+         "rest": 45,
+         "opts": [
+          "TIB"
+         ]
         },
         {
-         "c": "CPL",
+         "g": "adductoren",
+         "lbl": "Adductoren",
          "s": 2,
          "lo": 20,
          "hi": 30,
          "rir": 2,
-         "rest": 45
+         "rest": 45,
+         "opts": [
+          "CPL",
+          "ADD",
+          "CAD"
+         ],
+         "note": "Copenhagen in seconden per kant"
         }
-       ],
-       "min": 60
+       ]
       }
      ]
     },
@@ -1433,75 +1976,115 @@
        "id": "2026-11-26-b",
        "t": "strength",
        "title": "Upper B licht (RIR 2–3)",
-       "ex": [
+       "min": 60,
+       "detail": "Alleen bovenlijf, geen carries. 2 dagen voor Ibiza: niets tot falen.",
+       "bl": [
         {
-         "c": "PU",
+         "g": "rug",
+         "lbl": "Rug · verticaal",
          "s": 4,
          "lo": 5,
          "hi": 8,
          "rir": 2,
          "rest": 150,
-         "note": "Haal je 8 reps bij RIR 2: extra kg aan de riem."
+         "opts": [
+          "PU",
+          "CHU",
+          "LPD"
+         ]
         },
         {
-         "c": "OHP",
+         "g": "schouders",
+         "lbl": "Schouders · drukken",
          "s": 3,
          "lo": 6,
-         "hi": 8,
+         "hi": 10,
          "rir": 2,
-         "rest": 150
+         "rest": 120,
+         "opts": [
+          "OHP",
+          "DBS",
+          "MSP",
+          "ARN"
+         ]
         },
         {
-         "c": "SAR",
+         "g": "rug",
+         "lbl": "Rug · eenarmig/kabel",
          "s": 3,
          "lo": 10,
          "hi": 12,
          "rir": 2,
-         "rest": 75
+         "rest": 90,
+         "opts": [
+          "SAR",
+          "DBR",
+          "SRW",
+          "MROW",
+          "SAP"
+         ]
         },
         {
-         "c": "RDF",
+         "g": "borst",
+         "lbl": "Borst · licht",
+         "s": 2,
+         "lo": 10,
+         "hi": 15,
+         "rir": 2,
+         "rest": 90,
+         "opts": [
+          "DBB",
+          "DIP",
+          "PSH",
+          "CCO",
+          "PDK"
+         ]
+        },
+        {
+         "g": "schouders",
+         "lbl": "Schouders · achterkant",
          "s": 3,
          "lo": 12,
          "hi": 15,
-         "rir": 1,
-         "rest": 60
+         "rir": 2,
+         "rest": 60,
+         "opts": [
+          "RDF",
+          "FP",
+          "RPD"
+         ]
         },
         {
-         "c": "IDC",
+         "g": "biceps",
+         "lbl": "Biceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
-         "rir": 1,
-         "rest": 60
+         "rir": 2,
+         "rest": 60,
+         "opts": [
+          "HAM",
+          "BBC",
+          "CBC",
+          "PRC",
+          "IDC"
+         ]
         },
         {
-         "c": "HAM",
+         "g": "triceps",
+         "lbl": "Triceps",
          "s": 2,
          "lo": 10,
          "hi": 12,
-         "rir": 1,
-         "rest": 60
-        },
-        {
-         "c": "SC",
-         "s": 3,
-         "lo": 30,
-         "hi": 40,
          "rir": 2,
-         "rest": 60
-        },
-        {
-         "c": "HKR",
-         "s": 3,
-         "lo": 10,
-         "hi": 15,
-         "rir": 2,
-         "rest": 60
+         "rest": 60,
+         "opts": [
+          "OTE",
+          "TPD",
+          "SKC"
+         ]
         }
-       ],
-       "min": 60,
-       "detail": "Alleen bovenlijf en core, geen carries met zware benen."
+       ]
       }
      ]
     },
@@ -2152,16 +2735,17 @@
   }
  ],
  "setTargets": {
-  "borst": 10,
+  "borst": 8,
   "rug": 10,
-  "schouders": 8,
-  "biceps": 6,
-  "triceps": 6,
+  "schouders": 9,
+  "biceps": 4,
+  "triceps": 4,
   "quads": 8,
   "hamstrings": 6,
-  "bilspieren": 6,
-  "kuiten": 8,
-  "core": 6
+  "bilspieren": 4,
+  "kuiten": 6,
+  "adductoren": 4,
+  "core": 5
  },
  "bodyGoal": "78–79 kg, geleidelijk (geen cut)",
  "routines": {
@@ -3670,5 +4254,398 @@
   "kuit": 8,
   "hamstring": 8,
   "bil": 8
+ },
+ "blockTemplates": {
+  "UA": [
+   {
+    "g": "borst",
+    "lbl": "Borst · zwaar",
+    "s": 3,
+    "lo": 6,
+    "hi": 8,
+    "rir": 2,
+    "rest": 150,
+    "opts": [
+     "BP",
+     "DBB",
+     "MCP",
+     "SMI"
+    ]
+   },
+   {
+    "g": "rug",
+    "lbl": "Rug · roeien",
+    "s": 3,
+    "lo": 8,
+    "hi": 10,
+    "rir": 2,
+    "rest": 120,
+    "opts": [
+     "CSR",
+     "SRW",
+     "BBR",
+     "TBR",
+     "MROW"
+    ]
+   },
+   {
+    "g": "borst",
+    "lbl": "Borst · schuin",
+    "s": 2,
+    "lo": 8,
+    "hi": 12,
+    "rir": 2,
+    "rest": 90,
+    "opts": [
+     "IDB",
+     "IBB",
+     "SMI",
+     "CCO",
+     "DIP"
+    ]
+   },
+   {
+    "g": "schouders",
+    "lbl": "Schouders · zijkant",
+    "s": 3,
+    "lo": 12,
+    "hi": 15,
+    "rir": 1,
+    "rest": 60,
+    "opts": [
+     "LAT",
+     "CLR"
+    ]
+   },
+   {
+    "g": "triceps",
+    "lbl": "Triceps",
+    "s": 2,
+    "lo": 10,
+    "hi": 12,
+    "rir": 1,
+    "rest": 60,
+    "opts": [
+     "TPD",
+     "OTE",
+     "SKC",
+     "CGB"
+    ]
+   },
+   {
+    "g": "biceps",
+    "lbl": "Biceps",
+    "s": 2,
+    "lo": 10,
+    "hi": 12,
+    "rir": 1,
+    "rest": 60,
+    "opts": [
+     "IDC",
+     "HAM",
+     "BBC",
+     "CBC",
+     "PRC"
+    ]
+   },
+   {
+    "g": "core",
+    "lbl": "Core · anti-rotatie",
+    "s": 2,
+    "lo": 10,
+    "hi": 12,
+    "rir": 2,
+    "rest": 45,
+    "opts": [
+     "PAL",
+     "DBG",
+     "ABW",
+     "CCR"
+    ]
+   }
+  ],
+  "UB": [
+   {
+    "g": "rug",
+    "lbl": "Rug · verticaal",
+    "s": 4,
+    "lo": 5,
+    "hi": 8,
+    "rir": 2,
+    "rest": 150,
+    "opts": [
+     "PU",
+     "CHU",
+     "LPD"
+    ]
+   },
+   {
+    "g": "schouders",
+    "lbl": "Schouders · drukken",
+    "s": 3,
+    "lo": 6,
+    "hi": 10,
+    "rir": 2,
+    "rest": 120,
+    "opts": [
+     "OHP",
+     "DBS",
+     "MSP",
+     "ARN"
+    ]
+   },
+   {
+    "g": "rug",
+    "lbl": "Rug · eenarmig/kabel",
+    "s": 3,
+    "lo": 10,
+    "hi": 12,
+    "rir": 2,
+    "rest": 90,
+    "opts": [
+     "SAR",
+     "DBR",
+     "SRW",
+     "MROW",
+     "SAP"
+    ]
+   },
+   {
+    "g": "borst",
+    "lbl": "Borst · licht",
+    "s": 2,
+    "lo": 10,
+    "hi": 15,
+    "rir": 2,
+    "rest": 90,
+    "opts": [
+     "DBB",
+     "DIP",
+     "PSH",
+     "CCO",
+     "PDK"
+    ]
+   },
+   {
+    "g": "schouders",
+    "lbl": "Schouders · achterkant",
+    "s": 3,
+    "lo": 12,
+    "hi": 15,
+    "rir": 1,
+    "rest": 60,
+    "opts": [
+     "RDF",
+     "FP",
+     "RPD"
+    ]
+   },
+   {
+    "g": "biceps",
+    "lbl": "Biceps",
+    "s": 2,
+    "lo": 10,
+    "hi": 12,
+    "rir": 1,
+    "rest": 60,
+    "opts": [
+     "HAM",
+     "BBC",
+     "CBC",
+     "PRC",
+     "IDC"
+    ]
+   },
+   {
+    "g": "triceps",
+    "lbl": "Triceps",
+    "s": 2,
+    "lo": 10,
+    "hi": 12,
+    "rir": 1,
+    "rest": 60,
+    "opts": [
+     "OTE",
+     "TPD",
+     "SKC"
+    ]
+   },
+   {
+    "g": "core",
+    "lbl": "Core · dragen/buik",
+    "s": 3,
+    "lo": 8,
+    "hi": 12,
+    "rir": 2,
+    "rest": 60,
+    "opts": [
+     "SC",
+     "HKR",
+     "ABW",
+     "CCR",
+     "SPL"
+    ]
+   }
+  ],
+  "LA": [
+   {
+    "g": "quads",
+    "lbl": "Quads · zwaar",
+    "s": 3,
+    "lo": 5,
+    "hi": 6,
+    "rir": 2,
+    "rest": 180,
+    "opts": [
+     "SQ",
+     "FSQ",
+     "HSQ",
+     "SMS"
+    ]
+   },
+   {
+    "g": "hamstrings",
+    "lbl": "Heup · hinge",
+    "s": 3,
+    "lo": 6,
+    "hi": 8,
+    "rir": 2,
+    "rest": 150,
+    "opts": [
+     "RDL",
+     "GBB",
+     "HT"
+    ]
+   },
+   {
+    "g": "quads",
+    "lbl": "Eenbenig",
+    "s": 3,
+    "lo": 6,
+    "hi": 8,
+    "rir": 2,
+    "rest": 120,
+    "opts": [
+     "BSS",
+     "RLU",
+     "SU"
+    ]
+   },
+   {
+    "g": "kuiten",
+    "lbl": "Kuiten",
+    "s": 3,
+    "lo": 8,
+    "hi": 12,
+    "rir": 1,
+    "rest": 75,
+    "opts": [
+     "CR",
+     "SLCR",
+     "LPC"
+    ]
+   },
+   {
+    "g": "scheen",
+    "lbl": "Scheen",
+    "s": 2,
+    "lo": 15,
+    "hi": 20,
+    "rir": 1,
+    "rest": 45,
+    "opts": [
+     "TIB"
+    ]
+   },
+   {
+    "g": "adductoren",
+    "lbl": "Adductoren",
+    "s": 2,
+    "lo": 20,
+    "hi": 30,
+    "rir": 2,
+    "rest": 45,
+    "opts": [
+     "CPL",
+     "ADD",
+     "CAD"
+    ],
+    "note": "Copenhagen in seconden per kant"
+   }
+  ],
+  "LB": [
+   {
+    "g": "quads",
+    "lbl": "Quads · volume",
+    "s": 3,
+    "lo": 10,
+    "hi": 12,
+    "rir": 2,
+    "rest": 120,
+    "opts": [
+     "LP",
+     "HSQ",
+     "LEX",
+     "GSQ"
+    ]
+   },
+   {
+    "g": "hamstrings",
+    "lbl": "Hamstrings · curl",
+    "s": 3,
+    "lo": 8,
+    "hi": 12,
+    "rir": 2,
+    "rest": 90,
+    "opts": [
+     "HC",
+     "SLC",
+     "NH",
+     "GHR"
+    ]
+   },
+   {
+    "g": "bilspieren",
+    "lbl": "Bilspieren",
+    "s": 3,
+    "lo": 8,
+    "hi": 10,
+    "rir": 2,
+    "rest": 90,
+    "opts": [
+     "HT",
+     "GBB",
+     "CKB"
+    ]
+   },
+   {
+    "g": "kuiten",
+    "lbl": "Kuiten · soleus",
+    "s": 3,
+    "lo": 12,
+    "hi": 15,
+    "rir": 1,
+    "rest": 60,
+    "opts": [
+     "SCR",
+     "LPC",
+     "SLCR"
+    ]
+   },
+   {
+    "g": "adductoren",
+    "lbl": "Adductoren/abductoren",
+    "s": 2,
+    "lo": 12,
+    "hi": 15,
+    "rir": 2,
+    "rest": 45,
+    "opts": [
+     "ADD",
+     "ABD",
+     "CAD"
+    ]
+   }
+  ]
  }
 }

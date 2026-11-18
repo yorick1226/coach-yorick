@@ -124,3 +124,10 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - v3.1: Inzicht → sectienavigatie (`data-jump`), `perfCard` (Riegel-prognose uit beste race ≤ 240 d; tempo's als % drempelsnelheid; Coggan-fietszones), fietskaart, Mozart telt afdaal-/excentrische prikkels en gut-trainingsessies. Belastingswaarschuwing nu bij > +30% loopvolume (Nielsen 2014). Taperbanner in Week als een race binnen 14 dagen valt (doel −41–60% volume, Bosquet 2007). Vandaag: training eerst, herstel & mobiliteit eronder. Coachnotitie: eerste 2 regels, rest uitklapbaar.
 - Planregel: loopvolume per week max ~30% boven het gemiddelde van de 3 weken ervoor.
 - v3.4: `glance(s)` = doelregel op de dichte kaart (tempo/HF/watt/RIR uit tgt of detail). Zwift: sessie-veld `zwo` = [{min,pct} | {min,pct:[van,naar]} | {rep,on:{min,pct},off:{min,pct}}] (% FTP) → knop "Zwift-bestand" (.zwo). Alleen toevoegen bij intervaltrainingen op de fiets. HF-drift: strava.json-veld `dec` (%), berekend door tools/decoupling.py in de avondsync (vlakke runs ≥ 75 min, hm/km < 10). Check-in vragenset v3 (cijfer, benen, richting, opmerkingen); v1/v2 blijven leesbaar.
+
+## v4.0.0 (18 nov 2026) — opgeschoond front-end, spiergroep-blokken
+- Trainingskaarten ingeklapt: alleen titel, type en afstand/duur (of Strava-km/tijd). Alles anders (doel, warming-up, logger-knop, details) pas na uitklappen.
+- Kracht: sessies kunnen `bl` (blokken) hebben i.p.v. `ex`: `{g, lbl, s, lo, hi, rir, rest, opts[], note}`. Het plan schrijft spiergroep + sets/reps/RIR/rust voor; Yorick kiest de oefening (laatst gekozen uit `opts` = standaard). Blok-id = `B0..Bn`, keuze in `S.swaps[sid|Bi]`. Gebruik altijd `cOf(sid, e)` om de echte oefeningcode te krijgen.
+- Sjablonen staan in `plan.blockTemplates` (UA, UB, LA, LB). Oefeningen hebben `eq` (bb/db/m/c/bw/sm/kb/bal). Dumbbells: kg = per dumbbell.
+- `setTargets` = harde sets/week; `groupTargets()` verlaagt benen ×0,75 bij ≥ 50 km lopen gepland en ×0,6 in een wedstrijdweek.
+- Inzicht: tabbladen Overzicht/Lopen/Fietsen/Kracht/Lichaam (`ui.ins`), KPI-tegels bovenaan.
