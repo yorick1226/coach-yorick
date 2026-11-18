@@ -106,7 +106,7 @@ function ouraSync(days) {
   let sh = ss.getSheetByName('oura'); if (!sh) { sh = ss.insertSheet('oura'); sh.appendRow(['day', 'json', 'ts']); }
   const n = sh.getLastRow(); const have = n > 1 ? sh.getRange(2, 1, n - 1, 1).getValues().map(r => String(r[0]).slice(0, 10)) : [];
   Object.keys(by).forEach(d => { const o = by[d]; delete o._len; if (o.rd == null && o.sl == null) return;
-    const vals = [d, JSON.stringify(o), new Date()]; const i = have.indexOf(d);
+    const vals = ["'" + d, JSON.stringify(o), new Date()]; // apostrof: Sheets maakt er anders een datum van const i = have.indexOf(d);
     if (i >= 0) sh.getRange(i + 2, 1, 1, 3).setValues([vals]); else { sh.appendRow(vals); have.push(d); } });
 }
 function ouraRows_(days) {
