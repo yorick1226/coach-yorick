@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-22b",
+ "updated": "2026-11-22c",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -1844,7 +1844,12 @@
        "title": "Heuvels: 8 × 90 s bergop (avond)",
        "km": 10,
        "min": 55,
-       "detail": "Avond, vóór de krachtsessie.\nWU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8% @ ~12 km/u, of brug/heuvel), wandel/jog terug (± 2 min)\nCD 2 km · totaal ~10 km\nKracht bergop zonder veel volume; niet tot het gaatje."
+       "detail": "Avond, vóór de krachtsessie.\nWU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8% @ ~12 km/u, of brug/heuvel), wandel/jog terug (± 2 min)\nCD 2 km · totaal ~10 km\nKracht bergop zonder veel volume; niet tot het gaatje.",
+       "alts": [
+        "Vlak: 5 × 3 min @ 4:35–4:40/km, 90 s jog (WU 3 km, CD 2 km, ~10 km)",
+        "Ingekort: 5 × 90 s bergop, zelfde helling",
+        "Easy 40 min, HF ≤ 145"
+       ]
       },
       {
        "id": "2026-11-24-b",
