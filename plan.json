@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-22",
+ "updated": "2026-11-22b",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -1841,17 +1841,17 @@
       {
        "id": "2026-11-24-a",
        "t": "run",
-       "title": "Heuvels: 8 × 90 s bergop",
+       "title": "Heuvels: 8 × 90 s bergop (avond)",
        "km": 10,
        "min": 55,
-       "detail": "Ochtend.\nWU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8% @ ~12 km/u, of brug/heuvel), wandel/jog terug (± 2 min)\nCD 2 km · totaal ~10 km\nKracht bergop zonder veel volume; niet tot het gaatje."
+       "detail": "Avond, vóór de krachtsessie.\nWU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8% @ ~12 km/u, of brug/heuvel), wandel/jog terug (± 2 min)\nCD 2 km · totaal ~10 km\nKracht bergop zonder veel volume; niet tot het gaatje."
       },
       {
        "id": "2026-11-24-b",
        "t": "strength",
-       "title": "Lower A licht (2 sets, RIR 3)",
-       "min": 40,
-       "detail": "Avond, minstens 6 uur na de heuvels. Laatste benensessie vóór Ibiza: 2 sets voor squat/hinge/eenbenig, alles RIR 3, geen nordics, geen nieuwe oefeningen. Doel: prikkel houden, geen spierpijn.",
+       "title": "Lower A licht (direct na heuvels)",
+       "min": 35,
+       "detail": "Direct na de heuvels: eten/drinken, 10 min pauze, dan 2 sets squat/hinge/eenbenig, alles RIR 3, geen nordics, geen nieuwe oefeningen. Kort op tijd of benen leeg na de heuvels: laat hem vallen, dat kost je voor Ibiza niets.",
        "bl": [
         {
          "g": "quads",
@@ -2123,7 +2123,7 @@
     }
    ],
    "vert": 900,
-   "note": "Raceweek: minder volume, wel prikkels houden. Kracht gaat door (zoals je wilde), alleen benen licht en uiterlijk dinsdag.\nMa alleen ochtend: dag na je 21 km, dus alleen Upper A, geen run.\nDo alleen ochtend: Upper B verhuist naar wo-avond, do is alleen een kort loopje.\nTempo's herijkt: je drempel ligt nu rond 4:35/km, niet 4:23 (zie evaluatie). Gebruik voor Ibiza hartslag en gevoel, niet tempo.\nRace: eerste 20–30 min RPE 7 en HF onder ~168, steil (> 12%) power-hiken, vanaf halverwege opschalen, laatste 5–6 km alles. Dalen snel maar beheerst.\nVoeding: 60–80 g KH/uur vanaf 20–30 min, 500 ml/uur + zout. Niets nieuws op racedag."
+   "note": "Raceweek: minder volume, wel prikkels houden. Kracht gaat door (zoals je wilde), alleen benen licht en uiterlijk dinsdag.\nMa alleen ochtend: dag na je 21 km, dus alleen Upper A, geen run.\nDi alleen avond: heuvels en Lower A licht achter elkaar (harde dag bij elkaar houden, wo/do benen vrij).\nDo alleen ochtend: Upper B verhuist naar wo-avond, do is alleen een kort loopje.\nTempo's herijkt: je drempel ligt nu rond 4:35/km, niet 4:23 (zie evaluatie). Gebruik voor Ibiza hartslag en gevoel, niet tempo.\nRace: eerste 20–30 min RPE 7 en HF onder ~168, steil (> 12%) power-hiken, vanaf halverwege opschalen, laatste 5–6 km alles. Dalen snel maar beheerst.\nVoeding: 60–80 g KH/uur vanaf 20–30 min, 500 ml/uur + zout. Niets nieuws op racedag."
   },
   {
    "id": "2026-W49",
