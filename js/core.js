@@ -1,7 +1,7 @@
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.3.1';
+const APP_VERSION = '4.3.2';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -234,8 +234,12 @@ function intensitySplit(acts){ const t = {rustig:0, matig:0, hard:0}; const tp =
   const tot = t.rustig+t.matig+t.hard; return {t, tot}; }
 /* B8: intervalbeoordeling op basis van ronden en doeltempo uit het plan (tgt.pace = [snelst, langzaamst] in s/km). */
 function intervalEval(s, a){ if(!s.tgt || !s.tgt.pace || !a || !a.laps) return null; const [lo, hi] = s.tgt.pace;
-  const reps = a.laps.filter(l => l.m >= 150 && l.sec/(l.m/1000) <= hi*1.06); if(!reps.length) return null;
-  const pc = reps.map(l => l.sec/(l.m/1000)); const fast = [], slow = []; let ok = 0;
+  /* bewegende tijd (mv) als die er is: stilstaan in de pauze telt niet mee; een herhaling die over een auto-lap heen loopt (1000 m + rest) wordt samengevoegd */
+  const t = l => l.mv || l.sec, q = l => l.m >= 150 && t(l)/(l.m/1000) <= hi*1.06; const reps = [];
+  a.laps.forEach((l, i) => { if(!q(l)) return; const prev = i && q(a.laps[i-1]) && a.laps[i-1].m >= 990 ? reps[reps.length-1] : null;
+    if(prev) { prev.m += l.m; prev.s += t(l); } else reps.push({m:l.m, s:t(l)}); });
+  if(!reps.length) return null;
+  const pc = reps.map(r => r.s/(r.m/1000)); const fast = [], slow = []; let ok = 0;
   pc.forEach((v,i) => { if(v < lo-3) fast.push(i+1); else if(v > hi+3) slow.push(i+1); else ok++; });
   const drift = pc.length>1 ? pc[pc.length-1]-pc[0] : 0;
   let txt = reps.length+' werkronden · '+ok+' binnen '+fmtSec(lo)+'–'+fmtSec(hi);

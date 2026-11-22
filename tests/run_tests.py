@@ -182,7 +182,8 @@ def features(pg, shots=True):
     tab(pg, "week"); pg.wait_for_selector("#stats")
     for sid in ("2026-11-17-a", "2026-11-19-a", "2026-11-18-b", "2026-11-21-a"): ensure_open(pg, sid)
     ok(pg.evaluate("(() => { const s0 = sessById('2026-11-21-a').s; const k = s0.km; s0.km = 40; const w = loadWarnings(weekByStart('2026-11-16')); s0.km = k; return w.length > 0 && w[0].includes('%'); })()"), "waarschuwing bij >30% opbouw (gesimuleerd)")
-    ok(pg.locator("#loadwarn").count() == 0, "W47 blijft onder de 30%-grens")
+    # plan zelf moet onder de grens blijven (gedaan km bevat in de test ook handmatig toegevoegde sessies + echte Strava t/m vandaag)
+    ok(pg.evaluate("(() => { const w = weekByStart('2026-11-16'); const prev = [1,2,3].map(i => weekDone(addDays(w.start, -7*i)).km); const avg = prev.reduce((a,b)=>a+b,0)/3; return weekStats(w).runPlan <= avg*1.3; })()"), "W47-plan blijft onder de 30%-grens")
     pg.fill('[data-min="2026-11-17-a"]', "90"); pg.press('[data-min="2026-11-17-a"]', "Tab")
     pg.click('[data-srpe="2026-11-17-a"][data-v="4"]')
     pg.click('[data-done="2026-11-16-a"]')
@@ -362,7 +363,7 @@ def features(pg, shots=True):
       S.daily['2026-11-30'] = {rd:80, pain:5}; r.adv3 = advice('2026-11-30').lvl;
       const ses = {t:'run', title:'Easy 8 km', date:'2026-11-30', km:8}; r.ez = [!!easyFlag(ses,{sport:'Run',km:8,sec:2700,hr:152}), !!easyFlag(ses,{sport:'Run',km:8,sec:2700,hr:135})];
       r.ms = matchScore({t:'run', title:'Easy', date:'2026-11-30'}, {sport:'Run', date:'2026-11-30', name:'x'}) > matchScore({t:'run', title:'Easy', date:'2026-11-30'}, {sport:'Ride', date:'2026-11-30', name:'x'});
-      const iv = intervalEval({tgt:{pace:[280,285]}}, {laps:[{m:1000,sec:282},{m:1000,sec:283},{m:400,sec:200},{m:1000,sec:300}]}); r.iv = iv ? [iv.txt.startsWith('3 werkronden'), iv.good] : null;
+      const iv = intervalEval({tgt:{pace:[280,285]}}, {laps:[{m:1000,sec:282},{m:400,sec:200},{m:1000,sec:283},{m:400,sec:200},{m:1000,sec:300}]}); r.iv = iv ? [iv.txt.startsWith('3 werkronden'), iv.good] : null;
       S = S0; return r; }""")
     ok(u["up"] == 62.5 and u["stay"] == 60 and u["down"] == 57.5 and u["first"] is None, f"unit: dubbele progressie {u['up'],u['stay'],u['down'],u['first']}")
     ok(u["alt"][0] == 13 and u["alt"][1] == 0 and u["alt"][3] == 20, f"unit: altKm {u['alt']}")

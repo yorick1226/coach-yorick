@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-18b",
+ "updated": "2026-11-22",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -13,7 +13,7 @@
  },
  "athlete": {
   "lthr": 173,
-  "tpace": 263,
+  "tpace": 275,
   "ftp": 230
  },
  "races": [
@@ -1711,26 +1711,19 @@
   {
    "id": "2026-W48",
    "start": "2026-11-23",
-   "status": "concept",
+   "status": "definitief",
    "phase": "Basis 1 · week 2/3 · raceweek Ibiza",
-   "focus": "Trailrace za 28 nov (23,5 km, ±690 hm). Mini-taper: volume omlaag, kort scherp houden. FTP-test schuift naar week 49.",
+   "focus": "Raceweek Ibiza Trail (za 28 nov, 23,5 km, ±690 hm). Mini-taper: loopvolume omlaag, één scherpe heuvelprikkel, kracht wel maar licht.",
    "days": [
     {
      "date": "2026-11-23",
      "s": [
       {
-       "id": "2026-11-23-a",
-       "t": "run",
-       "title": "Easy 8 km + 6 strides",
-       "detail": "HF ≤ 145 · RPE 2–3",
-       "min": 50,
-       "km": 8
-      },
-      {
        "id": "2026-11-23-b",
        "t": "strength",
        "title": "Upper A",
        "min": 60,
+       "detail": "Ochtend. Bovenlijf normaal zwaar (RIR 1–2), benen rust na je 21 km. Kies per blok zelf de oefening.",
        "bl": [
         {
          "g": "borst",
@@ -1838,8 +1831,7 @@
           "CCR"
          ]
         }
-       ],
-       "detail": "Doel: borst + rug dik, armen. Kies per blok zelf de oefening."
+       ]
       }
      ]
     },
@@ -1850,21 +1842,21 @@
        "id": "2026-11-24-a",
        "t": "run",
        "title": "Heuvels: 8 × 90 s bergop",
-       "detail": "WU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8% @ ~12 km/u, of een brug/heuvel), wandel/jog terug (± 2 min)\nCD 2 km\nTrail-specifiek: kracht bergop zonder veel volume.",
+       "km": 10,
        "min": 55,
-       "km": 10
+       "detail": "Ochtend.\nWU 3 km easy + 4 strides\n8 × 90 s bergop @ RPE 8 (loopband 8% @ ~12 km/u, of brug/heuvel), wandel/jog terug (± 2 min)\nCD 2 km · totaal ~10 km\nKracht bergop zonder veel volume; niet tot het gaatje."
       },
       {
        "id": "2026-11-24-b",
        "t": "strength",
-       "title": "Lower A (RIR 2–3)",
-       "detail": "Laatste zware benen vóór Ibiza. Geen falen, geen nieuwe oefeningen.",
-       "min": 60,
+       "title": "Lower A licht (2 sets, RIR 3)",
+       "min": 40,
+       "detail": "Avond, minstens 6 uur na de heuvels. Laatste benensessie vóór Ibiza: 2 sets voor squat/hinge/eenbenig, alles RIR 3, geen nordics, geen nieuwe oefeningen. Doel: prikkel houden, geen spierpijn.",
        "bl": [
         {
          "g": "quads",
          "lbl": "Quads · zwaar",
-         "s": 3,
+         "s": 2,
          "lo": 5,
          "hi": 6,
          "rir": 3,
@@ -1879,7 +1871,7 @@
         {
          "g": "hamstrings",
          "lbl": "Heup · hinge",
-         "s": 3,
+         "s": 2,
          "lo": 6,
          "hi": 8,
          "rir": 3,
@@ -1893,7 +1885,7 @@
         {
          "g": "quads",
          "lbl": "Eenbenig",
-         "s": 3,
+         "s": 2,
          "lo": 6,
          "hi": 8,
          "rir": 3,
@@ -1910,7 +1902,7 @@
          "s": 3,
          "lo": 8,
          "hi": 12,
-         "rir": 1,
+         "rir": 3,
          "rest": 75,
          "opts": [
           "CR",
@@ -1924,7 +1916,7 @@
          "s": 2,
          "lo": 15,
          "hi": 20,
-         "rir": 1,
+         "rir": 3,
          "rest": 45,
          "opts": [
           "TIB"
@@ -1936,7 +1928,7 @@
          "s": 2,
          "lo": 20,
          "hi": 30,
-         "rir": 2,
+         "rir": 3,
          "rest": 45,
          "opts": [
           "CPL",
@@ -1954,30 +1946,18 @@
      "s": [
       {
        "id": "2026-11-25-a",
-       "t": "bike",
-       "title": "Zwift Z2 60 min",
-       "detail": "Z2 @ 130–160 W · HF < 140 · cadans 85–95 · RPE 3\nFTP-test schuift naar week 49 (niet maximaal 3 dagen voor een race).",
-       "min": 60
-      }
-     ]
-    },
-    {
-     "date": "2026-11-26",
-     "s": [
-      {
-       "id": "2026-11-26-a",
        "t": "run",
-       "title": "Easy 6 km + 4 strides",
-       "detail": "HF ≤ 145 · 5:40–6:00/km\n4 × 20 s soepel op ~4:00/km-gevoel. Benen wakker houden.",
-       "min": 38,
-       "km": 6
+       "title": "Easy 7 km + 4 strides",
+       "km": 7,
+       "min": 42,
+       "detail": "Ochtend. HF ≤ 145 · 5:40–6:00/km · RPE 2–3\n4 × 20 s soepel versnellen, volledig herstel."
       },
       {
-       "id": "2026-11-26-b",
+       "id": "2026-11-25-b",
        "t": "strength",
        "title": "Upper B licht (RIR 2–3)",
-       "min": 60,
-       "detail": "Alleen bovenlijf, geen carries. 2 dagen voor Ibiza: niets tot falen.",
+       "min": 45,
+       "detail": "Avond. Alleen bovenlijf, geen carries, geen core-blok. 3 dagen voor Ibiza: niets tot falen.",
        "bl": [
         {
          "g": "rug",
@@ -2089,15 +2069,28 @@
      ]
     },
     {
+     "date": "2026-11-26",
+     "s": [
+      {
+       "id": "2026-11-26-a",
+       "t": "run",
+       "title": "Easy 5 km + 3 × 1 min racegevoel",
+       "km": 5,
+       "min": 32,
+       "detail": "Ochtend. 3 km easy (HF ≤ 145), dan 3 × 1 min op racegevoel (RPE 7, ~4:40/km) met 1 min jog, uitlopen.\nDaarna inpakken: schoenen, gels (genoeg voor 3 u), zout, vest/flask, startnummer-spullen."
+      }
+     ]
+    },
+    {
      "date": "2026-11-27",
      "s": [
       {
        "id": "2026-11-27-a",
        "t": "run",
-       "title": "Reisdag (vroege vlucht): shake-out 15–20 min of rust",
+       "title": "Reisdag: shake-out 15–20 min (avond)",
        "min": 20,
        "km": 3,
-       "detail": "Na aankomst: 15–20 min heel rustig + 3 × 15 s versnellen. Moe van het vroege reizen: gewoon rust, dat kost niets.\nVeel drinken, normaal + koolhydraatrijk eten, uitrusting en gels klaarleggen, startlocatie Cala Sant Vicent en vervoer checken."
+       "detail": "Vroege vlucht. Op Ibiza in de avond: 15–20 min heel rustig + 3 × 15 s versnellen. Te moe van het reizen: rust kost niets.\nVeel drinken, koolhydraatrijk eten, uitrusting en gels klaarleggen, vervoer naar Cala Sant Vicent checken."
       }
      ]
     },
@@ -2130,7 +2123,7 @@
     }
    ],
    "vert": 900,
-   "note": "Ibiza (alleen de halve marathon) gaat voluit: een echte trail-test 4 maanden na Val d'Aran. Reis vr vroeg heen, ma avond terug.\nMini-taper: geen zware benen na dinsdag, geen Hyrox.\nVoluit ≠ vanaf de start knallen: eerste klim RPE 7 (HF rond/onder ~170), steil (> 12%) power-hiken, vanaf halverwege opschalen, laatste 5–6 km alles eruit. Dalen: snel maar beheerst, kleine passen; daar win je weinig en verlies je veel (val, quads kapot).\nVerwachting ruwweg 2:15–2:45 (onzeker: hangt sterk af van hoe technisch het parcours is en van de warmte).\nVoeding: 60–80 g KH/uur vanaf 20–30 min (bv. Gel 100 elke ~25 min, laatste CAF rond uur 1:30), 500 ml/uur + zout. Niets nieuws op racedag; schoenen die je kent."
+   "note": "Raceweek: minder volume, wel prikkels houden. Kracht gaat door (zoals je wilde), alleen benen licht en uiterlijk dinsdag.\nMa alleen ochtend: dag na je 21 km, dus alleen Upper A, geen run.\nDo alleen ochtend: Upper B verhuist naar wo-avond, do is alleen een kort loopje.\nTempo's herijkt: je drempel ligt nu rond 4:35/km, niet 4:23 (zie evaluatie). Gebruik voor Ibiza hartslag en gevoel, niet tempo.\nRace: eerste 20–30 min RPE 7 en HF onder ~168, steil (> 12%) power-hiken, vanaf halverwege opschalen, laatste 5–6 km alles. Dalen snel maar beheerst.\nVoeding: 60–80 g KH/uur vanaf 20–30 min, 500 ml/uur + zout. Niets nieuws op racedag."
   },
   {
    "id": "2026-W49",
@@ -2389,16 +2382,16 @@
       {
        "id": "2026-12-03-a",
        "t": "run",
-       "title": "3 × 10 min @ 4:25–4:32",
+       "title": "3 × 10 min @ 4:33–4:40",
        "km": 12,
        "min": 65,
        "tgt": {
         "pace": [
-         265,
-         272
+         273,
+         280
         ]
        },
-       "detail": "WU 2,5 km + 4 strides\n3 × 10 min @ 4:25–4:32/km · 2 min jog\nCD 2 km · totaal ~12 km · RPE 7\nGecontroleerde drempel, geen race. Benen nog zwaar: 2 × 10 min."
+       "detail": "WU 2,5 km + 4 strides\n3 × 10 min @ 4:33–4:40/km (drempel, HF rond 168–172) · 2 min jog (niet stilstaan)\nCD 2 km · totaal ~12 km · RPE 7\nBenen nog zwaar van Ibiza: 2 × 10 min."
       },
       {
        "id": "2026-12-03-b",
