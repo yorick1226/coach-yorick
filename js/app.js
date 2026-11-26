@@ -54,6 +54,9 @@ document.addEventListener('click', ev => {
   if(ds.jump){ const e = $(ds.jump); if(e) e.scrollIntoView({behavior:'smooth', block:'start'}); else toast('Nog geen gegevens voor dit onderdeel'); return; }
   if(ds.block){ ui.block = Number(ds.block); rerender(); return; }
   if(ds.ins){ ui.ins = ds.ins; rerender(); window.scrollTo(0,0); return; }
+  if(ds.brief){ go(() => { ui.tab = 'brief'; ui.sid = ds.brief; }); return; }
+  if(ds.review){ go(() => { ui.tab = 'review'; ui.week = ds.review; }); return; }
+  if(ds.rvweek){ ui.week = ds.rvweek; render(); window.scrollTo(0,0); return; }
   if(ds.range){ ui.range = Number(ds.range); rerender(); return; }
   if(ds.laps){ ui.laps[ds.laps] = !ui.laps[ds.laps]; rerender(); return; }
   if(ds.menu){ ui.menu[ds.menu] = !ui.menu[ds.menu]; rerender(); return; }

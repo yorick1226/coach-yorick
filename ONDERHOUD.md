@@ -158,3 +158,9 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - Sheet-script: `APP_KEY` in scripteigenschappen; app stuurt `k` mee (`sheetU()`), sleutel in Meer → Instellingen. Zonder APP_KEY blijft het script open (oud gedrag). Volgorde bij instellen: nieuwe Code.gs + nieuwe versie implementeren → sleutel in app bewaren → APP_KEY zetten.
 - Lege installatie: kaart op Vandaag om alles uit de Sheet terug te zetten (`restoreFromSheet`).
 - CI: `.github/workflows/pages.yml` draait de releasetest (Chromium + WebKit, prev = HEAD~1) vóór publicatie. Cachenummer hoeft alleen omhoog als app-bestanden wijzigen (niet bij alleen strava.json/ics).
+
+## v4.5.0 — coachschermen + alleen donker
+- Nieuw `js/coach.js` (laden ná insight.js): `rBrief` (Training vooraf, knop "Vooraf ›" op elke sessiekaart), `rReview`/`reviewHtml` (weekevaluatie; knop onder Plan, compact op Voortgang), `seasonHtml` (tabblad Seizoen op Voortgang).
+- Sessietype via `sessKind(s)`; standaardteksten in `KIND`. Per sessie te overschrijven in plan.json: `why`, `cues`, `ifthen` ([[als, dan]]), `success`. Per week: `review: {changes:[[input, actie]], focus}`.
+- plan.json: `season` (fases met km-band) en `milestones` (kind: long | hmweek | weekkm | race; auto-afgevinkt uit Strava).
+- App is altijd donker (geen licht thema meer); test controleert dat.

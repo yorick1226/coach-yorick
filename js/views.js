@@ -38,6 +38,7 @@ function sessCard(it, m, opt){
   if(a) h += planVsDone(s, a);
   if(a) h += '<div class="strava"><b>✓ Strava</b> '+actLine(a)+(a.laps?'<br><button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>'+(ui.laps[s.id]?lapsTable(a):''):'')+'</div>';
   const quick = [];
+  if(!skip && !['rest','mobility'].includes(s.t) && !s.rt) quick.push('<button class="btn sm'+(hasEx(s)||done?'':' pri')+'" data-brief="'+s.id+'">Vooraf ›</button>');
   if(hasEx(s) && !skip) quick.push('<button class="btn sm pri" data-logger="'+s.id+'">Logger</button>');
   if(s.zwo && !skip) quick.push('<button class="btn sm" data-zwo="'+s.id+'">⬇ Zwift-bestand</button>');
   if(s.rt && !skip) quick.push('<button class="btn sm pri" data-rtstart="'+s.rt+'" data-rtkey="'+s.rt+'" data-rtdate="'+it.date+'">▶ Start routine</button>');
@@ -70,7 +71,7 @@ function sessCard(it, m, opt){
 
 /* ---------- views ---------- */
 function render(){
-  { const par = {log:'vandaag', duur:'inzicht', check:'meer'}[ui.tab] || ui.tab; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab===par)); }
+  { const par = {log:'vandaag', duur:'inzicht', check:'meer', brief:'vandaag', review:'week'}[ui.tab] || ui.tab; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab===par)); }
   { const lb = S.settings.lastBackup; const mb = document.querySelector('#tabs [data-tab="meer"]'); if(mb) mb.classList.toggle('badge', !lb || (Date.now()-lb) > 14*864e5); }
   const nav = ['week','check'].includes(ui.tab);
   $('prev').style.visibility = $('next').style.visibility = nav ? 'visible' : 'hidden';
@@ -79,7 +80,7 @@ function render(){
   $('back').textContent = nav ? '←' : '← Terug';
   $('prev').style.display = $('next').style.display = (!nav && ui.stack.length) ? 'none' : '';
   if(!PLAN && ui.tab!=='meer'){ $('view').innerHTML = '<div class="card">Plan kon niet geladen worden. Controleer je verbinding en herlaad.</div>'; return; }
-  ({vandaag:rToday, week:rWeek, log:rLog, duur:rDuur, inzicht:rInsight, check:rCheck, meer:rMeer})[ui.tab]();
+  ({vandaag:rToday, week:rWeek, log:rLog, duur:rDuur, inzicht:rInsight, check:rCheck, meer:rMeer, brief:rBrief, review:rReview})[ui.tab]();
 }
 
 /* ---------- routines (mobiliteit, warming-up, cooldown, herstel) ---------- */
@@ -294,6 +295,7 @@ function rWeek(){
     if(rc){ const prevKm = [1,2,3,4].map(i => { const ww = weekByStart(addDays(w.start, -7*i)); return ww ? weekStats(ww).runPlan : 0; }); const peak = Math.max(...prevKm); const cur = weekStats(w).runPlan;
       if(peak > 0) h += '<div class="card" id="taper"><b>Taper richting '+esc(rc.name.split(' – ')[0])+'</b><div class="small">Loopvolume '+fmtN(cur)+' km = '+Math.round((1-cur/peak)*100)+'% minder dan de piekweek ('+fmtN(peak)+' km). Doel over 2 weken: 41–60% minder volume, intensiteit en frequentie houden (Bosquet 2007).</div></div>'; } }
   if(w.days.length) h += statsCard(w);
+  if(w.days.length && w.start <= t) h += '<div class="row"><button class="btn" id="rvbtn" data-review="'+w.start+'">Weekevaluatie ›</button></div>';
   $('view').innerHTML = h;
 }
 

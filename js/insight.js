@@ -97,7 +97,8 @@ function rInsight(){
     h += '<div class="kpis">'+tile('Lopen deze week', fmtN(cur.km)+' km', (weekByStart(thisMon) ? 'plan '+fmtN(weekStats(weekByStart(thisMon)).runPlan)+' · ' : '')+'gem. '+fmtN(avg(x=>x.km)), over?'var(--warn)':'')+tile('Trainingstijd', fmtH(cur.sec), 'gem. '+fmtH(avg(x=>x.sec)))+tile('Fietsen', fmtN(rh)+' u', 'gem. '+fmtN(rhA)+' u')+tile('Harde krachtsets', String(hs), 'deze week')+'</div>';
     { const ca = coachAdvice(); if(ca.length) h += '<div class="card" id="coachadv"><div class="coachline">'+ic('progress',18)+'<div><b>Coach</b>'+ca.map(x => '<div class="advice1" style="margin-top:4px">'+x+'</div>').join('')+'</div></div></div>'; }
     { const ph = (PLAN.season||[]).find(x => x.from <= t && t <= x.to); const i = ph ? PLAN.season.indexOf(ph) : -1;
-      if(ph) h += '<div class="card" id="phasecard"><span class="small">Seizoensfase '+(i+1)+'/'+PLAN.season.length+' · t/m '+fmtDay(ph.to)+'</span><b style="display:block;font-size:17px;margin:2px 0">'+esc(ph.name)+'</b><div class="small">'+esc(ph.goal)+'</div><div class="small" style="margin-top:4px">Lopen '+ph.km[0]+'–'+ph.km[1]+' km/week'+(PLAN.season[i+1] ? ' · daarna: '+esc(PLAN.season[i+1].name) : '')+'</div></div>'; }
+      if(ph) h += '<div class="card" id="phasecard"><span class="small">Seizoensfase '+(i+1)+'/'+PLAN.season.length+' · t/m '+fmtDay(ph.to)+'</span><b style="display:block;font-size:17px;margin:2px 0">'+esc(ph.name)+'</b><div class="small">'+esc(ph.goal)+'</div><div class="small" style="margin-top:4px">Lopen '+ph.km[0]+'–'+ph.km[1]+' km/week'+(PLAN.season[i+1] ? ' · daarna: '+esc(PLAN.season[i+1].name) : '')+'</div><button class="btn link" data-ins="seizoen">Op weg naar Mozart ›</button></div>'; }
+    h += reviewHtml(reviewWeek(), true);
     h += loadCard();
     if(nr) h += '<div class="card nextrace"><span class="small">Volgende wedstrijd</span><b>'+esc(nr.name)+'</b><span class="small">'+fmtDay(nr.date)+' · over '+nd+' dagen</span></div>'; }
   sec('lopen'); h += tpCard() + perfCard();
@@ -168,9 +169,10 @@ function rInsight(){
   sec('end');
   { const ws = thisMon, {tg, why} = groupTargets(ws), per = weekGroupSets(ws);
     B.kracht = '<div class="card" id="grpwk"><h3>Deze week per spiergroep</h3><div class="gsg">'+MG.filter(([g]) => tg[g]).map(([g,n]) => { const v = per[g]||0, tt = tg[g]; return '<div class="gs"><span>'+n+'</span><b>'+v+'<i>/'+tt+'</i></b><div class="bar"><i style="width:'+Math.min(100, Math.round(v/tt*100))+'%'+(v>=tt?';background:var(--acc)':'')+'"></i></div></div>'; }).join('')+'</div><div class="small" style="margin-top:6px">Harde sets (RIR ≤ 4, geen opwarmsets).'+(why?' Benendoel lager: '+esc(why)+'.':'')+'</div></div>' + (B.kracht||''); }
-  const TABS = [['overzicht','Overzicht'],['lopen','Lopen'],['fietsen','Fietsen'],['kracht','Kracht'],['lichaam','Lichaam']];
+  B.seizoen = seasonHtml();
+  const TABS = [['overzicht','Overzicht'],['seizoen','Seizoen'],['lopen','Lopen'],['fietsen','Fietsen'],['kracht','Kracht'],['lichaam','Lichaam']];
   let top = '<div class="seg" role="tablist">'+TABS.map(([k,l]) => '<button role="tab" class="'+(IT===k?'on':'')+'" data-ins="'+k+'">'+l+'</button>').join('')+'</div>';
-  if(IT!=='lichaam') top += '<div class="seg sm">'+[[12,'12 wk'],[26,'½ jaar'],[52,'jaar']].map(([n,l]) => '<button class="'+((ui.range||12)===n?'on':'')+'" data-range="'+n+'">'+l+'</button>').join('')+'</div>';
+  if(!['lichaam','seizoen'].includes(IT)) top += '<div class="seg sm">'+[[12,'12 wk'],[26,'½ jaar'],[52,'jaar']].map(([n,l]) => '<button class="'+((ui.range||12)===n?'on':'')+'" data-range="'+n+'">'+l+'</button>').join('')+'</div>';
   $('view').innerHTML = top + ((B[IT]||'').trim() || '<div class="card mut">Nog geen gegevens hier.</div>');
 }
 const STD = [['1 km',1],['1 mijl',1.609],['5 km',5],['10 km',10],['15 km',15],['21,1 km',21.0975],['30 km',30],['42,2 km',42.195],['50 km',50]];

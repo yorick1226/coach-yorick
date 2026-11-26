@@ -4758,5 +4758,57 @@
     45
    ]
   }
+ ],
+ "milestones": [
+  {
+   "by": "2027-01-03",
+   "t": "Week van 50+ km rustig verdragen",
+   "kind": "weekkm",
+   "v": 50
+  },
+  {
+   "by": "2027-01-17",
+   "t": "Vondelparkloop onder 45:40",
+   "kind": "race",
+   "km": 10,
+   "v": 2740
+  },
+  {
+   "by": "2027-02-28",
+   "t": "Lange duur 28+ km",
+   "kind": "long",
+   "v": 28
+  },
+  {
+   "by": "2027-03-14",
+   "t": "Lange duur 32+ km (met marathontempo)",
+   "kind": "long",
+   "v": 32
+  },
+  {
+   "by": "2027-03-21",
+   "t": "Week van 1000+ hm (heuvelweekend)",
+   "kind": "hmweek",
+   "v": 1000
+  },
+  {
+   "by": "2027-04-04",
+   "t": "Parijs in 3:30",
+   "kind": "race",
+   "km": 42.2,
+   "v": 12600
+  },
+  {
+   "by": "2027-05-02",
+   "t": "Week van 2000+ hm",
+   "kind": "hmweek",
+   "v": 2000
+  },
+  {
+   "by": "2027-05-16",
+   "t": "Duurloop 40+ km (trail)",
+   "kind": "long",
+   "v": 40
+  }
  ]
 }
