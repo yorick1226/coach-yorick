@@ -311,7 +311,7 @@ def features(pg, shots=True):
     rv = pg.inner_text("#view"); ok("In cijfers" in rv and "COACH" in rv.upper() and pg.locator(".pm").count() >= 2, "weekevaluatie: oordeel, plus/min en meetpunten")
     if shots: pg.screenshot(path=str(OUT/"weekreview.png"), full_page=True)
     tab(pg, "week"); ok(pg.locator("#rvbtn").count() == 1, "weekevaluatie-knop in Plan")
-    tab(pg, "inzicht"); instab(pg, "overzicht"); ok(pg.locator("#reviewc").count() == 1, "compacte weekevaluatie op Voortgang")
+    tab(pg, "inzicht"); instab(pg, "overzicht"); ok(pg.locator("[data-range]").count() == 0, "overzicht zonder periodeknop"); ok(pg.locator("#reviewc").count() == 1, "compacte weekevaluatie op Voortgang")
     instab(pg, "seizoen"); sz = pg.inner_text("#view")
     ok(pg.locator("#season svg.prof rect").count() == 6 and "Vormcheck" in sz and pg.locator("#miles .ms").count() >= 6, "seizoen: tijdlijn, vormcheck en mijlpalen")
     if shots: pg.screenshot(path=str(OUT/"seizoen.png"), full_page=True)

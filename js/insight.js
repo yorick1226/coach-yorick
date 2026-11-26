@@ -86,7 +86,10 @@ function rInsight(){
   const splits = weeks.map(a => intensitySplit(actsIn(a, addDays(a,6))));
   const fuel = S.cardio.filter(c => !c.del && c.kh && c.sec >= (MZ.fuelH||4)*3600 && (c.maag||5) >= 3).map(c => c.kh); const fuelBest = fuel.length ? Math.max(...fuel) : 0;
   const days = Math.round((parseD(MZ.date||'2027-06-05') - parseD(t))/864e5);
-  const IT = ui.ins || 'overzicht'; let h = ''; const B = {}; let curT = 'overzicht'; const sec = t => { B[curT] = (B[curT]||'') + h; h = ''; curT = t; };
+  const IT = ui.ins || 'overzicht';
+  const PER = '<div class="per"><span>Periode</span><div class="seg sm">'+[[12,'12 weken'],[26,'half jaar'],[52,'jaar']].map(([n,l]) => '<button class="'+((ui.range||12)===n?'on':'')+'" data-range="'+n+'">'+l+'</button>').join('')+'</div></div>';
+  const NL = NW===12 ? '12 weken' : NW===26 ? 'half jaar' : 'jaar';
+  const w12 = wk.slice(-12), l12 = lab.slice(-12); let h = ''; const B = {}; let curT = 'overzicht'; const sec = t => { B[curT] = (B[curT]||'') + h; h = ''; curT = t; };
   { const cur = wk[wk.length-1], prev = wk.slice(-5,-1); const avg = f => prev.reduce((p,x)=>p+f(x),0)/Math.max(1,prev.length);
     const rideH = a => actsIn(a, addDays(a,6)).filter(x => /Ride/.test(x.sport||'')).reduce((p,x) => p+(x.sec||0)/3600, 0);
     const rh = rideH(thisMon), rhA = weeks.slice(-5,-1).reduce((p,a)=>p+rideH(a),0)/4;
@@ -106,7 +109,7 @@ function rInsight(){
   const pr = (l, v, tg, u, f) => '<div style="margin:8px 0"><div class="kv" style="border:0;padding:0"><span>'+l+'</span><span><b>'+(f?f(v):Math.round(v))+'</b> / '+tg+' '+u+'</span></div><div class="bar"><i style="width:'+Math.min(100, Math.round(v/tg*100))+'%"></i></div></div>';
   h += pr('Langste duurloop', longKm, MZ.longRunKm||50, 'km', v=>fmtN(v));
   h += pr('Langste tijd op de benen', longH, MZ.timeOnFeetH||8, 'u', v=>fmtN(v));
-  h += pr('Meeste hoogtemeters in een week (12 wk)', maxWkHm, MZ.weekVert||4000, 'm');
+  h += pr('Meeste hoogtemeters in een week (afgelopen '+NL+')', maxWkHm, MZ.weekVert||4000, 'm');
   h += pr('Meeste hoogtemeters in één sessie', sessHm, MZ.sessionVert||2500, 'm');
   h += pr('Back-to-back (2 dagen)', b2b, MZ.b2bKm||60, 'km', v=>fmtN(v));
   h += pr('Geteste voeding ≥ '+(MZ.fuelH||4)+' u (maag ≥ 3)', fuelBest, MZ.fuelGph||80, 'g/u');
@@ -122,15 +125,15 @@ function rInsight(){
   if(ref){ const prog = MZ_EK/ref.rate; h += '<div class="banner '+(prog > 18 ? 'rood' : prog > 16.5 ? 'oranje' : 'groen')+'" style="margin-top:10px" id="mzprog"><b>Mozart-prognose ± '+fmtN(prog)+' u</b> (limiet 19 u)<div class="small" style="color:inherit">Grove schatting: 132 effort-km (84 km + 4800 hm/100) gedeeld door je tempo in '+esc(ref.a.name)+' ('+fmtN(ref.rate)+' effort-km/u, incl. stops). Wordt beter zodra je recentere lange heuvelsessies loopt.</div></div>'; }
   if(hilly.length) h += '<details style="margin-top:10px"><summary><b style="font-size:15px">Klimsessies (≥ 300 hm)</b></summary><table><tr><th>Datum</th><th class="r">hm</th><th class="r">hm/u</th><th class="r">effort-km/u</th></tr>'+hilly.slice(0,6).map(x => '<tr><td>'+fmtDay(x.a.date)+' '+x.a.date.slice(2,4)+'<div class="small">'+esc(x.a.name.slice(0,34))+'</div></td><td class="r">'+x.a.hm+'</td><td class="r">'+Math.round(x.vph)+'</td><td class="r">'+fmtN(x.rate)+'</td></tr>').join('')+'</table><div class="small">hm/u = hoogtemeters per bewegend uur over de hele sessie (inclusief vlak/dalen), geen pure klimsnelheid.</div></details>';
   h += '</div>';
-  h += '<div class="card" id="runwk"><h3>Hardlopen km/week</h3>'+barSvg(wk.map(x=>x.km), lab)+'</div>';
+  h += PER + '<div class="card" id="runwk"><h3>Hardlopen km/week</h3>'+barSvg(wk.map(x=>x.km), lab)+'</div>';
   h += '<div class="card"><h3>Looptijd rustig / matig / hard</h3>'+stackSvg(splits, lab)+'<div class="small">Per ronde ingedeeld waar ronden bekend zijn (tempo t.o.v. drempel), anders per sessie op gemiddelde HF (rustig ≤ '+easyHr()+', hard ≥ 160) of tempo. Grof, maar laat het patroon zien. Richting ≥ 75–80% rustig.</div></div>';
   h += '<div class="card"><h3>Hoogtemeters/week</h3>'+barSvg(wk.map(x=>x.hm), lab)+'</div>';
-  sec('overzicht'); h += '<div class="card"><h3>Trainingsuren/week</h3>'+barSvg(wk.map(x=>x.sec/3600), lab, {fmt:v=>fmtN(v)})+'</div>';
+  sec('overzicht'); h += '<div class="card"><h3>Trainingsuren per week <span class="small">12 weken</span></h3>'+barSvg(w12.map(x=>x.sec/3600), l12, {fmt:v=>fmtN(v)})+'</div>';
   sec('fietsen'); { const bk = weeks.map(a => actsIn(a, addDays(a,6)).filter(x => /Ride/.test(x.sport||'')).reduce((p,x) => p + (x.sec||0)/3600, 0)
       + S.cardio.filter(c => !c.del && c.sport==='bike' && c.date >= a && c.date <= addDays(a,6) && !c.sid).reduce((p,c) => p + (c.sec||0)/3600, 0));
     const rides = (STRAVA.activities||[]).filter(x => /Ride/.test(x.sport||'') && x.w).sort((p,q) => q.date.localeCompare(p.date)).slice(0,5);
-    h += '<div class="card" id="bikewk"><h3>Fietsen: uren/week</h3>'+barSvg(bk, lab, {fmt:v=>fmtN(v)})+(rides.length ? '<table><tr><th>Recente ritten met vermogen</th><th class="r">W gem.</th></tr>'+rides.map(x => '<tr><td>'+fmtDay(x.date)+' · '+esc(x.name)+'</td><td class="r">'+x.w+'</td></tr>').join('')+'</table>' : '')+'</div>'; }
-  sec('overzicht'); if(wk.some(x=>x.load)) h += '<div class="card"><h3>Belasting (sRPE)/week</h3>'+barSvg(wk.map(x=>x.load), lab)+'<div class="small">Alleen weken waarin je RPE per sessie invult.</div></div>';
+    h += PER + '<div class="card" id="bikewk"><h3>Fietsen: uren/week</h3>'+barSvg(bk, lab, {fmt:v=>fmtN(v)})+(rides.length ? '<table><tr><th>Recente ritten met vermogen</th><th class="r">W gem.</th></tr>'+rides.map(x => '<tr><td>'+fmtDay(x.date)+' · '+esc(x.name)+'</td><td class="r">'+x.w+'</td></tr>').join('')+'</table>' : '')+'</div>'; }
+  sec('overzicht'); if(w12.some(x=>x.load)) h += '<div class="card"><h3>Belasting (sRPE) per week <span class="small">12 weken</span></h3>'+barSvg(w12.map(x=>x.load), l12)+'<div class="small">Alleen weken waarin je RPE per sessie invult.</div></div>';
   const rdp = [], slp = []; for(let i=27;i>=0;i--){ const y = dailyOf(addDays(t,-i)); if(y.rd!=null) rdp.push([28-i, y.rd]); if(y.sl!=null) slp.push([28-i, y.sl]); }
   if(rdp.length + slp.length >= 2) h += '<div class="card"><h3>Oura, 28 dagen</h3>'+lineSvg([{pts:rdp,c:'#22c55e'},{pts:slp,c:'#60a5fa'}])+'<div class="small"><span style="color:#22c55e">■</span> Readiness <span style="color:#60a5fa">■</span> Slaap</div></div>';
   let tr = '';
@@ -151,7 +154,7 @@ function rInsight(){
     h += '<div class="small">InBody-sprongen van dag tot dag zijn vaak vocht/glycogeen; kijk naar de trend over maanden. Meet onder gelijke omstandigheden (ochtend, nuchter).</div></div>'; }
   sec('kracht'); const vol = weeks.map(a => { const b2 = addDays(a,6); return S.sets.filter(x => work(x) && x.date>=a && x.date<=b2 && (x.rir==null||x.rir<=4) && !['plyo','hyrox'].includes(EXN(x.code).g)).length; });
   if(vol.some(Boolean)){ const tg = PLAN.setTargets||{}; const last4 = weeks.slice(-4); const per = {}; for(const x of S.sets) if(work(x) && x.date>=last4[0] && (x.rir==null||x.rir<=4)){ const g = EXN(x.code).g; if(g && !['plyo','hyrox'].includes(g)) per[g] = (per[g]||0)+1; }
-    h += '<div class="card" id="volins"><h3>Krachtvolume: harde sets/week</h3>'+barSvg(vol, lab)+'<table><tr><th>Spiergroep</th><th class="r">gem./wk (4 wk)</th><th class="r">doel</th></tr>'+Object.keys(Object.assign({}, tg, per)).map(g => '<tr><td>'+g+'</td><td class="r">'+fmtN((per[g]||0)/4)+'</td><td class="r">'+(tg[g]||'–')+'</td></tr>').join('')+'</table></div>'; }
+    h += PER + '<div class="card" id="volins"><h3>Krachtvolume: harde sets/week</h3>'+barSvg(vol, lab)+'<table><tr><th>Spiergroep</th><th class="r">gem./wk (4 wk)</th><th class="r">doel</th></tr>'+Object.keys(Object.assign({}, tg, per)).map(g => '<tr><td>'+g+'</td><td class="r">'+fmtN((per[g]||0)/4)+'</td><td class="r">'+(tg[g]||'–')+'</td></tr>').join('')+'</table></div>'; }
   sec('lichaam'); { const T = PLAN.mobTests||[]; const L = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
     const cnt = {}; for(const x of Object.values(S.rt||{})) for(const k of Object.keys(x)){ const m = k.match(/^MOB_([A-Z]+)_/); if(m) cnt[m[1]] = (cnt[m[1]]||0)+1; }
     if(L.length || Object.keys(cnt).length){ h += '<div class="card" id="mobins"><h3>Mobiliteit</h3>';
@@ -172,7 +175,6 @@ function rInsight(){
   B.seizoen = seasonHtml();
   const TABS = [['overzicht','Overzicht'],['seizoen','Seizoen'],['lopen','Lopen'],['fietsen','Fietsen'],['kracht','Kracht'],['lichaam','Lichaam']];
   let top = '<div class="seg" role="tablist">'+TABS.map(([k,l]) => '<button role="tab" class="'+(IT===k?'on':'')+'" data-ins="'+k+'">'+l+'</button>').join('')+'</div>';
-  if(!['lichaam','seizoen'].includes(IT)) top += '<div class="seg sm">'+[[12,'12 wk'],[26,'½ jaar'],[52,'jaar']].map(([n,l]) => '<button class="'+((ui.range||12)===n?'on':'')+'" data-range="'+n+'">'+l+'</button>').join('')+'</div>';
   $('view').innerHTML = top + ((B[IT]||'').trim() || '<div class="card mut">Nog geen gegevens hier.</div>');
 }
 const STD = [['1 km',1],['1 mijl',1.609],['5 km',5],['10 km',10],['15 km',15],['21,1 km',21.0975],['30 km',30],['42,2 km',42.195],['50 km',50]];

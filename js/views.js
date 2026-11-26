@@ -240,7 +240,7 @@ function dailyCard(d, isT){ const x = dailyOf(d); const filled = x.rd!=null || x
   return h+'</div>'; }
 function rToday(){
   const t = today(); const d = ui.day || t; const isT = d===t;
-  $('htitle').textContent = (isT ? 'Vandaag · ' : '')+fmtDay(d);
+  $('htitle').textContent = (isT ? 'Vandaag, ' : '')+fmtDay(d)+' · week '+Number(weekIdOf(mondayOf(d)).split('-W')[1]);
   let h = weekStrip(mondayOf(d), d, 'day');
   const chips = []; const nr = nextRace(); if(nr) chips.push(nr);
   const pv = PLAN.version+'/'+PLAN.updated; if(S.settings.seenPlan !== pv) chips.push('<button class="hchip info" data-seen="1">Plan bijgewerkt · '+esc(PLAN.updated)+' ✕</button>');

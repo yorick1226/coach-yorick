@@ -316,3 +316,4 @@ nav.tabs button.on{color:var(--pur2)}
 .strip .dot.pop{animation:dotin .5s .15s both}
 @media (prefers-reduced-motion: reduce){.chk.pop,.strip .dot.pop{animation:none}}
 :focus-visible{outline:2px solid var(--pur2);outline-offset:2px}
+.per{display:flex;align-items:center;gap:10px;margin:14px 2px 8px}.per>span{font-size:var(--fs-s);font-weight:650;color:var(--mut)}.per .seg.sm{margin:0 0 0 auto}
