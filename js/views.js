@@ -166,6 +166,8 @@ function routinesCard(d, items){
   for(const [key, icon, n, min, rid, why] of rows){ const on = rtDone(d, key);
     h += '<div class="rtrow"><button class="chk'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'" aria-label="Afvinken">✓</button><div class="nm"'+(on?' style="opacity:.55"':'')+'><b>'+icon+' '+esc(n)+'</b><div class="small rtw">'+min+' min · '+esc(why)+'</div></div>'
       +(rid ? '<button class="btn sm'+(on?'':' pri')+'" data-rtstart="'+rid+'" data-rtkey="'+key+'" data-rtdate="'+d+'" aria-label="Start '+esc(n)+'">▶</button>' : '')+'</div>'; }
+  if(!rows.length){ let nx = null; for(let i=1;i<=7 && !nx;i++){ const dd = addDays(d,i); const l = dailyList(dd); if(l.length) nx = [dd, rtDef(l[0], dd)]; }
+    h += '<div class="small" style="margin-top:4px">Vandaag geen vaste routine'+(nx && nx[1] ? ' · volgende: '+fmtDay(nx[0])+', '+esc(nx[1].n.replace(/ \(.*\)/,''))+' '+nx[1].min+'′' : '')+'</div>'; }
   if(recs.length) h += '<div class="rtchips" style="margin-top:8px">'+recs.map(([key, icon, n, min, rid]) => { const on = rtDone(d, key); return rid && !on ? '<button class="rtchip" data-rtstart="'+rid+'" data-rtkey="'+key+'" data-rtdate="'+d+'">'+icon+' '+esc(n)+' '+min+'′ ▶</button>' : '<button class="rtchip'+(on?' on':'')+'" data-rtchk="'+key+'" data-rtdate="'+d+'">'+(on?'✓ ':icon+' ')+esc(n)+' '+min+'′</button>'; }).join('')+'</div>';
   if(bp >= 4) h += '<div class="banner rood" style="margin:8px 0 0">Onderrug '+bp+'/8: rug & core A (McGill), side plank op je knieën, geen hamstringstretch. RDL en squat wisselen (knop in de sessie).</div>';
   const sw = staticWeek(mondayOf(d)); const goal = PLAN.staticGoal || {}; const lt = (S.mob||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
@@ -253,6 +255,7 @@ function rToday(){
   if(isT){ for(const it of rpeTodo(d)){ const a = matchWeek(weekByStart(mondayOf(it.date))).by[it.s.id];
       h += '<div class="card" id="rpeask_'+it.s.id+'"><div class="small">'+(it.date===d?'Vandaag':'Gisteren')+' · uit Strava: '+(a.km?fmtN(a.km)+' km · ':'')+fmtSec(a.el||a.sec)+'</div><b>Hoe zwaar was '+esc(it.s.title)+'?</b> <span class="small">RPE 1–10</span>'+infoBtn('rpe')+infoBox('rpe')+'<div class="chips xs" style="margin-top:6px">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip" data-srpe="'+it.s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div><button class="btn link" data-norpe="'+it.s.id+'">Overslaan</button></div>'; }
     for(const it of fuelTodo()) h += '<div class="card"><b>Voeding loggen</b> <span class="small">'+esc(it.s.title)+' · '+fmtDay(it.date)+'</span><div class="small">Hoeveel g KH/uur en hoe ging je maag?</div><div class="row"><button class="btn sm" data-cardio="'+it.s.id+'">Log voeding</button></div></div>'; }
+  if(isT && isFresh()) h += '<div class="card" id="freshcard"><b>Nieuwe installatie?</b><div class="small">Zet al je gegevens terug uit je Google Sheet. Back-upcode plakken kan ook: Meer → Herstellen.</div><input id="fr_url" type="url" placeholder="https://script.google.com/macros/s/…/exec" style="margin-top:8px"><input id="fr_key" type="text" autocomplete="off" autocapitalize="off" placeholder="geheime sleutel" style="margin-top:6px"><div class="row"><button class="btn pri" id="fr_go">Alles terugzetten</button></div></div>';
   h += dailyCard(d, isT);
   { const dow = (parseD(d).getDay()+6)%7; const wid = weekIdOf(mondayOf(d)); const ci = S.checkins[wid] || {};
     if(isT && dow >= 5 && !ci.cijfer && w) h += '<div class="card" id="checkcard" style="display:flex;align-items:center;gap:10px"><div style="flex:1"><b>Weekcheck-in</b><div class="small">1 minuut · cijfer, benen, richting en beschikbaarheid volgende week</div></div><button class="btn sm pri" data-tab="check">Start</button></div>'; }
@@ -315,6 +318,10 @@ function rLog(){
   const ss = S.sets.filter(x => x.sid===s.id && !x.del).map(x=>x.ts); const dur = ss.length > 1 ? Math.round((Math.max(...ss)-Math.min(...ss))/60000) : 0;
   let h = '<div class="card"><span class="tag">'+(TYPE_LABEL[s.t]||s.t)+'</span><b>'+esc(s.title)+'</b><div class="mut">'+fmtDay(date)+' · scherm blijft aan'+(dur?' · bezig '+dur+' min':'')+'</div>';
   h += '<div class="row"><button class="btn sm" data-pick="1">Andere sessie</button><button class="btn sm '+((S.done[s.id]||{}).d?'pri':'')+'" data-done="'+s.id+'">'+((S.done[s.id]||{}).d?'✓ Afgerond':'Sessie afronden')+'</button></div></div>';
+  { const open = sessEx(s).some(e => !S.exskip[s.id+'|'+e.c] && !EXN(cOf(s.id, e)).time && S.sets.filter(x => x.sid===s.id && x.code===cOf(s.id, e) && work(x)).length < (e.s||0));
+    const lp = ui.lastPlan && ui.lastPlan.sid===s.id ? ui.lastPlan : null;
+    if(lp) h += '<div class="card" id="asplanned" style="display:flex;align-items:center;gap:8px"><span style="flex:1">✓ '+lp.n+' sets gelogd zoals voorgesteld</span><button class="btn sm" data-unplan="'+lp.batch+'">Ongedaan</button></div>';
+    else if(open) h += '<div class="card" style="display:flex;align-items:center;gap:8px" id="asplancard"><span style="flex:1" class="small">Alles gedaan zoals voorgesteld? Dan hoef je niets in te vullen.</span><button class="btn sm pri" data-asplan="*">✓ Hele sessie</button></div>'; }
   h += groupStrip(s, date);
   const list = sessEx(s); const cnt = e => S.sets.filter(x => x.sid===s.id && x.code===cOf(s.id, e) && work(x)).length;
   let focus = ui.exFocus[s.id]; if(!list.some(e => e.c===focus) || S.exskip[s.id+'|'+focus]) focus = (list.find(e => !S.exskip[s.id+'|'+e.c] && cnt(e) < e.s) || {}).c; ui.exFocus[s.id] = focus;
@@ -385,10 +392,20 @@ function setTable(s, e, code, now, prev, sug){ const u = unitOf(code), X = EXN(c
     h += '<div class="sr ok'+(x.wu?' wu':'')+'"><span class="sn">'+lab+'</span><span class="pv">'+pvStr(p)+'</span>'+(hasKg?'<span class="v">'+(x.kg!=null?fmtKg(x.kg):'–')+'</span>':'')+'<span class="v">'+x.reps+(x.rir!=null?'<i>@'+x.rir+'</i>':'')+'</span><button class="sx" data-del="'+x.id+'" aria-label="Set verwijderen">×</button></div>'; }
   R.forEach((r, k) => { const p = prev ? prev[kn + k] || null : null; const lab = r.wu ? 'W' : String(kn + k + 1);
     h += '<div class="sr'+(r.wu?' wu':'')+'" data-row="'+rk+'|'+k+'"><button class="sn" data-rwu="'+rk+'|'+k+'" aria-label="Opwarmset aan/uit">'+lab+'</button><span class="pv">'+pvStr(p)+'</span>'+(hasKg?'<input type="text" inputmode="decimal" data-rkg="'+rk+'|'+k+'" value="'+esc(r.kg==null?'':String(r.kg).replace('.', ','))+'" placeholder="'+(X.eq==='bw'?'0':'kg')+'">':'')+'<input type="text" inputmode="numeric" data-rreps="'+rk+'|'+k+'" value="'+esc(r.reps==null?'':String(r.reps))+'"><button class="sok" data-rset="'+code+'" data-k="'+k+'" aria-label="Set loggen">✓</button></div>'; });
-  h += '</div><div class="row" style="margin-top:6px"><button class="btn link" data-raddrow="'+rk+'">＋ Set</button><span class="small" style="flex:2">Tik het setnummer voor een opwarmset (W).</span></div>';
+  h += '</div><div class="row" style="margin-top:6px"><button class="btn link" data-raddrow="'+rk+'">＋ Set</button>'+(R.length ? '<button class="btn sm" data-asplan="'+code+'">✓ Rest zoals voorgesteld</button>' : '')+'</div><div class="small">Tik het setnummer voor een opwarmset (W).</div>';
   if(u==='kg' && e.rir!==0){ const sel = ui.rir[rk] ?? e.rir; h += '<div class="rirrow"><span class="small">RIR volgende set'+infoBtn('rir')+'</span><div class="chips xs">'+[0,1,2,3,4].map(r => '<button class="chip'+(r===sel?' on':'')+'" data-rir="'+rk+'" data-v="'+r+'">'+r+'</button>').join('')+'</div></div>'+infoBox('rir'); }
   if(X.eq==='bb' && R[0] && R[0].kg > 20){ const pl = plates(Number(R[0].kg)); if(pl) h += '<div class="small plates">🏋 '+pl+'</div>'; }
   return h; }
+/* "zoals voorgesteld": logt de openstaande setrijen met de voorgevulde waarden (vorige keer / progressievoorstel) */
+function logAsPlanned(sid, only){ const f = sessById(sid); if(!f) return 0; const s = f.s, batch = 'pl'+Date.now(); let n = 0;
+  for(const e of sessEx(s)){ if(S.exskip[s.id+'|'+e.c]) continue; const code = cOf(s.id, e); if(only && code!==only) continue; const X = EXN(code); if(X.time) continue;
+    const now = S.sets.filter(x => x.sid===s.id && x.code===code && !x.del).sort((a,b)=>a.ts-b.ts); const prev = prevGroup(code, s.id, f.date); const sug = suggest(e, code, prev);
+    const {R} = rowsFor(s, e, code, now, prev, sug);
+    for(const r of R.splice(0)){ if(r.reps==null) continue; const ts = Date.now()+n; const id = s.id+'|'+code+'|'+ts;
+      const rec = {id, date:f.date, sid:s.id, code, pc:e.c, kg: r.kg ?? null, reps:Number(r.reps), ts, pl:batch};
+      if(r.wu) rec.wu = true; else if(unitOf(code)==='kg' && e.rir!==0) rec.rir = ui.rir[s.id+'|'+code] ?? e.rir;
+      S.sets.push(rec); enqueue('set', id, f.date, rec); n++; } }
+  if(n){ ui.lastPlan = {sid, batch, n}; save(); } return n; }
 function logSet(code, reps, extra, opt){
   const f = sessById(ui.sid); if(!f || reps==null || isNaN(reps)) return;
   const e = sessEx(f.s).find(x => cOf(f.s.id, x)===code) || {};

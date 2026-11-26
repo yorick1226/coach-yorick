@@ -51,6 +51,11 @@ const e1 = x => x.reps<=12 && x.kg ? x.kg*(1+x.reps/30) : null;
 function bestRace(){ const t = today(); const rs = (STRAVA.activities||[]).filter(a => a.race && RUNS.includes(a.sport) && a.km >= 4.5 && a.km <= 22 && diffD(t, a.date) <= 240)
   .concat(S.cardio.filter(c => !c.del && c.race && ['run'].includes(c.sport) && c.km >= 4.5 && c.km <= 22 && c.sec && diffD(t, c.date) <= 240).map(c => ({date:c.date, km:c.km, sec:c.sec, name:'Handmatig'})));
   if(!rs.length) return null; const eq = a => (a.el||a.sec) * Math.pow(10/a.km, 1.06); return rs.sort((a,b) => eq(a)-eq(b))[0]; }
+/* drempel herijken: ≈ 1-uurs wedstrijdtempo uit je beste recente wedstrijd (≤ 10 weken). Alleen een voorstel; jij beslist. */
+function tpSuggest(){ const br = bestRace(); if(!br || diffD(today(), br.date) > 70) return null; const T = br.el||br.sec; const d60 = br.km * Math.pow(3600/T, 1/1.06); const nw = Math.round(3600/d60);
+  const tp = Number(setting('tpace')) || 263; if(Math.abs(nw - tp) < 6) return null; if(S.settings.tpSkip === nw) return null; return {nw, tp, br}; }
+function tpCard(){ const x = tpSuggest(); if(!x) return '';
+  return '<div class="card" id="tpcard"><b>Drempeltempo herijken?</b><div class="small" style="margin-top:4px">Ingesteld: <b>'+fmtPace(x.tp)+'</b>. Je '+esc(x.br.name)+' ('+fmtDay(x.br.date)+', '+fmtN(x.br.km,1)+' km in '+fmtSec(x.br.el||x.br.sec)+') wijst op ≈ <b>'+fmtPace(x.nw)+'</b> (1-uurstempo via Riegel). Een heuvelachtig of warm parcours geeft een tragere schatting dan je echt kunt; twijfel je, wacht dan op een vlakke wedstrijd of drempeltraining.</div><div class="row"><button class="btn sm pri" data-settp="'+x.nw+'">Zet op '+fmtPace(x.nw)+'</button><button class="btn sm" data-skiptp="'+x.nw+'">Niet nu</button></div></div>'; }
 function riegel(t1, d1, d2, k){ return t1 * Math.pow(d2/d1, k||1.06); }
 function perfCard(){ const br = bestRace(); const tp = Number(setting('tpace')) || 263; const ftp = num(S.settings.ftp) || (PLAN.athlete||{}).ftp || 230;
   let h = '<div class="card" id="perf"><h3>Prestatie & tempo’s</h3>';
@@ -93,7 +98,7 @@ function rInsight(){
     { const ca = coachAdvice(); if(ca.length) h += '<div class="card" id="coachadv"><div class="coachline">'+ic('progress',18)+'<div><b>Coach</b>'+ca.map(x => '<div class="advice1" style="margin-top:4px">'+x+'</div>').join('')+'</div></div></div>'; }
     h += loadCard();
     if(nr) h += '<div class="card nextrace"><span class="small">Volgende wedstrijd</span><b>'+esc(nr.name)+'</b><span class="small">'+fmtDay(nr.date)+' · over '+nd+' dagen</span></div>'; }
-  sec('lopen'); h += perfCard();
+  sec('lopen'); h += tpCard() + perfCard();
   h += '<div class="card" id="mozart"><h3>Richting Mozart <span class="small">nog '+days+' dagen</span></h3>';
   const pr = (l, v, tg, u, f) => '<div style="margin:8px 0"><div class="kv" style="border:0;padding:0"><span>'+l+'</span><span><b>'+(f?f(v):Math.round(v))+'</b> / '+tg+' '+u+'</span></div><div class="bar"><i style="width:'+Math.min(100, Math.round(v/tg*100))+'%"></i></div></div>';
   h += pr('Langste duurloop', longKm, MZ.longRunKm||50, 'km', v=>fmtN(v));

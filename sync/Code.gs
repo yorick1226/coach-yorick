@@ -5,7 +5,12 @@
  */
 const HEAD = ['id', 'date', 'ts', 'json'];
 
+/* Beveiliging: zet scripteigenschap APP_KEY (dezelfde sleutel als in de app onder Meer → Instellingen).
+ * Zonder APP_KEY blijft het script open (oude werking). */
+function keyOk_(e) { const k = PropertiesService.getScriptProperties().getProperty('APP_KEY'); return !k || ((e && e.parameter && e.parameter.k) === k); }
+
 function doPost(e) {
+  if (!keyOk_(e)) return ContentService.createTextOutput('sleutel onjuist');
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
@@ -32,6 +37,7 @@ function doPost(e) {
 }
 
 function doGet(e) {
+  if (!keyOk_(e)) return json_({ error: 'sleutel onjuist of ontbreekt' });
   const q = (e && e.parameter) || {};
   if (q.oura_code) return json_(ouraConnect_(q.oura_code));
   if (q.oura) { try { ouraSync(); } catch (err) {} return json_(ouraRows_(Number(q.days) || 21)); }

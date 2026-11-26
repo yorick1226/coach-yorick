@@ -80,6 +80,10 @@ document.addEventListener('click', ev => {
     const kg = ki ? num(ki.value) : null, reps = num(ri && ri.value); if(reps==null){ toast('Vul '+(unitOf(c)==='kg'?'reps':'een waarde')+' in'); return; }
     R.splice(k, 1); if(ui.xrows[rk] && R.length < ui.xrows[rk]) ui.xrows[rk] = R.length; logSet(c, reps, null, {kg: ki ? kg : null, wu: !!r.wu}); return; }
   if(ds.rwu){ const [sid, c, k] = ds.rwu.split('|'); const R = ui.rv[sid+'|'+c] || []; if(R[k]){ R[k].wu = !R[k].wu; if(R[k].wu){ const p = Number(R[k].kg); if(p) R[k].kg = Math.round(p*0.5/2.5)*2.5 || p; } } rerender(); return; }
+  if(ds.asplan){ const n = logAsPlanned(ui.sid, ds.asplan==='*' ? null : ds.asplan); if(ds.asplan==='*' && n) setDone(ui.sid, {d:true}); toast(n ? n+' sets gelogd zoals voorgesteld' : 'Niets open'); rerender(); return; }
+  if(ds.unplan){ for(const x of S.sets) if(x.pl===ds.unplan && !x.del){ x.del = true; enqueue('set', x.id, x.date, x); } ui.lastPlan = null; save(); toast('Ongedaan gemaakt'); rerender(); return; }
+  if(ds.settp){ S.settings.tpace = Number(ds.settp); save(); toast('Drempel '+fmtPace(Number(ds.settp))+'/km'); rerender(); return; }
+  if(ds.skiptp){ S.settings.tpSkip = Number(ds.skiptp); save(); rerender(); return; }
   if(ds.raddrow){ ui.xrows[ds.raddrow] = (ui.xrows[ds.raddrow]||0) + 1; rerender(); return; }
   if(ds.repgo){ const i = document.querySelector('[data-repx="'+ds.repgo+'"]'); const v = num(i && i.value); if(v!=null) logSet(ds.repgo, v); return; }
   if(ds.swapopen){ ui.swap[ds.swapopen] = !ui.swap[ds.swapopen]; rerender(); return; }
@@ -128,10 +132,13 @@ document.addEventListener('click', ev => {
     case 'r_go': { if(!ui.restoreArmed){ try { parseBackup($('r_in').value); } catch(e){ toast('Ongeldige code'); return; } ui.restoreArmed = true; const v = $('r_in').value; rMeer(); $('r_in').value = v; return; }
       try { const o = parseBackup($('r_in').value); try { localStorage.setItem(KEY+'.undo', JSON.stringify(S)); } catch(_){} S = o; save(); ui.restoreArmed = false; toast('Hersteld'); render(); } catch(e){ toast('Ongeldige code'); } return; }
     case 'r_sheet': { if(!ui.sheetArmed){ ui.sheetArmed = true; rMeer(); return; } ui.sheetArmed = false;
-      fetch(S.settings.sheetUrl+(S.settings.sheetUrl.includes('?')?'&':'?')+'all=1').then(r => r.json()).then(d => { const o = fromSheet(d); try { localStorage.setItem(KEY+'.undo', JSON.stringify(S)); } catch(_){} o.settings = S.settings; S = o; save(); toast('Hersteld uit Sheet'); render(); }).catch(e => toast('Sheet niet bereikbaar: '+e.message)); return; }
+      restoreFromSheet(S.settings.sheetUrl, S.settings.sheetKey).then(() => { toast('Hersteld uit Sheet'); render(); }).catch(e => toast('Sheet: '+e.message)); return; }
+    case 'fr_go': { const url = $('fr_url').value.trim(), key = $('fr_key').value.trim(); if(!/^https:\/\/script\.google/.test(url)){ toast('Plak je /exec-URL'); return; }
+      toast('Ophalen…'); restoreFromSheet(url, key).then(() => { toast('Alles terug ✓'); render(); }).catch(e => toast('Lukt niet: '+e.message)); return; }
+    case 's_newkey': { $('s_key').value = newKey(); toast('Nieuwe sleutel: kopieer hem naar APP_KEY in je script en bewaar'); return; }
     case 'r_undo': { try { S = migrate(JSON.parse(localStorage.getItem(KEY+'.undo'))); save(); localStorage.removeItem(KEY+'.undo'); toast('Herstel ongedaan gemaakt'); render(); } catch(e){ toast('Niets om terug te zetten'); } return; }
     case 's_save': { S.settings.ftp = num($('s_ftp').value); S.settings.lthr = num($('s_lthr').value); S.settings.easyHr = num($('s_easy').value);
-      const tp = tmParse($('s_tpace').value, 's'); S.settings.tpace = isNaN(tp) ? null : tp; S.settings.sheetUrl = $('s_url').value.trim(); save(); toast('Bewaard'); scheduleSync(); return; }
+      const tp = tmParse($('s_tpace').value, 's'); S.settings.tpace = isNaN(tp) ? null : tp; S.settings.sheetUrl = $('s_url').value.trim(); S.settings.sheetKey = $('s_key').value.trim(); save(); toast('Bewaard'); scheduleSync(); return; }
     case 's_sync': flush().then(()=> toast(S.queue.length ? 'Nog '+S.queue.length+' in wachtrij' : 'Verstuurd')); return;
   }
 });
@@ -185,7 +192,7 @@ document.addEventListener('touchend', ev => { if(sx===null) return; const dx = e
   { const q = new URLSearchParams(location.search); const code = q.get('code');
     if(code && q.get('state') && q.get('state')===sessionStorage.getItem('ouraState')){ history.replaceState(null, '', location.pathname); ui.tab = 'meer';
       if(!S.settings.sheetUrl) toast('Eerst je Google Sheet-URL invullen onder Meer'); else {
-        toast('Oura verbinden…'); fetch(S.settings.sheetUrl+(S.settings.sheetUrl.includes('?')?'&':'?')+'oura_code='+encodeURIComponent(code)).then(r => r.json())
+        toast('Oura verbinden…'); fetch(sheetU('oura_code='+encodeURIComponent(code))).then(r => r.json())
           .then(d => { if(d.ok){ S.settings.oura = true; save(); toast('Oura verbonden ✓'); ouraPull(true); } else toast('Oura mislukt: '+(d.error||'onbekend')); rerender(); })
           .catch(() => toast('Oura verbinden mislukt (geen verbinding met je script)')); } }
     else if(q.get('error')){ history.replaceState(null, '', location.pathname); toast('Oura: '+q.get('error')); } }

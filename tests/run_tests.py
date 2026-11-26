@@ -54,7 +54,8 @@ def static_checks(cur: pathlib.Path, prev: pathlib.Path):
     pq = re.findall(r"\n  (\d+): \[(.*?)\n  \]", qs(phtml), re.S); cq = dict(re.findall(r"\n  (\d+): \[(.*?)\n  \]", qs(html), re.S))
     ok(all(cq.get(v) == body for v, body in pq), "bestaande check-in-vragensets ongewijzigd")
     cache = lambda d: re.search(r"const CACHE = '([^']+)'", (d/"sw.js").read_text()).group(1)
-    if cur != prev: ok(cache(cur) != cache(prev), f"cachenummer opgehoogd ({cache(prev)} → {cache(cur)})")
+    appfiles = lambda d: {str(p.relative_to(d)): p.read_bytes() for p in list(d.glob("*.html")) + list(d.glob("js/*.js")) + list(d.glob("css/*.css")) + [d/"plan.json", d/"manifest.webmanifest"] if p.exists()}
+    if cur != prev and appfiles(cur) != appfiles(prev): ok(cache(cur) != cache(prev), f"cachenummer opgehoogd ({cache(prev)} → {cache(cur)})")
     for f in ["manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "ONDERHOUD.md", "ics/all.ics", "splash-1179x2556.png", "splash-1290x2796.png", "splash-1170x2532.png", "splash-1125x2436.png"]:
         ok((cur/f).exists(), f"{f} aanwezig")
     for w in plan["weeks"]:
@@ -146,7 +147,9 @@ def features(pg, shots=True):
     ok(store(pg)["daily"]["2026-11-17"].get("hrv") == 48, "getypte waarde bewaard zonder veld te verlaten (app sluiten)")
     tab(pg, "check"); ok(pg.locator("#ckq").count() == 1 and pg.locator('[data-ct="pijn"]').count() == 0, "check-in v3: 3 tikken + opmerkingen") if pg.evaluate("!S.checkins[weekIdOf(ui.chkWeek)]") else None
     # Routines
-    tab(pg, "vandaag"); ok(pg.locator('#rtcard [data-rtstart^="RUG"]').count() == 1 and pg.locator('#rtcard .rtrow [data-rtstart^="MOB_"]').count() >= 1, "dagroutines (rug + gekozen mobiliteit)")
+    tab(pg, "vandaag"); ok(pg.locator('#rtcard .rtrow [data-rtchk]').count() == 0 and "volgende: wo 18 nov" in pg.inner_text("#rtcard"), "geen dagelijkse routine-lijst; vaste momenten met ‘volgende’")
+    vm = pg.evaluate("[0,1,2,3,4,5,6].map(i => dailyList(addDays('2026-11-16', i)).length)"); ok(sum(vm) == 3 and vm[1] == 0, f"3 vaste routinemomenten per week {vm}")
+    pg.click('#view [data-strip="2026-11-18"][data-mode="day"]'); ok(pg.locator('#rtcard [data-rtstart^="RUG"]').count() == 1, "woensdag: rug & core")
     mob = pg.evaluate("chooseMob('2026-11-17')"); ok(mob and mob["id"].startswith("MOB_") and mob["why"], f"mobiliteit op maat gekozen: {mob}")
     ok(pg.evaluate("rtDef('MOB_LANG','2026-11-17').parts.length") == 3, "Mobiliteit compleet = 3 gebieden")
     pg.click('#rtcard [data-rtstart^="RUG"]'); ok(pg.is_visible("#rp") and "Cat-cow" in pg.inner_text("#rp"), "routinespeler opent")
@@ -155,12 +158,13 @@ def features(pg, shots=True):
     for _ in range(40):
         if not pg.is_visible("#rp"): break
         pg.click('[data-rp="next"]')
-    ok(not pg.is_visible("#rp") and store(pg)["rt"].get("2026-11-17", {}).get("RUG"), "routine afgerond en afgevinkt")
+    ok(not pg.is_visible("#rp") and store(pg)["rt"].get("2026-11-18", {}).get("RUG"), "routine afgerond en afgevinkt")
+    pg.click('#tabs [data-tab="vandaag"]')
     ok(pg.evaluate("document.querySelectorAll('.sess .glance, .sess .rtchips').length") == 0, "ingeklapte trainingskaart toont alleen type, titel, afstand/duur")
     pg.evaluate("for(const b of document.querySelectorAll('[data-open]')) ui.open[b.dataset.open] = true; render()")
     ok(pg.locator('[data-rtkey^="WU_"]').count() >= 1, "warming-up bij training (uitgeklapt)")
     ok(pg.locator(".banner.oranje", has_text="back-up").count() == 0 and "badge" in (pg.get_attribute('#tabs [data-tab="meer"]', "class") or ""), "back-upmelding als stip op Meer, niet op Vandaag")
-    ok(pg.evaluate("[chooseRug('2026-11-18'), chooseRug('2026-11-19')]")[0] == "RUG_B", "rug & core roteert (A → B)")
+    ok(pg.evaluate("chooseRug('2026-11-25')") == "RUG_B", "rug & core roteert (A → B)")
     ok("Rekken deze week" in pg.inner_text("#rtcard") and "Massagegun" in pg.inner_text("#rtcard") and pg.locator("#rtcard > .rtrow").count() <= 6, "compacte herstelkaart: max 6 regels, rekteller, herstel op maat")
     ok(pg.evaluate("(() => { const k = dayKind(dayItems('2026-11-21')); return k.long && !k.q; })()"), "dagtype lange duur herkend")
     pg.evaluate("{ const y = S.daily['2026-11-17'] || (S.daily['2026-11-17'] = {}); y.pains = Object.assign({}, y.pains, {'Onderrug':5}); save(); render(); }")
@@ -170,7 +174,7 @@ def features(pg, shots=True):
         sid = bs.first.get_attribute("data-backswap"); bs.first.click(); sw = store(pg)["swaps"]
         ok(any(k.startswith(sid) and v in ("HT","LP") for k, v in sw.items()), "rugvriendelijk wisselen")
     pg.evaluate("delete S.daily['2026-11-17'].pains.Onderrug; save(); render()")
-    ok("Routines: rug 1/" in pg.evaluate("weekText('2026-11-16')"), "routines in zondag-export")
+    ok("Routines (vaste momenten): rug 1/1" in pg.evaluate("weekText('2026-11-16')"), "routines in zondag-export")
     pg.click("#rtcard details summary"); pg.click('[data-mobtest="1"]'); pg.fill("#mt_ktwL", "8"); pg.fill("#mt_sq", "35"); pg.click("#mt_save")
     ok(store(pg)["mob"][-1]["ktwL"] == 8, "mobiliteitstest bewaard")
     tab(pg, "inzicht"); instab(pg, "lichaam"); ok("Knie-naar-muur links" in pg.inner_text("#mobins"), "mobiliteit in inzicht"); tab(pg, "vandaag")
@@ -304,7 +308,7 @@ def features(pg, shots=True):
     ok("niet uitgevoerd: Agenda" in txt and "ALTERNATIEF: Ingekort" in txt and "verplaatst van" in txt and "RPE 4" in txt, "export bevat niet-uitvoeren, alternatief, verplaatsen en RPE")
     ok("SAMENVATTING" in txt and "Rustige runs te hard:" in txt and txt.index("SAMENVATTING") < txt.index("DI 17 NOV"), "export begint met samenvatting")
     ok("Oura readiness 55" in txt and "pijn Kuit L 5" in txt, "export bevat Oura-ochtendcheck en pijn per plek")
-    ok("(afgevinkt zonder te loggen)" in txt, "afvinken zonder loggen is prima en staat in de export")
+    ok("afgevinkt zonder te loggen; telt als gepland" in txt, "afvinken zonder loggen is prima en staat in de export")
     if shots: pg.screenshot(path=str(OUT/"checkin.png"))
     # Lichaam: weekmeting + InBody-import (testdata, geen echte metingen in de repo)
     pg.click("#bodysum"); pg.fill("#b_w", "76,8"); pg.fill("#b_waist", "80"); pg.click("#b_save")
@@ -332,6 +336,16 @@ def features(pg, shots=True):
     ok(not pg.is_visible("#back"), "terug naar vandaag: geen terugknop")
     vp = pg.get_attribute('meta[name="viewport"]', "content"); fs = pg.evaluate("Math.min(...[...document.querySelectorAll('input,select,textarea')].map(e => parseFloat(getComputedStyle(e).fontSize)))")
     ok("maximum-scale=1" in vp and fs >= 16, f"geen auto-zoom op iOS (kleinste invoertekst {fs}px)")
+    # v4.4: kracht zoals voorgesteld, afvinken telt als gepland, drempelvoorstel, sleutel voor het Sheet-script
+    pg.evaluate("go(() => { ui.tab = 'log'; ui.sid = '2026-11-25-b'; })"); pg.wait_for_selector('[data-asplan="*"]'); pg.click('[data-asplan="*"]')
+    st = store(pg); pl = [x for x in st["sets"] if x.get("sid") == "2026-11-25-b" and x.get("pl") and not x.get("del")]
+    ok(len(pl) >= 10 and st["done"]["2026-11-25-b"].get("d") and pg.locator("#asplanned").count() == 1, f"‘Hele sessie zoals voorgesteld’ logt alle sets ({len(pl)})")
+    pg.click('[data-unplan]'); ok(not [x for x in store(pg)["sets"] if x.get("sid") == "2026-11-25-b" and x.get("pl") and not x.get("del")], "zoals voorgesteld ongedaan te maken")
+    g = pg.evaluate("(() => { const b = weekGroupSets('2026-11-23').borst||0; S.done['2026-11-23-b'] = {d:true}; return [b, weekGroupSets('2026-11-23').borst||0]; })()")
+    ok(g[1] - g[0] >= 5, f"afgevinkte krachtsessie zonder log telt als geplande sets (borst {g})")
+    tp = pg.evaluate("(() => { S.settings.tpace = 240; const x = tpSuggest(); S.settings.tpace = null; return x && x.nw; })()"); ok(tp and 265 <= tp <= 290, f"drempelvoorstel uit recente wedstrijd ({tp})")
+    ok(pg.evaluate("sheetU('all=1','https://x/exec','abc')") == "https://x/exec?k=abc&all=1" and pg.evaluate("sheetU('', 'https://x/exec', '')") == "https://x/exec?", "sleutel gaat mee naar het Sheet-script")
+    tab(pg, "meer"); ok(pg.locator("#s_key").count() == 1, "sleutelveld in instellingen")
     # Back-up, herstel, ongedaan maken
     tab(pg, "meer"); pg.click("#x_json"); code = pg.input_value("#x_out"); ok(code.startswith("YC1:"), "back-upcode gemaakt")
     ok(store(pg)["settings"]["lastBackup"], "laatste back-up vastgelegd")

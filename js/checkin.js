@@ -88,12 +88,12 @@ function weekText(start){
     L.push('- Rustige runs te hard: '+(st.easyFlags.length ? st.easyFlags.map(f => fmtDay(f.date)+' ('+f.txt.replace(/^.*?: /,'')+')').join('; ') : 'geen'));
     if(st.intv.length) L.push('- Intervallen: '+st.intv.map(x => fmtDay(x.date)+': '+x.iv.txt).join(' | '));
     L.push('- Pijn: '+(Object.keys(pains).length ? Object.entries(pains).map(([k,v])=>k+' max '+v).join(', ') : 'geen gemeld'));
-    { let rp = 0, rd = 0, mp = 0, md = 0, wp = 0, wd = 0, rec = 0; for(let i=0;i<7;i++){ const dd = addDays(start,i); if(dd > today()) break; const dl = dailyList(dd); const x = S.rt[dd]||{};
+    { let rp = 0, rd = 0, mp = 0, md = 0, wp = 0, wd = 0, rec = 0; for(let i=0;i<7;i++){ const dd = addDays(start,i); const dl = dailyList(dd); const x = S.rt[dd]||{};
         if(dl.some(k => /^RUG/.test(k))){ rp++; if(RUGV.some(k => x[k])) rd++; } for(const k of dl.filter(k => /^MOB/.test(k))){ mp++; if(x[k]) md++; }
         for(const it of weekItems(w).filter(z => z.date===dd)){ if(it.s.rt){ mp++; if(x[it.s.rt]) md++; } const wc = wuFor(it.s); if(wc && (S.done[it.s.id]||{}).d){ wp++; if(x[wc[0]+'@'+it.s.id]) wd++; } }
         rec += Object.keys(x).filter(k => /^(REC|X_)/.test(k)).length; }
       { const sw = staticWeek(start), g = PLAN.staticGoal||{}; if(Object.keys(g).length) L.push('- Statisch rekken (min/kant, doel '+Object.values(g)[0]+'): '+Object.keys(g).map(t => t+' '+fmtN(sw[t]||0)).join(', ')); }
-      if(rp) L.push('- Routines: rug '+rd+'/'+rp+' · mobiliteit '+md+'/'+mp+' · warming-ups '+wd+'/'+wp+' (bij afgevinkte trainingen) · herstel '+rec+'×'); }
+      if(rp || mp) L.push('- Routines (vaste momenten): rug '+rd+'/'+rp+' · mobiliteit '+md+'/'+mp+' · warming-ups '+wd+'/'+wp+' (bij afgevinkte trainingen) · herstel '+rec+'×'); }
     if(st.rd.length||st.sl.length) L.push('- Oura gem.: readiness '+(avg(st.rd)??'–')+', slaap '+(avg(st.sl)??'–'));
     const cf = availConflicts(weekByStart(addDays(start,7))||{id:''}); if(cf.length) L.push('- Conflicten volgende week: '+cf.join(' '));
     L.push(''); }
@@ -111,7 +111,7 @@ function weekText(start){
       if(sets.length){ const g = {}; for(const x of sets) (g[x.code] = g[x.code] || []).push((x.wu?'W ':'')+(x.kg?fmtKg(x.kg)+'×':'')+x.reps+(x.rir!=null?'@'+x.rir:'')+(x.sec?' ('+fmtSec(x.sec)+')':''));
         for(const c in g){ const pc = sets.find(x=>x.code===c).pc; const added = (S.extra[s.id]||[]).some(x=>x.c===pc); const bk = blocksOf(s).find(b => b.c===pc); L.push('    '+(bk ? bk.lbl+': ' : '')+EXN(c).n+(added?' (toegevoegd)':'')+(pc && pc!==c && !bk?' (i.p.v. '+EXN(pc).n+')':'')+': '+g[c].join(', ')); } }
       const skipped = sessEx(s).filter(e => S.exskip[s.id+'|'+e.c]).map(e => e.blk ? e.lbl : EXN(e.c).n); if(skipped.length) L.push('    Overgeslagen oefeningen: '+skipped.join(', '));
-      if(st.d && hasEx(s) && !sets.length) L.push('    (afgevinkt zonder te loggen)'); }
+      if((st.d || m.by[s.id]) && hasEx(s) && !sets.length){ const L2 = sessEx(s).filter(e => !S.exskip[s.id+'|'+e.c]); L.push('    (afgevinkt zonder te loggen; telt als gepland: '+(st.alt ? 'eerste 3 oefeningen × 2 sets' : L2.map(e => EXN(cOf(s.id, e)).n.replace(/ \(.*\)$/,'')+' '+e.s+'×'+e.lo+(e.hi!==e.lo?'–'+e.hi:'')).join(', '))+')'); } }
     for(const a of ex) L.push('[+] Niet gepland, Strava: '+a.name+' · '+actLine(a));
   }
   const cs = S.cardio.filter(c => !c.del && c.date>=start && c.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
@@ -171,6 +171,8 @@ function rMeer(){
   h += '<label class="f">Grens rustige run: max gem. HF</label><input id="s_easy" type="text" inputmode="numeric" placeholder="145" value="'+esc(st.easyHr??'')+'">';
   h += '<label class="f">Drempeltempo (m:ss /km)</label><input id="s_tpace" type="text" inputmode="numeric" data-tm="s" autocomplete="off" placeholder="'+(PLAN?fmtSec(PLAN.athlete.tpace):'')+'" value="'+(st.tpace?fmtSec(st.tpace):'')+'">';
   h += '<label class="f">Google Sheet web-app-URL (optioneel)</label><input id="s_url" type="url" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(st.sheetUrl||'')+'">';
+  h += '<label class="f">Geheime sleutel (zelfde als APP_KEY in je script)</label><div class="row nw"><input id="s_key" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(st.sheetKey||'')+'" placeholder="nog geen sleutel"><button class="btn sm" id="s_newkey">Maak</button></div>';
+  if(st.sheetUrl && !st.sheetKey) h += '<div class="banner oranje" style="margin-top:8px">Je Sheet-script is nog open voor iedereen met de URL. Maak een sleutel, zet hem als APP_KEY in je script en bewaar hier.</div>';
   h += '<div class="row"><button class="btn pri" id="s_save">Bewaar instellingen</button><button class="btn" id="s_sync">Sync nu ('+S.queue.length+')</button></div>';
   h += '<div class="small" style="margin-top:8px">Wachtrij: '+S.queue.length+' item(s). Versturen gaat zonder ontvangstbevestiging (no-cors). Leidend blijft je back-upcode.</div></div>';
   h += '<div class="card"><h3>Handmatig loggen</h3><div class="row"><button class="btn" data-manual="1">＋ Duursessie zonder Strava</button></div></div>';
@@ -185,7 +187,7 @@ function scheduleSync(){ clearTimeout(syncT); syncT = setTimeout(flush, 2000); }
 async function flush(){
   const url = S.settings.sheetUrl; if(!url || !S.queue.length || !navigator.onLine) return;
   const batch = S.queue.slice(0, 50);
-  try { await fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(batch)});
+  try { await fetch(sheetU(''), {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(batch)});
     const sent = new Set(batch.map(b => b.kind+'|'+b.id+'|'+b.ts)); S.queue = S.queue.filter(q => !sent.has(q.kind+'|'+q.id+'|'+q.ts)); save();
     if(S.queue.length) scheduleSync(); if(ui.tab==='meer') rMeer();
   } catch(e){ /* offline: blijft in wachtrij */ }

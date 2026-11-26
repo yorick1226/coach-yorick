@@ -3564,32 +3564,17 @@
  },
  "dailyRoutines": [
   [
-   "RUGX",
    "MOB"
   ],
+  [],
   [
-   "RUGX",
-   "MOB"
+   "RUGX"
   ],
+  [],
+  [],
+  [],
   [
-   "RUGX",
-   "MOB"
-  ],
-  [
-   "RUGX",
-   "MOB"
-  ],
-  [
-   "RUGX",
-   "MOB"
-  ],
-  [
-   "RUGX",
-   "MOB"
-  ],
-  [
-   "RUGX",
-   "MOB"
+   "MOB_LANG"
   ]
  ],
  "recoveryTips": {
@@ -4295,10 +4280,10 @@
   }
  ],
  "staticGoal": {
-  "heupbuiger": 8,
-  "kuit": 8,
-  "hamstring": 8,
-  "bil": 8
+  "heupbuiger": 5,
+  "kuit": 5,
+  "hamstring": 5,
+  "bil": 5
  },
  "blockTemplates": {
   "UA": [
@@ -4692,5 +4677,6 @@
     ]
    }
   ]
- }
+ },
+ "routineNote": "Vaste momenten: ma mobiliteit (±10 min), wo rug & core (±8 min), zo mobiliteit compleet (±18 min). Rest: alleen warming-up/cooldown bij de training."
 }

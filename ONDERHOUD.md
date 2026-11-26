@@ -150,3 +150,11 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 ## v4.3.0 — dag aanpassen + fitheid/vermoeidheid
 - `adaptPlan(d, lvl)` (core.js): bij oranje/rood ochtendadvies voorstel per open sessie; knop "Pas vandaag aan" zet `done.alt` + `done.auto`; "Terug naar plan" wist die. Alleen voor vandaag; al gedane (of Strava-gekoppelde) sessies blijven staan.
 - `loadSeries()/loadCard()` (insight.js): minuten × RPE (Foster); zonder RPE geschat uit gem. HF / drempel-HF. CTL 42 d, ATL 7 d. Vorm = (CTL−ATL)/CTL: < −0,3 zwaar, < −0,1 opbouw, < 0,15 in balans, anders fris. Alleen trend.
+
+## v4.4.0 — kracht zonder invullen, vaste routinemomenten, drempelvoorstel, beveiligd script, CI
+- Kracht: "✓ Hele sessie" / "✓ Rest zoals voorgesteld" (`logAsPlanned`, sets krijgen `pl:<batch>`, ongedaan via `data-unplan`). Afgevinkte of Strava-gekoppelde krachtsessie zonder sets telt in spiergroepen/export als gepland (`plannedSetsTicked`; bij alternatief: eerste 3 oefeningen × 2 sets).
+- Routines: `plan.dailyRoutines` = vaste momenten (ma MOB, wo RUGX, zo MOB_LANG). Export telt per week.
+- `tpSuggest()/tpCard()`: drempelvoorstel uit beste wedstrijd ≤ 10 weken (Riegel naar 60 min), afwijking ≥ 6 s/km; accepteren zet `settings.tpace`.
+- Sheet-script: `APP_KEY` in scripteigenschappen; app stuurt `k` mee (`sheetU()`), sleutel in Meer → Instellingen. Zonder APP_KEY blijft het script open (oud gedrag). Volgorde bij instellen: nieuwe Code.gs + nieuwe versie implementeren → sleutel in app bewaren → APP_KEY zetten.
+- Lege installatie: kaart op Vandaag om alles uit de Sheet terug te zetten (`restoreFromSheet`).
+- CI: `.github/workflows/pages.yml` draait de releasetest (Chromium + WebKit, prev = HEAD~1) vóór publicatie. Cachenummer hoeft alleen omhoog als app-bestanden wijzigen (niet bij alleen strava.json/ics).

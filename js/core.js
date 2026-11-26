@@ -1,7 +1,7 @@
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.3.2';
+const APP_VERSION = '4.4.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -97,9 +97,16 @@ function applyOura(days){ let n = 0;
     if(o.temp!=null) x.temp = o.temp;
     if(ch){ x.src = 'oura'; x.ts = Date.now(); enqueue('daily', o.day, o.day, x); n++; } }
   return n; }
+/* alle verkeer naar je eigen Sheet-script gaat met je geheime sleutel (APP_KEY in het script) */
+function sheetU(params, url, key){ url = url || S.settings.sheetUrl; key = key ?? S.settings.sheetKey; if(!url) return '';
+  return url + (url.includes('?') ? '&' : '?') + (key ? 'k='+encodeURIComponent(key) + (params ? '&' : '') : '') + (params||''); }
+function newKey(){ const a = new Uint8Array(18); crypto.getRandomValues(a); return Array.from(a, b => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 56]).join(''); }
+function isFresh(){ return !S.sets.length && !Object.keys(S.done).length && !Object.keys(S.daily).length && !S.cardio.length; }
+async function restoreFromSheet(url, key){ const r = await fetch(sheetU('all=1', url, key)); const d = await r.json(); if(d && d.error) throw new Error(d.error);
+  const o = fromSheet(d); try { localStorage.setItem(KEY+'.undo', JSON.stringify(S)); } catch(_){} o.settings = Object.assign({}, S.settings, {sheetUrl:url, sheetKey:key||''}); S = o; save(); return S; }
 async function ouraPull(force){ const url = S.settings.sheetUrl; if(!url || !S.settings.oura || !navigator.onLine) return;
   const last = Number(sessionStorage.getItem('ouraPull')||0); if(!force && Date.now()-last < 20*60000) return; sessionStorage.setItem('ouraPull', Date.now());
-  try { const d = await (await fetch(url+(url.includes('?')?'&':'?')+'oura=1&days=21')).json(); S.settings.ouraLast = Date.now();
+  try { const d = await (await fetch(sheetU('oura=1&days=21'))).json(); if(d && d.error){ toast('Sheet: '+d.error); return null; } S.settings.ouraLast = Date.now();
     const n = applyOura(d.days); save(); if(n && typeof rerender==='function') rerender(); return d; } catch(e){ return null; } }
 /* ---------- opslag ---------- */
 function blank(){ return {schema:SCHEMA, done:{}, moves:{}, swaps:{}, extra:{}, exskip:{}, custom:{}, body:[], rt:{}, mob:[], sets:[], cardio:[], checkins:{}, avail:{}, daily:{},
@@ -143,7 +150,15 @@ function groupTargets(wstart){ const tg = Object.assign({}, PLAN.setTargets||{})
   let f = 1, why = ''; if(race){ f = 0.6; why = 'wedstrijdweek'; } else if(km >= 50){ f = 0.75; why = fmtN(km)+' km lopen gepland'; }
   if(f < 1) for(const g of ['quads','hamstrings','bilspieren','adductoren']) if(tg[g]) tg[g] = Math.round(tg[g]*f);
   return {tg, why}; }
-function weekGroupSets(wstart){ const b = addDays(wstart,6), per = {}; for(const x of S.sets) if(work(x) && x.date>=wstart && x.date<=b && (x.rir==null||x.rir<=4)){ const g = EXN(x.code).g; if(g) per[g] = (per[g]||0)+1; } return per; }
+function weekGroupSets(wstart){ const b = addDays(wstart,6), per = {}; for(const x of S.sets) if(work(x) && x.date>=wstart && x.date<=b && (x.rir==null||x.rir<=4)){ const g = EXN(x.code).g; if(g) per[g] = (per[g]||0)+1; }
+  for(const [g, n] of Object.entries(plannedSetsTicked(wstart))) per[g] = (per[g]||0)+n; return per; }
+/* afgevinkte (of via Strava gekoppelde) krachtsessie zonder gelogde sets telt als uitgevoerd volgens plan; bij een gekozen alternatief: eerste 3 oefeningen × max 2 sets */
+function plannedSetsTicked(wstart){ const w = weekByStart(wstart); const per = {}; if(!w) return per; const m = matchWeek(w);
+  for(const it of weekItems(w)){ const s = it.s, st = S.done[s.id]||{}; if(!hasEx(s) || st.skip || !(st.d || m.by[s.id])) continue;
+    if(S.sets.some(x => x.sid===s.id && !x.del)) continue;
+    let L = sessEx(s).filter(e => !S.exskip[s.id+'|'+e.c]); if(st.alt) L = L.slice(0,3);
+    for(const e of L){ const g = EXN(cOf(s.id, e)).g; if(!g || ['plyo','hyrox'].includes(g)) continue; per[g] = (per[g]||0) + (st.alt ? Math.min(2, e.s||2) : (e.s||0)); } }
+  return per; }
 function groupStrip(s, date){ const ws = mondayOf(date); const {tg, why} = groupTargets(ws); const per = weekGroupSets(ws); const mine = new Set(sessEx(s).map(e => EXN(cOf(s.id, e)).g));
   const cells = MG.filter(([g]) => tg[g]).map(([g,n]) => { const v = per[g]||0, t = tg[g]; return '<div class="gs'+(mine.has(g)?' me':'')+'"><span>'+n+'</span><b>'+v+'<i>/'+t+'</i></b><div class="bar"><i style="width:'+Math.min(100, Math.round(v/t*100))+'%'+(v>=t?';background:var(--acc)':'')+'"></i></div></div>'; }).join('');
   return '<details class="card"'+(ui.gsOpen?' open':'')+' data-gsopen="1"><summary><b>Spiergroepen deze week</b> <span class="small">harde sets / doel'+(why?' · benen lager: '+esc(why):'')+'</span></summary><div class="gsg">'+cells+'</div><div class="small" style="margin-top:6px">Omlijnd = deze sessie. Richtlijn 6–10+ harde sets per spiergroep per week voor groei; benen lager omdat lopen en fietsen ze al belasten.</div></details>'; }
@@ -405,6 +420,7 @@ function weekStats(w){
   for(const c of manualUnlinked(a,b,m)){ st.secDone += c.sec||0; if(['run','trail'].includes(c.sport)) st.runDone += c.km||0; st.vertDone += c.hm||0;
     if(c.rpe && c.sec && !(c.sid && (S.done[c.sid]||{}).rpe)) st.load += c.rpe*c.sec/60; }
   for(const x of S.sets) if(work(x) && x.date>=a && x.date<=b && (x.rir==null || x.rir<=4)){ const g = EXN(x.code).g || 'overig'; st.groups[g] = (st.groups[g]||0)+1; }
+  for(const [g, n] of Object.entries(plannedSetsTicked(a))) st.groups[g] = (st.groups[g]||0)+n;
   for(let i=0;i<7;i++){ const y = dailyOf(addDays(a,i)); if(y.rd!=null) st.rd.push(y.rd); if(y.sl!=null) st.sl.push(y.sl); }
   st.split = intensitySplit(actsIn(a,b));
   return st;

@@ -11,7 +11,36 @@ concurrency:
   group: coach-publiceer
   cancel-in-progress: true
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Playwright installeren
+        run: |
+          pip install playwright==1.63.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Releasetest (Chromium + WebKit, upgrade vanaf vorige commit)
+        run: |
+          PREV=$(git rev-parse --verify -q HEAD~1 || git rev-parse HEAD)
+          python tests/run_tests.py --prev "$PREV"
+      - name: Screenshots bewaren
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: tests/out/
+          retention-days: 7
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     environment:
       name: github-pages
