@@ -274,7 +274,7 @@ def features(pg, shots=True):
     pg.type("#c_time", "14512"); ok(pg.input_value("#c_time") == "1:45:12", "tijd 14512 → 1:45:12"); pg.fill("#c_time", "")
     pg.fill("#c_time", "4:10:00"); pg.click("details.card summary")
     pg.fill("#c_kh", "75"); pg.click('[data-maag="4"]'); pg.click("#c_save")
-    tab(pg, "inzicht"); instab(pg, "overzicht"); ok(pg.locator(".kpi").count() == 4 and pg.locator(".seg [data-ins]").count() == 6, "inzicht: KPI-tegels + 6 tabbladen")
+    tab(pg, "inzicht"); instab(pg, "overzicht"); ok(pg.locator("#wkhero").count() == 1 and pg.locator(".seg [data-ins]").count() == 6, "voortgang: weekheld + 6 tabbladen")
     ok(pg.locator("#blockrep").count() == 1 and "BLOKRAPPORT" in pg.inner_text("#blockrep") and "Naleving" in pg.inner_text("#blockrep"), "blokrapport zichtbaar")
     lc = pg.inner_text("#loadcurve") if pg.locator("#loadcurve").count() else ""; ok("Vorm nu" in lc and "fitheid" in lc, "fitheid/vermoeidheid-curve op Overzicht")
     ok(pg.locator("#coachadv").count() == 1 and len(pg.inner_text("#coachadv")) > 20, "coachadvies bovenaan Voortgang")

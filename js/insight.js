@@ -70,7 +70,7 @@ function perfCard(){ const br = bestRace(); const tp = Number(setting('tpace')) 
   h += '<div class="small">Looptempo’s als percentage van je drempelsnelheid en fietszones volgens Coggan (% FTP): schattingen, geen labwaarden. Werk FTP en drempeltempo bij onder Meer na een test.</div></div>';
   return h; }
 function rInsight(){
-  $('htitle').textContent = 'Inzicht';
+  $('htitle').textContent = 'Voortgang';
   const t = today(); const thisMon = mondayOf(t); const weeks = []; const NW = ui.range||12; for(let i=NW-1;i>=0;i--) weeks.push(addDays(thisMon, -7*i));
   const lab = weeks.map(w => weekIdOf(w).split('-W')[1]);
   const wk = weeks.map(a => { const b = addDays(a,6); const pw = weekByStart(a); const m = matchWeek(pw);
@@ -97,7 +97,12 @@ function rInsight(){
     const tile = (l, v, sub, tone) => '<div class="kpi"><span>'+l+'</span><b'+(tone?' style="color:'+tone+'"':'')+'>'+v+'</b><i>'+sub+'</i></div>';
     const nr = (PLAN.races||[]).find(r => r.date >= t); const nd = nr ? Math.round((parseD(nr.date)-parseD(t))/864e5) : null;
     const over = avg(x=>x.km) > 0 && cur.km > avg(x=>x.km)*1.3;
-    h += '<div class="kpis">'+tile('Lopen deze week', fmtN(cur.km)+' km', (weekByStart(thisMon) ? 'plan '+fmtN(weekStats(weekByStart(thisMon)).runPlan)+' · ' : '')+'gem. '+fmtN(avg(x=>x.km)), over?'var(--warn)':'')+tile('Trainingstijd', fmtH(cur.sec), 'gem. '+fmtH(avg(x=>x.sec)))+tile('Fietsen', fmtN(rh)+' u', 'gem. '+fmtN(rhA)+' u')+tile('Harde krachtsets', String(hs), 'deze week')+'</div>';
+    { const pw = weekByStart(thisMon), pl = pw ? weekStats(pw).runPlan : 0, av = avg(x=>x.km), mx = Math.max(pl, av, cur.km, 1)*1.08;
+      const pc = v => Math.min(100, v/mx*100).toFixed(1);
+      h += '<div class="wkhero" id="wkhero"><span class="meta-l">Lopen deze week</span><div class="big"><b'+(over?' style="color:var(--warn)"':'')+'>'+fmtN(cur.km)+'</b><span>'+(pl ? 'van '+fmtN(pl)+' km' : 'km')+'</span></div>'
+        +'<div class="pbar"><i style="width:'+pc(cur.km)+'%"></i>'+(pl ? '<em class="pl" style="left:'+pc(pl)+'%"></em>' : '')+(av ? '<em class="av" style="left:'+pc(av)+'%"></em>' : '')+'</div>'
+        +'<div class="small">'+(pl ? 'Streep: plan. ' : '')+'Stip: gemiddelde vorige 4 weken ('+fmtN(av)+' km)'+(over ? '. Meer dan 30% boven je gemiddelde.' : '.')+'</div>'
+        +'<div class="subk"><div><b>'+fmtH(cur.sec)+'</b><span>trainingstijd<br>gem. '+fmtH(avg(x=>x.sec))+'</span></div><div><b>'+fmtN(rh)+' u</b><span>fietsen<br>gem. '+fmtN(rhA)+' u</span></div><div><b>'+hs+'</b><span>harde krachtsets<br>deze week</span></div></div></div>'; }
     { const ca = coachAdvice(); if(ca.length) h += '<div class="card" id="coachadv"><div class="coachline">'+ic('progress',18)+'<div><b>Coach</b>'+ca.map(x => '<div class="advice1" style="margin-top:4px">'+x+'</div>').join('')+'</div></div></div>'; }
     { const ph = (PLAN.season||[]).find(x => x.from <= t && t <= x.to); const i = ph ? PLAN.season.indexOf(ph) : -1;
       if(ph) h += '<div class="card" id="phasecard"><span class="small">Seizoensfase '+(i+1)+'/'+PLAN.season.length+' · t/m '+fmtDay(ph.to)+'</span><b style="display:block;font-size:17px;margin:2px 0">'+esc(ph.name)+'</b><div class="small">'+esc(ph.goal)+'</div><div class="small" style="margin-top:4px">Lopen '+ph.km[0]+'–'+ph.km[1]+' km/week'+(PLAN.season[i+1] ? ' · daarna: '+esc(PLAN.season[i+1].name) : '')+'</div><button class="btn link" data-ins="seizoen">Bekijk seizoen</button></div>'; }
@@ -173,7 +178,7 @@ function rInsight(){
   { const ws = thisMon, {tg, why} = groupTargets(ws), per = weekGroupSets(ws);
     B.kracht = '<div class="card" id="grpwk"><h3>Deze week per spiergroep</h3><div class="gsg">'+MG.filter(([g]) => tg[g]).map(([g,n]) => { const v = per[g]||0, tt = tg[g]; return '<div class="gs"><span>'+n+'</span><b>'+v+'<i>/'+tt+'</i></b><div class="bar"><i style="width:'+Math.min(100, Math.round(v/tt*100))+'%'+(v>=tt?';background:var(--acc)':'')+'"></i></div></div>'; }).join('')+'</div><div class="small" style="margin-top:6px">Harde sets (RIR ≤ 4, geen opwarmsets).'+(why?' Benendoel lager: '+esc(why)+'.':'')+'</div></div>' + (B.kracht||''); }
   B.seizoen = seasonHtml();
-  const TABS = [['overzicht','Overzicht'],['seizoen','Seizoen'],['lopen','Lopen'],['fietsen','Fietsen'],['kracht','Kracht'],['lichaam','Lichaam']];
+  const TABS = [['overzicht','Overzicht'],['seizoen','Seizoen'],['lopen','Lopen'],['fietsen','Fiets'],['kracht','Kracht'],['lichaam','Lichaam']];
   let top = '<div class="seg" role="tablist">'+TABS.map(([k,l]) => '<button role="tab" class="'+(IT===k?'on':'')+'" data-ins="'+k+'">'+l+'</button>').join('')+'</div>';
   $('view').innerHTML = top + ((B[IT]||'').trim() || '<div class="card mut">Nog geen gegevens hier.</div>');
 }

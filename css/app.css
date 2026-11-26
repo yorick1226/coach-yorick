@@ -317,3 +317,38 @@ nav.tabs button.on{color:var(--pur2)}
 @media (prefers-reduced-motion: reduce){.chk.pop,.strip .dot.pop{animation:none}}
 :focus-visible{outline:2px solid var(--pur2);outline-offset:2px}
 .per{display:flex;align-items:center;gap:10px;margin:14px 2px 8px}.per>span{font-size:var(--fs-s);font-weight:650;color:var(--mut)}.per .seg.sm{margin:0 0 0 auto}
+
+/* ---------- v4.7: weekoverzicht, terrein, held, meldingen ---------- */
+/* weekstrip als terrein: balkhoogte = geplande belasting, paars gevuld = gedaan */
+.strip button{min-height:96px;padding:6px 0 6px;gap:3px}
+.strip .terr{display:flex;align-items:flex-end;justify-content:center;width:100%;height:30px}
+.strip .terr i{position:relative;display:block;width:44%;min-height:3px;border:1.5px solid var(--pur2);border-bottom-width:0;border-radius:4px 4px 0 0;overflow:hidden;opacity:.85}
+.strip .terr u{position:absolute;left:0;right:0;bottom:0;background:var(--pur)}
+.strip .dot{width:60%;height:3px;border-radius:2px;border:0;background:var(--line)}
+.strip .dot.ok{background:var(--moss)}.strip .dot.part{background:var(--warn)}.strip .dot.miss{background:var(--bad)}.strip .dot.alt{background:var(--glac)}.strip .dot.rest{background:transparent}
+.strip button.sel{border-color:var(--pur2);background:#221C38}.strip button.td b{color:var(--pur2)}
+/* plan: compacte regels */
+.sess.compact{background:none;border:0;border-left:3px solid var(--tc,var(--line));border-radius:0;padding:6px 0 6px 10px;margin:0 0 2px}
+.sess.compact.done{background:none}
+.sess.compact .chk{width:32px;height:32px;border-radius:50%;font-size:15px}
+.sess.compact .tt b{font-size:var(--fs-m);font-weight:600;font-stretch:90%;line-height:1.25}
+.sess.compact .meta{margin-top:2px;font-size:var(--fs-xs)}.sess.compact .meta .tag{display:none}
+.sess.compact.open{background:var(--card);border-radius:0 12px 12px 0;padding:10px 10px 10px 12px;margin:4px 0 8px}
+.day .rest{color:var(--mut);padding:4px 0 4px 13px;border-left:3px solid var(--line)}
+.day h2{margin-top:16px}
+/* rustdag */
+.restday{border-left:3px solid var(--glac);padding:4px 0 4px 14px;margin:4px 0 18px}.restday b{display:block;font-size:var(--fs-xl);font-stretch:72%;font-weight:750;margin-bottom:4px}
+/* voortgang: één held */
+.wkhero{padding:4px 2px 14px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.wkhero .big{display:flex;align-items:baseline;gap:10px}.wkhero .big b{font-size:64px;line-height:1;font-stretch:68%;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.wkhero .big span{font-size:var(--fs-m);color:var(--mut)}
+.pbar{position:relative;height:10px;background:var(--card2);border-radius:5px;margin:12px 0 6px}.pbar i{display:block;height:100%;background:var(--pur);border-radius:5px}
+.pbar em.pl{position:absolute;top:-4px;width:2px;height:18px;background:var(--tx)}.pbar em.av{position:absolute;top:2px;width:6px;height:6px;border-radius:50%;background:var(--glac);transform:translateX(-3px)}
+.subk{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.subk b{display:block;font-size:var(--fs-l);font-stretch:72%;font-weight:750;font-variant-numeric:tabular-nums}.subk span{font-size:var(--fs-xs);color:var(--mut);line-height:1.3}
+/* subtabs passend */
+.seg button{padding-left:10px;padding-right:10px}
+/* melding onderin, rustig */
+.toast{top:auto;bottom:calc(84px + env(safe-area-inset-bottom));background:var(--card2);color:var(--tx);border:1px solid var(--line);font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.day>.strava{background:none;border:0;border-left:3px solid var(--str);border-radius:0;padding:6px 0 6px 13px;margin:0 0 2px;color:var(--tx2);font-size:var(--fs-s)}
+.day>.strava b{color:var(--str);font-weight:600}
+.seg button{font-size:14px;padding-left:8px;padding-right:8px}

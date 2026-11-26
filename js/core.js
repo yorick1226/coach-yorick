@@ -1,7 +1,7 @@
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.6.1';
+const APP_VERSION = '4.7.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -454,10 +454,17 @@ function dayStatus(date){
   if(done === its.length) return 'ok'; if(skip === its.length) return 'miss';
   if(date < today()){ return done+alt ? 'part' : 'miss'; } if(alt && !done) return 'alt'; return done ? 'part' : 'todo';
 }
+/* geplande belasting per sessie: minuten × intensiteit (ruwe schatting, alleen voor de vorm van de week) */
+function sessLoad(s){ if(['rest','mobility'].includes(s.t) || s.rt) return 0; const k = typeof sessKind==='function' ? sessKind(s) : s.t;
+  const min = s.min || (s.km ? s.km*5.6 : s.t==='strength' ? 60 : 45);
+  const f = {race:2, drempel:1.6, interval:1.7, heuvel:1.6, fietskwal:1.4, hyrox:1.6, lang:1.15, strength:1.1, plyo:0.9, easy:1, herstel:0.5, activatie:0.7, fietsz2:0.75, swim:0.8}[k] ?? 1; return min*f; }
 function weekStrip(start, sel, mode){
   const t = today(); let h = '<div class="strip">';
-  for(let i=0;i<7;i++){ const d = addDays(start,i); const st = dayStatus(d);
-    h += '<button data-strip="'+d+'" data-mode="'+mode+'" class="'+(d===sel?'sel ':'')+(d===t?'td':'')+'">'+DAYS[i]+'<b>'+parseD(d).getDate()+'</b><span class="dot '+st+(ui.popDay===d?' pop':'')+'"></span></button>'; }
+  const L = []; for(let i=0;i<7;i++){ const d = addDays(start,i); const its = dayItems(d).filter(x => !isSkipped(x.s.id)); const w = weekByStart(mondayOf(d)); const m = w ? matchWeek(w) : {by:{}};
+    L.push({d, pl: its.reduce((p,x) => p+sessLoad(x.s), 0), dn: its.filter(x => (S.done[x.s.id]||{}).d || m.by[x.s.id]).reduce((p,x) => p+sessLoad(x.s), 0)}); }
+  const mx = Math.max(60, ...L.map(x => x.pl));
+  for(let i=0;i<7;i++){ const {d, pl, dn} = L[i]; const st = dayStatus(d); const hp = pl ? Math.max(10, pl/mx*100) : 0;
+    h += '<button data-strip="'+d+'" data-mode="'+mode+'" class="'+(d===sel?'sel ':'')+(d===t?'td':'')+'">'+DAYS[i]+'<b>'+parseD(d).getDate()+'</b><span class="terr">'+(pl ? '<i style="height:'+hp.toFixed(0)+'%"><u style="height:'+Math.min(100, dn/pl*100).toFixed(0)+'%"></u></i>' : '')+'</span><span class="dot '+st+(ui.popDay===d?' pop':'')+'"></span></button>'; }
   return h+'</div>';
 }
 function nextRace(){ const t = today(); const r = (PLAN.races||[]).filter(x => x.date>=t).sort((a,b)=>a.date.localeCompare(b.date))[0]; if(!r) return '';

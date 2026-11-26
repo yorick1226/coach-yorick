@@ -170,3 +170,9 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - Lettertype Archivo (variabele breedte) zelf gehost in `fonts/archivo.woff2` (in sw CORE): smal/zwaar voor cijfers en titels, normaal voor tekst.
 - Kopjes in zinsvorm, geen hoofdletterlabels. Vandaag: sessies als `.sess.hero` zonder kader; morgen als `.list`.
 - Seizoen: volumeprofiel (`profileSvg`) + hoogtelijnen (`CONTOUR`). Afvinken: animatie `pop` (respecteert reduced motion).
+
+## v4.7.0 — structuur
+- Weekstrip = terrein: `sessLoad(s)` (minuten × intensiteit) bepaalt balkhoogte, paars gevuld = gedaan; statuslijn eronder (`.dot`).
+- Plan: `sessCard(.., {compact:true})` = regels met rond vinkje; Vandaag blijft `hero`.
+- Voortgang-overzicht: `#wkhero` (lopen vs plan + gemiddelde) i.p.v. 4 tegels; kop heet "Voortgang".
+- Melding (`toast`) onderin; rustdag-toestand `#restday` met volgende training.

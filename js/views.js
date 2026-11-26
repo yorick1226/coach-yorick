@@ -22,7 +22,7 @@ function sessCard(it, m, opt){
   const open = ui.open[s.id] ?? !!opt.open;
   const meta = a ? (a.km ? fmtN(a.km)+' km' : '')+((a.el||a.sec) ? (a.km?' · ':'')+fmtSec(a.el||a.sec) : '') : planLine(s) || (hasEx(s) ? sessEx(s).length+' oefeningen' : '');
   const flag = skip ? '<span class="pill o">vervallen</span>' : st.alt ? '<span class="pill o">alternatief</span>' : it.date!==it.orig ? '<span class="pill o">verplaatst</span>' : (easyFlag(s, a) ? '<span class="pill r">⚠</span>' : '');
-  let h = '<div class="card sess'+(opt.hero?' hero':'')+(done?' done':'')+(skip?' skip':'')+(open?' open':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
+  let h = '<div class="card sess'+(opt.hero?' hero':'')+(opt.compact?' compact':'')+(done?' done':'')+(skip?' skip':'')+(open?' open':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
   h += '<button class="chk'+(done?' on':'')+(done && ui.pop===s.id?' pop':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
   h += (s.t!=='rest' ? '<button class="tt tap" data-open="'+s.id+'" data-isopen="'+(open?1:0)+'" aria-expanded="'+open+'">' : '<div class="tt">')+'<b>'+esc(s.title)+'</b><span class="meta"><span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span>'+(meta?'<span>'+esc(meta)+'</span>':'')+flag+'</span>';
   h += s.t!=='rest' ? '</button><span class="chev" aria-hidden="true">'+(open?'▴':'▾')+'</span></div>' : '</div></div>';
@@ -249,9 +249,10 @@ function rToday(){
   const items = weekItems(w).filter(i => i.date===d);
   h += '<div class="day today"><h2>Training '+(isT?'vandaag':fmtDay(d))+'</h2>';
   if(!w) h += '<div class="card mut">Geen plan voor deze week.</div>';
-  else if(!items.length) h += '<div class="card mut">Niets gepland. Rust, of de routines hieronder.</div>';
+  else if(!items.length){ let nx = null; for(let i=1;i<=7 && !nx;i++){ const dd = addDays(d,i); const di = dayItems(dd).filter(x => !['rest','mobility'].includes(x.s.t)); if(di.length) nx = [dd, di[0].s]; }
+    h += '<div class="restday" id="restday"><b>Rustdag</b><div class="small">Herstel is training: dit is wanneer je sterker wordt. Routines staan hieronder.'+(nx ? '<br>Volgende training: '+fmtDay(nx[0])+', '+esc(nx[1].title)+'.' : '')+'</div></div>'; }
   for(const it of items) h += sessCard(it, m, {hero:true});
-  for(const a of m.extra.filter(x => x.date===d)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
+  for(const a of m.extra.filter(x => x.date===d)) h += '<div class="strava"><b>Niet gepland (Strava):</b> '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
   h += '</div>';
   if(isT){ for(const it of rpeTodo(d)){ const a = matchWeek(weekByStart(mondayOf(it.date))).by[it.s.id];
       h += '<div class="card" id="rpeask_'+it.s.id+'"><div class="small">'+(it.date===d?'Vandaag':'Gisteren')+' · uit Strava: '+(a.km?fmtN(a.km)+' km · ':'')+fmtSec(a.el||a.sec)+'</div><b>Hoe zwaar was '+esc(it.s.title)+'?</b> <span class="small">RPE 1–10</span>'+infoBtn('rpe')+infoBox('rpe')+'<div class="chips xs" style="margin-top:6px">'+[1,2,3,4,5,6,7,8,9,10].map(r => '<button class="chip" data-srpe="'+it.s.id+'" data-v="'+r+'">'+r+'</button>').join('')+'</div><button class="btn link" data-norpe="'+it.s.id+'">Overslaan</button></div>'; }
@@ -284,9 +285,9 @@ function rWeek(){
   const items = weekItems(w);
   if(w.days.length) for(let i=0;i<7;i++){ const dd = addDays(w.start,i); const di = items.filter(x => x.date===dd);
     h += '<div class="day'+(dd===t?' today':'')+'" id="d_'+dd+'"><h2>'+fmtDay(dd)+(dd===t?' · vandaag':'')+'</h2>';
-    if(!di.length) h += '<div class="card small">Geen sessie.</div>';
-    for(const it of di) h += sessCard(it, m, {});
-    for(const a of m.extra.filter(x => x.date===dd)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
+    if(!di.length) h += '<div class="rest small">Rust</div>';
+    for(const it of di) h += sessCard(it, m, {compact:true});
+    for(const a of m.extra.filter(x => x.date===dd)) h += '<div class="strava"><b>Niet gepland (Strava):</b> '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
     h += '</div>'; }
   else h += '<div class="card mut">Nog niet uitgewerkt. Volgt na de check-in van de week ervoor.</div>';
   h += '<div class="secttl">Deze week</div>';
