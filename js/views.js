@@ -22,8 +22,8 @@ function sessCard(it, m, opt){
   const open = ui.open[s.id] ?? !!opt.open;
   const meta = a ? (a.km ? fmtN(a.km)+' km' : '')+((a.el||a.sec) ? (a.km?' · ':'')+fmtSec(a.el||a.sec) : '') : planLine(s) || (hasEx(s) ? sessEx(s).length+' oefeningen' : '');
   const flag = skip ? '<span class="pill o">vervallen</span>' : st.alt ? '<span class="pill o">alternatief</span>' : it.date!==it.orig ? '<span class="pill o">verplaatst</span>' : (easyFlag(s, a) ? '<span class="pill r">⚠</span>' : '');
-  let h = '<div class="card sess'+(done?' done':'')+(skip?' skip':'')+(open?' open':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
-  h += '<button class="chk'+(done?' on':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
+  let h = '<div class="card sess'+(opt.hero?' hero':'')+(done?' done':'')+(skip?' skip':'')+(open?' open':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
+  h += '<button class="chk'+(done?' on':'')+(done && ui.pop===s.id?' pop':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
   h += (s.t!=='rest' ? '<button class="tt tap" data-open="'+s.id+'" data-isopen="'+(open?1:0)+'" aria-expanded="'+open+'">' : '<div class="tt">')+'<b>'+esc(s.title)+'</b><span class="meta"><span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span>'+(meta?'<span>'+esc(meta)+'</span>':'')+flag+'</span>';
   h += s.t!=='rest' ? '</button><span class="chev" aria-hidden="true">'+(open?'▴':'▾')+'</span></div>' : '</div></div>';
   if(!open || s.t==='rest') return h+'</div>';
@@ -38,7 +38,7 @@ function sessCard(it, m, opt){
   if(a) h += planVsDone(s, a);
   if(a) h += '<div class="strava"><b>✓ Strava</b> '+actLine(a)+(a.laps?'<br><button class="btn link" data-laps="'+s.id+'">'+(ui.laps[s.id]?'Ronden verbergen':'Ronden tonen ('+a.laps.length+')')+'</button>'+(ui.laps[s.id]?lapsTable(a):''):'')+'</div>';
   const quick = [];
-  if(!skip && !['rest','mobility'].includes(s.t) && !s.rt) quick.push('<button class="btn sm'+(hasEx(s)||done?'':' pri')+'" data-brief="'+s.id+'">Vooraf ›</button>');
+  if(!skip && !['rest','mobility'].includes(s.t) && !s.rt) quick.push('<button class="btn sm'+(hasEx(s)||done?'':' pri')+'" data-brief="'+s.id+'">Bekijk voorbereiding</button>');
   if(hasEx(s) && !skip) quick.push('<button class="btn sm pri" data-logger="'+s.id+'">Logger</button>');
   if(s.zwo && !skip) quick.push('<button class="btn sm" data-zwo="'+s.id+'">⬇ Zwift-bestand</button>');
   if(s.rt && !skip) quick.push('<button class="btn sm pri" data-rtstart="'+s.rt+'" data-rtkey="'+s.rt+'" data-rtdate="'+it.date+'">▶ Start routine</button>');
@@ -250,7 +250,7 @@ function rToday(){
   h += '<div class="day today"><h2>Training '+(isT?'vandaag':fmtDay(d))+'</h2>';
   if(!w) h += '<div class="card mut">Geen plan voor deze week.</div>';
   else if(!items.length) h += '<div class="card mut">Niets gepland. Rust, of de routines hieronder.</div>';
-  for(const it of items) h += sessCard(it, m, {});
+  for(const it of items) h += sessCard(it, m, {hero:true});
   for(const a of m.extra.filter(x => x.date===d)) h += '<div class="strava"><b>Strava (niet gepland)</b> · '+esc(a.name)+'<div>'+actLine(a)+'</div></div>';
   h += '</div>';
   if(isT){ for(const it of rpeTodo(d)){ const a = matchWeek(weekByStart(mondayOf(it.date))).by[it.s.id];
@@ -262,7 +262,7 @@ function rToday(){
     if(isT && dow >= 5 && !ci.cijfer && w) h += '<div class="card" id="checkcard" style="display:flex;align-items:center;gap:10px"><div style="flex:1"><b>Weekcheck-in</b><div class="small">1 minuut · cijfer, benen, richting en beschikbaarheid volgende week</div></div><button class="btn sm pri" data-tab="check">Start</button></div>'; }
   h += routinesCard(d, items);
   const tm = addDays(d,1); const items2 = weekItems(weekByStart(mondayOf(tm))).filter(i => i.date===tm);
-  if(items2.length) h += '<div class="secttl">'+(isT?'Morgen':fmtDay(tm))+'</div><div class="card">'+items2.map(i => '<div style="display:flex;gap:8px;align-items:center;color:var(--tx2)">'+(TYPE_ICON[i.s.t]||'')+' <span>'+esc(i.s.title)+'</span><span class="small" style="margin-left:auto">'+esc(planLine(i.s))+'</span></div>').join('')+'</div>';
+  if(items2.length) h += '<div class="secttl">'+(isT?'Morgen':fmtDay(tm))+'</div><div class="list" id="tomorrow">'+items2.map(i => '<div class="li">'+(TYPE_ICON[i.s.t]||'')+' <span>'+esc(i.s.title)+'</span><span class="r">'+esc(planLine(i.s))+'</span></div>').join('')+'</div>';
   if(!isT) h += '<div class="row"><button class="btn" data-strip="'+t+'" data-mode="day">↩ Terug naar vandaag</button></div>';
   $('view').innerHTML = h;
 }
@@ -295,7 +295,7 @@ function rWeek(){
     if(rc){ const prevKm = [1,2,3,4].map(i => { const ww = weekByStart(addDays(w.start, -7*i)); return ww ? weekStats(ww).runPlan : 0; }); const peak = Math.max(...prevKm); const cur = weekStats(w).runPlan;
       if(peak > 0) h += '<div class="card" id="taper"><b>Taper richting '+esc(rc.name.split(' – ')[0])+'</b><div class="small">Loopvolume '+fmtN(cur)+' km = '+Math.round((1-cur/peak)*100)+'% minder dan de piekweek ('+fmtN(peak)+' km). Doel over 2 weken: 41–60% minder volume, intensiteit en frequentie houden (Bosquet 2007).</div></div>'; } }
   if(w.days.length) h += statsCard(w);
-  if(w.days.length && w.start <= t) h += '<div class="row"><button class="btn" id="rvbtn" data-review="'+w.start+'">Weekevaluatie ›</button></div>';
+  if(w.days.length && w.start <= t) h += '<div class="row"><button class="btn" id="rvbtn" data-review="'+w.start+'">Bekijk weekevaluatie</button></div>';
   $('view').innerHTML = h;
 }
 

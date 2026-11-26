@@ -164,3 +164,9 @@ Let op: iedereen met de URL kan naar je sheet schrijven. Deel de URL niet.
 - Sessietype via `sessKind(s)`; standaardteksten in `KIND`. Per sessie te overschrijven in plan.json: `why`, `cues`, `ifthen` ([[als, dan]]), `success`. Per week: `review: {changes:[[input, actie]], focus}`.
 - plan.json: `season` (fases met km-band) en `milestones` (kind: long | hmweek | weekkm | race; auto-afgevinkt uit Strava).
 - App is altijd donker (geen licht thema meer); test controleert dat.
+
+## v4.6.0 — nieuw ontwerp
+- Palet in `:root` (css/app.css): leisteen/basalt, paars `--pur` = merkkleur (primaire knop, actief tabblad, vandaag), `--trail` oranje = wedstrijden, `--glac` = coach, `--moss` = gedaan.
+- Lettertype Archivo (variabele breedte) zelf gehost in `fonts/archivo.woff2` (in sw CORE): smal/zwaar voor cijfers en titels, normaal voor tekst.
+- Kopjes in zinsvorm, geen hoofdletterlabels. Vandaag: sessies als `.sess.hero` zonder kader; morgen als `.list`.
+- Seizoen: volumeprofiel (`profileSvg`) + hoogtelijnen (`CONTOUR`). Afvinken: animatie `pop` (respecteert reduced motion).

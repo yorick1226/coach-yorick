@@ -63,11 +63,11 @@ function rBrief(){ const f = sessById(ui.sid); $('htitle').textContent = 'Traini
   if(!f){ $('view').innerHTML = '<div class="card mut">Sessie niet gevonden.</div>'; return; }
   const s = f.s, d = f.date, k = sessKind(s), K = KIND[k] || KIND.easy; const st = S.done[s.id]||{}; const a = matchWeek(f.w).by[s.id];
   const pp = planPace(s); const rpe = ((s.detail||'').match(/RPE\s*([\d–-]+)/)||[])[1] || K.rpe;
-  let h = '<div class="brief" id="brief"><div class="bhd" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><span class="eyebrow">'+fmtDay(d)+' · '+esc(TYPE_LABEL[s.t]||s.t)+' · '+esc(K.l)+'</span><h2>'+esc(s.title)+'</h2>';
+  let h = '<div class="brief" id="brief"><div class="bhd" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><span class="meta-l">'+fullDay(d)+', '+esc(K.l.toLowerCase())+'</span><h2>'+esc(s.title)+'</h2>';
   const stat = []; if(s.km) stat.push([fmtN(s.km), 'km']); if(s.min) stat.push([String(s.min), 'min']); if(s.hm) stat.push([String(s.hm), 'hm']); stat.push([rpe, /RIR/.test(rpe) ? '' : 'RPE']);
   h += '<div class="bstats">'+stat.map(([v,l]) => '<div><b>'+esc(v)+'</b><span>'+l+'</span></div>').join('')+'</div></div>';
   if(s.detail) h += '<div class="card"><span class="eyebrow">Opbouw</span><div class="det">'+esc(s.detail)+'</div>'+(hasEx(s) ? '<div class="small" style="margin-top:6px">'+sessEx(s).length+' oefeningen, details in de logger.</div>' : '')+'</div>';
-  h += '<div class="card coach"><span class="eyebrow">Waarom</span><div>'+esc(s.why || K.why)+'</div></div>';
+  h += '<div class="card coach"><span class="eyebrow">Waarom deze training</span><div>'+esc(s.why || K.why)+'</div></div>';
   const lim = []; if(pp) lim.push(['Tempo', fmtPace(pp[0])+'–'+fmtPace(pp[1]), 'per km']);
   const hd = (s.detail||'').match(/HF\s*[≤<]\s*(\d{3})/); const lt = lthrOf();
   if(hd) lim.push(['Hartslag', '≤ '+hd[1], 'gemiddeld']);
@@ -76,7 +76,7 @@ function rBrief(){ const f = sessById(ui.sid); $('htitle').textContent = 'Traini
   else if(k==='interval') lim.push(['Hartslag', '> '+(lt-3), 'mag, eind rep']);
   const w = (s.detail||'').match(/(\d{2,3})\s*[–-]\s*(\d{2,3})\s*W\b/); if(w) lim.push(['Vermogen', w[1]+'–'+w[2], 'watt']);
   lim.push(['Gevoel', rpe, /RIR/.test(rpe) ? 'reps in reserve' : k==='drempel' ? 'korte zinnen' : k==='interval' ? 'losse woorden' : ['easy','lang','herstel','fietsz2'].includes(k) ? 'praattempo' : 'RPE']);
-  h += '<div class="card"><span class="eyebrow">Grenzen</span><div class="lims">'+lim.map(([l,v,u]) => '<div><span>'+l+'</span><b>'+esc(v)+'</b><i>'+esc(u)+'</i></div>').join('')+'</div></div>';
+  h += '<div class="card"><span class="eyebrow">Binnen deze grenzen</span><div class="lims">'+lim.map(([l,v,u]) => '<div><span>'+l+'</span><b>'+esc(v)+'</b><i>'+esc(u)+'</i></div>').join('')+'</div></div>';
   const pv = prevOfKind(s, d); const cues = (s.cues || K.cues).slice();
   let pvIv = null; if(pv && pv.a){ pvIv = intervalEval(pv.it.s, pv.a);
     if(pvIv && !pvIv.good && /te snel/.test(pvIv.txt)) cues.unshift('Vorige keer te snel gestart. Vandaag blok 1 op '+(pp ? fmtPace(pp[1]) : 'de trage kant')+' en pas vanaf de helft naar het midden van de range.');
@@ -84,9 +84,9 @@ function rBrief(){ const f = sessById(ui.sid); $('htitle').textContent = 'Traini
     if(k==='lang' && pv.a.dec != null && pv.a.dec >= 5) cues.unshift('Vorige lange duur liep de hartslag '+fmtN(pv.a.dec)+'% op. Begin langzamer en eet eerder.'); }
   if(cues.length) h += '<div class="card"><span class="eyebrow">Let op</span><ol class="cues">'+cues.slice(0,3).map(c => '<li>'+esc(c)+'</li>').join('')+'</ol></div>';
   const rules = briefRules(s, d, k);
-  h += '<div class="card"><span class="eyebrow">Als … dan</span><div class="ifs">'+rules.map(([x,y,c]) => '<div class="if'+c+'"><span>'+esc(x)+'</span><b>'+esc(y)+'</b></div>').join('')+'</div></div>';
-  if(pv) h += '<div class="card" id="bprev"><span class="eyebrow">Vorige keer · '+fmtDay(pv.it.date)+' · '+esc(pv.it.s.title)+'</span>'+(pv.a ? '<div class="small" style="margin-top:4px">'+actLine(pv.a)+'</div>' : '<div class="small">Afgevinkt, geen Strava-data.</div>')+(pvIv ? '<div class="banner '+(pvIv.good?'groen':'oranje')+'" style="margin:8px 0 0;padding:6px 10px;font-size:14px">'+esc(pvIv.txt)+'</div>' : '')+((S.done[pv.it.s.id]||{}).rpe ? '<div class="small">RPE '+S.done[pv.it.s.id].rpe+'</div>' : '')+'</div>';
-  h += '<div class="card ok" id="bok"><span class="eyebrow">Geslaagd vandaag</span><div>'+esc(fill(s.success || K.ok, s))+'</div></div>';
+  h += '<div class="card"><span class="eyebrow">Als het anders loopt</span><div class="ifs">'+rules.map(([x,y,c]) => '<div class="if'+c+'"><span>'+esc(x)+'</span><b>'+esc(y)+'</b></div>').join('')+'</div></div>';
+  if(pv) h += '<div class="card" id="bprev"><span class="eyebrow">Vorige keer: '+esc(pv.it.s.title)+'</span><span class="meta-l">'+fullDay(pv.it.date)+'</span>'+(pv.a ? '<div class="small" style="margin-top:4px">'+actLine(pv.a)+'</div>' : '<div class="small">Afgevinkt, geen Strava-data.</div>')+(pvIv ? '<div class="banner '+(pvIv.good?'groen':'oranje')+'" style="margin:8px 0 0;padding:6px 10px;font-size:14px">'+esc(pvIv.txt)+'</div>' : '')+((S.done[pv.it.s.id]||{}).rpe ? '<div class="small">RPE '+S.done[pv.it.s.id].rpe+'</div>' : '')+'</div>';
+  h += '<div class="card ok" id="bok"><span class="eyebrow">Geslaagd als</span><div>'+esc(fill(s.success || K.ok, s))+'</div></div>';
   if(a){ const iv = intervalEval(s, a), ef = easyFlag(s, a); h += '<div class="card"><span class="eyebrow">Uitgevoerd</span><div class="small">'+actLine(a)+'</div>'+(iv ? '<div class="banner '+(iv.good?'groen':'oranje')+'" style="margin:8px 0 0;padding:6px 10px;font-size:14px">'+esc(iv.txt)+'</div>' : '')+(ef ? '<div class="banner rood" style="margin:8px 0 0;padding:6px 10px;font-size:14px">'+esc(ef)+'</div>' : '')+planVsDone(s, a)+'</div>'; }
   const done = !st.skip && (st.d || !!a);
   h += '<div class="row"><button class="btn'+(done?'':' pri')+'" data-done="'+s.id+'">'+(done ? '✓ Gedaan' : 'Afvinken')+'</button>'+(hasEx(s) ? '<button class="btn" data-logger="'+s.id+'">Logger</button>' : '')+'</div>';
@@ -122,12 +122,12 @@ function weekReview(a){ const w = weekByStart(a); if(!w || !w.days.length) retur
   const ci = (S.checkins[weekIdOf(a)]||{}).a || {};
   return {w, st, plus, minus, act:[...new Set(act)], score, head, partial, rd, base, ci, m}; }
 function reviewHtml(a, compact){ const R = weekReview(a); if(!R) return ''; const {w, st} = R; const b = addDays(a,6);
-  let h = '<div class="card review" id="review'+(compact?'c':'')+'"><span class="eyebrow">Week '+weekIdOf(a).split('-W')[1]+' · '+fmtDay(a)+' – '+fmtDay(b)+' · '+esc(w.phase.split(' · ').slice(0,2).join(' · '))+'</span>';
+  let h = '<div class="card review" id="review'+(compact?'c':'')+'"><span class="meta-l">Week '+weekIdOf(a).split('-W')[1]+', '+fmtDay(a)+' t/m '+fmtDay(b)+'</span>';
   h += '<div class="rvhd"><b>'+R.head+'</b><div class="grade"><b>'+(R.partial ? '…' : R.score)+'</b><span>coach</span></div>'+(R.ci.cijfer ? '<div class="grade you"><b>'+R.ci.cijfer+'</b><span>jij</span></div>' : '')+'</div>';
   h += R.plus.map(([l,x]) => '<div class="pm p"><i>+</i><div><b>'+l+'</b> '+x+'</div></div>').join('') + R.minus.map(([l,x]) => '<div class="pm m"><i>−</i><div><b>'+l+'</b> '+x+'</div></div>').join('');
   if(!R.plus.length && !R.minus.length) h += '<div class="small">Nog te weinig data voor een oordeel.</div>';
   if(R.act.length) h += '<div class="pm a"><i>→</i><div>'+R.act.slice(0, compact ? 1 : 3).map(esc).join('<br>')+'</div></div>';
-  if(compact) return h+'<div class="row"><button class="btn sm" data-review="'+a+'">Hele evaluatie ›</button></div></div>';
+  if(compact) return h+'<div class="row"><button class="btn sm" data-review="'+a+'">Bekijk hele evaluatie</button></div></div>';
   h += '</div>';
   const prev = [1,2,3].map(i => weekDone(addDays(a,-7*i))); const avg3 = prev.reduce((p,x)=>p+x.km,0)/3; const wd = weekDone(a);
   const ls = loadSeries(90).find(x => x.d===b) || null; const sp = st.split; const pc = k => sp.tot ? Math.round(sp.t[k]/sp.tot*100) : 0;
@@ -139,24 +139,24 @@ function reviewHtml(a, compact){ const R = weekReview(a); if(!R) return ''; cons
     ['Trainingstijd', fmtH(st.secDone), 'plan '+fmtH(st.minPlan*60)]];
   if(ls) rows.push(['Fitheid / vermoeidheid', Math.round(ls.ctl)+' / '+Math.round(ls.atl), (ls.ctl-ls.atl >= 0 ? 'fris' : 'vermoeid')+' ('+Math.round(ls.ctl-ls.atl)+')']);
   const hs = Object.entries(st.groups).filter(([g]) => !['plyo','hyrox','overig'].includes(g)).reduce((p,[,v])=>p+v,0); if(hs) rows.push(['Krachtsets (hard)', String(hs), 'gelogd + afgevinkt']);
-  h += '<div class="card" id="rvmeet"><span class="eyebrow">Meetpunten</span>'+rows.map(([l,v,n]) => '<div class="kv"><span>'+l+(n?'<div class="small">'+n+'</div>':'')+'</span><b>'+v+'</b></div>').join('')+'</div>';
+  h += '<div class="card" id="rvmeet"><span class="eyebrow">In cijfers</span>'+rows.map(([l,v,n]) => '<div class="kv"><span>'+l+(n?'<div class="small">'+n+'</div>':'')+'</span><b>'+v+'</b></div>').join('')+'</div>';
   if(R.rd.some(x => x.rd!=null)){ const lo = R.rd.filter(x => x.rd!=null).sort((p,q)=>p.rd-q.rd)[0];
-    h += '<div class="card" id="rvrec"><span class="eyebrow">Herstel · readiness</span><div class="rdbars">'+R.rd.map((x,i) => '<div><i style="height:'+(x.rd!=null ? Math.max(8, x.rd) : 0)+'%;background:'+(x.rd==null ? 'transparent' : x.rd < 65 ? 'var(--warn)' : x.rd >= 80 ? 'var(--acc2)' : '#3b8f5c')+'"></i><b>'+(x.rd ?? '–')+'</b><span>'+DAYS[i]+'</span></div>').join('')+'</div>'
+    h += '<div class="card" id="rvrec"><span class="eyebrow">Herstel per dag</span><div class="rdbars">'+R.rd.map((x,i) => '<div><i style="height:'+(x.rd!=null ? Math.max(8, x.rd) : 0)+'%;background:'+(x.rd==null ? 'transparent' : x.rd < 65 ? 'var(--warn)' : x.rd >= 80 ? 'var(--acc2)' : '#3b8f5c')+'"></i><b>'+(x.rd ?? '–')+'</b><span>'+DAYS[i]+'</span></div>').join('')+'</div>'
       +'<div class="small">Laagste: '+fmtDay(lo.d)+' ('+lo.rd+')'+(R.base ? ' · normaal ± '+Math.round(R.base.m) : '')+'. Bron: Oura of je ochtendcheck.</div></div>'; }
   const ch = ((w.review||{}).changes || []).slice(); const nw = weekByStart(addDays(a,7));
   if(R.ci.richting || R.ci.opm) ch.unshift([(R.ci.richting ? 'Richting: '+R.ci.richting : '')+(R.ci.opm ? (R.ci.richting ? ' · ' : '')+'“'+R.ci.opm+'”' : ''), nw && nw.note ? nw.note.split('\n')[0] : 'Wordt verwerkt in het schema van volgende week.']);
-  if(ch.length) h += '<div class="card" id="rvin"><span class="eyebrow">Jouw input → wat ik deed</span>'+ch.map(([x,y]) => '<div class="io"><span>'+esc(x)+'</span><b>→ '+esc(y)+'</b></div>').join('')+'</div>';
+  if(ch.length) h += '<div class="card" id="rvin"><span class="eyebrow">Jouw input en wat ik ermee deed</span>'+ch.map(([x,y]) => '<div class="io"><span>'+esc(x)+'</span><b>'+esc(y)+'</b></div>').join('')+'</div>';
   if(nw && nw.days.length){ const key = weekItems(nw).filter(i => QUALK.includes(sessKind(i.s)) || sessKind(i.s)==='lang');
-    h += '<div class="card coach" id="rvnext"><span class="eyebrow">Focus volgende week'+(nw.status==='concept' ? ' · concept' : '')+'</span><div>'+esc((w.review||{}).focus || nw.focus || '')+'</div>'+(key.length ? '<div class="keys">'+key.map(i => '<div><span>'+fmtDay(i.date).split(' ')[0]+'</span>'+esc(i.s.title)+'</div>').join('')+'</div>' : '')+'</div>'; }
+    h += '<div class="card coach" id="rvnext"><span class="eyebrow">Volgende week'+(nw.status==='concept' ? ' (concept)' : '')+'</span><div>'+esc((w.review||{}).focus || nw.focus || '')+'</div>'+(key.length ? '<div class="keys">'+key.map(i => '<div><span>'+fmtDay(i.date).split(' ')[0]+'</span>'+esc(i.s.title)+'</div>').join('')+'</div>' : '')+'</div>'; }
   return h; }
 function rReview(){ const a = ui.week; $('htitle').textContent = 'Weekevaluatie';
-  const h = reviewHtml(a, false); const nav = '<div class="row nw"><button class="btn sm" data-rvweek="'+addDays(a,-7)+'">‹ Vorige week</button>'+(addDays(a,7) <= today() ? '<button class="btn sm" data-rvweek="'+addDays(a,7)+'">Volgende ›</button>' : '')+'</div>';
+  const h = reviewHtml(a, false); const nav = '<div class="row nw"><button class="btn sm" data-rvweek="'+addDays(a,-7)+'">Vorige week</button>'+(addDays(a,7) <= today() ? '<button class="btn sm" data-rvweek="'+addDays(a,7)+'">Volgende week</button>' : '')+'</div>';
   $('view').innerHTML = (h || '<div class="card mut">Geen plan voor deze week.</div>') + nav; }
 /* welke week tonen we op Voortgang: ma/di de vorige week, anders de lopende */
 function reviewWeek(){ const t = today(), mon = mondayOf(t), dow = (parseD(t).getDay()+6)%7; return dow <= 1 && weekByStart(addDays(mon,-7)) ? addDays(mon,-7) : mon; }
 
 /* ---------- seizoen: op weg naar Mozart ---------- */
-const PH_COL = {herstel:'#3A4150', basis:'#1E3A5F', snelheid:'#4C2A5A', marathon:'#1F4D33', trail:'#5A3A12', taper:'#3A4150'};
+const PH_COL = {herstel:'#3A4350', basis:'#2F4566', snelheid:'#5B3F9A', marathon:'#3E5E46', trail:'#7A4527', taper:'#3A4350'};
 function msStatus(x){ const acts = (STRAVA.activities||[]).filter(a => RUNS.includes(a.sport) && a.date <= x.by && a.date >= (x.from||'2026-11-30'));
   let met = false, val = null;
   if(x.kind==='long'){ val = Math.max(0, ...acts.map(a => a.km||0)); met = val >= x.v; }
@@ -168,14 +168,12 @@ function seasonHtml(){ const SE = PLAN.season||[]; if(!SE.length) return ''; con
   const span = diffD(z, a0)+1, pos = d => Math.max(0, Math.min(100, diffD(d, a0)/span*100));
   const MZ = (PLAN.races||[]).find(r => /Mozart/.test(r.name)); const dl = MZ ? diffD(MZ.date, t) : null;
   const ph = SE.find(x => x.from <= t && t <= x.to); const pi = ph ? SE.indexOf(ph) : -1;
-  let h = '<div class="card season" id="season"><span class="eyebrow">Op weg naar Mozart</span><div class="sshd"><b>'+(dl!=null ? dl : '–')+'</b><span>dagen<br>84 km · 4800 hm</span></div>';
-  h += '<div class="tl">'+SE.map(x => '<i style="flex:'+(diffD(x.to,x.from)+1)+';background:'+(PH_COL[x.id]||'#333')+'" title="'+esc(x.name)+'"></i>').join('')+(t >= a0 && t <= z ? '<em style="left:'+pos(t)+'%"></em>' : '')+'</div>';
-  h += '<div class="tlr">'+(PLAN.races||[]).filter(r => r.date >= a0 && r.date <= z).map((r,i) => '<span style="left:'+pos(r.date)+'%" class="p'+(r.prio||'C')+(i%2?' dn':'')+'">'+esc(r.name.split(/ [–(]| \d+ km| relay/)[0].replace('Marathon de ','').replace('3 Días Trail ',''))+'</span>').join('')+'</div>';
-  h += '<div class="tll">'+SE.map((x,i) => '<span class="'+(i===pi?'on':'')+'" style="flex:'+(diffD(x.to,x.from)+1)+'">'+(i+1)+'</span>').join('')+'</div></div>';
+  let h = '<div class="card season" id="season">'+CONTOUR+'<span class="eyebrow">Op weg naar Mozart</span><div class="sshd"><b>'+(dl!=null ? dl : '–')+'</b><span>dagen<br>84 km · 4800 hm</span></div>';
+  h += profileSvg(SE, t)+'</div>';
   if(ph){ const wk = Math.floor(diffD(t, ph.from)/7)+1, nwk = Math.ceil((diffD(ph.to, ph.from)+1)/7);
     const mon = mondayOf(t); const last = [1,2,3].map(i => weekDone(addDays(mon,-7*i)).km); const av = last.reduce((p,q)=>p+q,0)/3;
     const tone = av < ph.km[0]*0.85 ? 'onder' : av > ph.km[1]*1.1 ? 'boven' : 'binnen';
-    h += '<div class="card coach" id="phasenow"><span class="eyebrow">Fase '+(pi+1)+'/'+SE.length+' · week '+wk+' van '+nwk+' · t/m '+fmtDay(ph.to)+'</span><b class="pn">'+esc(ph.name)+'</b><div>'+esc(ph.goal)+'</div>'
+    h += '<div class="card coach" id="phasenow"><span class="meta-l">Fase '+(pi+1)+' van '+SE.length+', week '+wk+' van '+nwk+'</span><b class="pn">'+esc(ph.name)+'</b><div>'+esc(ph.goal)+'</div>'
       +'<div class="kv" style="margin-top:8px"><span>Lopen per week (doel '+ph.km[0]+'–'+ph.km[1]+')</span><b>'+fmtN(av)+' km <span class="small">gem. 3 wk · '+tone+'</span></b></div>'
       +(SE[pi+1] ? '<div class="small">Daarna: '+esc(SE[pi+1].name)+' vanaf '+fmtDay(SE[pi+1].from)+'</div>' : '')+'</div>'; }
   { const br = bestRace(); const tp = tpOf(); let rows = '';
@@ -185,7 +183,7 @@ function seasonHtml(){ const SE = PLAN.season||[]; if(!SE.length) return ''; con
       if(vp && vp.date >= t) rows += row('10 km (Vondelpark)', p10, g10, 'onder 45:40');
       if(pa && pa.date >= t) rows += row('Marathon (Parijs)', pm, gm, '3:30:00 · 4:58/km');
       rows += '<div class="small">Schatting uit '+esc(br.name)+' ('+fmtDay(br.date)+', '+fmtN(br.km)+' km in '+fmtSec(T)+') met de Riegel-formule; voor de marathon iets strenger (exponent 1,07). Zegt niets over je duurvermogen: dat moeten de lange duurlopen laten zien.</div>'; }
-    const need = Math.round(gm_tp()); h += '<div class="card" id="formcheck"><span class="eyebrow">Vormcheck</span><div class="kv"><span>Drempeltempo nu<div class="small">instelling, herijkt na races</div></span><b>'+fmtPace(tp)+'/km</b></div><div class="kv"><span>Drempel die 3:30 comfortabel maakt<div class="small">vuistregel: marathontempo ± 12% trager dan drempel</div></span><b>± '+fmtPace(need)+'/km</b></div>'+rows+'</div>'; }
+    const need = Math.round(gm_tp()); h += '<div class="card" id="formcheck"><span class="eyebrow">Vormcheck</span><div class="kv"><span>Drempeltempo nu<div class="small">instelling, herijkt na races</div></span><b>'+fmtPace(tp)+'/km</b></div><div class="kv"><span>Drempel voor een comfortabele 3:30<div class="small">vuistregel: marathontempo ± 12% trager dan drempel</div></span><b>'+fmtPace(need)+'/km</b></div>'+rows+'</div>'; }
   const MS = PLAN.milestones||[]; if(MS.length){ h += '<div class="card" id="miles"><span class="eyebrow">Mijlpalen</span>'+MS.map(x => { const s = msStatus(x);
       const v = s.val==null ? '' : x.kind==='race' ? fmtSec(s.val) : x.kind==='hmweek' ? Math.round(s.val)+' hm' : fmtN(s.val)+' km';
       return '<div class="ms '+(s.met?'met':s.missed?'miss':'')+'"><i>'+(s.met?'✓':s.missed?'✕':'')+'</i><div><b>'+esc(x.t)+'</b><span>uiterlijk '+fmtDay(x.by)+' '+x.by.slice(0,4)+(v && !s.met ? ' · nu '+v : s.met ? ' · '+v : '')+'</span></div></div>'; }).join('')+'<div class="small">Automatisch afgevinkt uit Strava zodra je het haalt.</div></div>'; }
@@ -193,3 +191,38 @@ function seasonHtml(){ const SE = PLAN.season||[]; if(!SE.length) return ''; con
   return h; }
 /* drempel 4:25 → MP 4:58 is ±12%; gangbare vuistregel MP ≈ drempel × 1,06–1,12. Wij tonen het drempeltempo dat 4:58 comfortabel maakt. */
 function gm_tp(){ return (3.5*3600/42.195)/1.12; }
+
+const DAGEN = ['maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag','zondag'], MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+function fullDay(d){ const x = parseD(d); const s = DAGEN[(x.getDay()+6)%7]+' '+x.getDate()+' '+MAANDEN[x.getMonth()]; return s[0].toUpperCase()+s.slice(1); }
+/* hoogtelijnen als textuur: alleen in de kop van Seizoen */
+const CONTOUR = (() => { let p = ''; for(let k=0;k<9;k++){ const y = 18+k*16, a = 6+k*1.5; p += '<path d="M-10 '+y+' C 60 '+(y-a)+', 110 '+(y+a*1.6)+', 180 '+(y-a*0.4)+' S 300 '+(y+a)+', 370 '+(y-a*0.8)+'" fill="none" stroke="#B7A3FF" stroke-width="1"/>'; }
+  return '<svg class="contour" viewBox="0 0 360 170" preserveAspectRatio="none" aria-hidden="true">'+p+'</svg>'; })();
+/* volumeprofiel: km per week van seizoensstart tot Mozart. Gelopen = gevuld paars, gepland = gestippelde lijn. Wedstrijden als vlaggen. */
+function profileSvg(SE, t){ const a0 = mondayOf(SE[0].from), z = SE[SE.length-1].to; const weeks = []; for(let m = a0; m <= z; m = addDays(m,7)) weeks.push(m);
+  const val = weeks.map(m => { const ph = SE.find(x => x.from <= addDays(m,3) && addDays(m,3) <= x.to) || SE[SE.length-1]; const pw = weekByStart(m);
+    const plan = pw && pw.days.length ? weekStats(pw).runPlan : (ph.km[0]+ph.km[1])/2; const done = addDays(m,6) < t || m <= t ? weekDone(m).km : null;
+    return {m, plan, done: m <= t ? done : null, ph}; });
+  const W = 340, H = 150, top = 30, base = 112, max = Math.max(60, ...val.map(v => Math.max(v.plan, v.done||0)))*1.08;
+  const X = i => 6 + i*(W-12)/(weeks.length-1), Y = v => base - (v/max)*(base-top);
+  const line = pts => pts.map((p,i) => (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const planPts = val.map((v,i) => [X(i), Y(v.plan)]); const donePts = val.map((v,i) => v.done!=null ? [X(i), Y(v.done)] : null).filter(Boolean);
+  let g = '<svg class="prof" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Loopvolume per week tot Mozart">';
+  g += '<line x1="6" x2="'+(W-6)+'" y1="'+base+'" y2="'+base+'" stroke="#2E3641"/>';
+  for(const k of [20,40,60]) if(k < max) g += '<line x1="6" x2="'+(W-6)+'" y1="'+Y(k)+'" y2="'+Y(k)+'" stroke="#2E3641" stroke-dasharray="2 4"/><text x="8" y="'+(Y(k)-3)+'">'+k+'</text>';
+  g += '<path d="'+line(planPts)+'" fill="none" stroke="#B7A3FF" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="3 3"/>';
+  if(donePts.length > 1) g += '<path d="'+line(donePts)+' L'+donePts[donePts.length-1][0].toFixed(1)+' '+base+' L'+donePts[0][0].toFixed(1)+' '+base+' Z" fill="#7B5CE6" fill-opacity=".35"/><path d="'+line(donePts)+'" fill="none" stroke="#B7A3FF" stroke-width="2.2" stroke-linejoin="round"/>';
+  /* fases als lint onder de as */
+  SE.forEach((x,i) => { const xa = 6 + Math.max(0, diffD(x.from, a0))/7*(W-12)/(weeks.length-1), xb = 6 + Math.min(diffD(z, a0)+1, diffD(x.to, a0)+1)/7*(W-12)/(weeks.length-1);
+    g += '<rect x="'+xa.toFixed(1)+'" y="'+(base+6)+'" width="'+Math.max(2, xb-xa-2).toFixed(1)+'" height="7" rx="2" fill="'+(PH_COL[x.id]||'#333')+'"/>';
+    g += '<text x="'+((xa+xb)/2).toFixed(1)+'" y="'+(base+26)+'" text-anchor="middle"'+(x.from <= t && t <= x.to ? ' class="fl"' : '')+'>'+(i+1)+'</text>'; });
+  /* wedstrijden als vlaggen */
+  const RC = (PLAN.races||[]).filter(r => r.date >= SE[0].from && r.date <= z); const xd = d => 6 + diffD(d, a0)/7*(W-12)/(weeks.length-1);
+  RC.forEach((r, i) => { const x = xd(r.date); const A = r.prio==='A'; const y0 = A ? 8 : (i%2 ? 22 : 12);
+    const nm = r.name.split(/ [–(]| \d+ km| relay/)[0].replace('Marathon de ','').replace('Vondelparkloop','Vondelpark').replace(' Ultra','');
+    g += '<line x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+y0+'" y2="'+base+'" stroke="#F26B3A" stroke-width="'+(A?1.6:1)+'" stroke-opacity="'+(A?1:.7)+'"/><path d="M'+x.toFixed(1)+' '+y0+' l'+(A?9:7)+' 3.5 l-'+(A?9:7)+' 3.5 Z" fill="#F26B3A"/>';
+    g += '<text class="fl" x="'+(x + (x > W-60 ? -4 : 10)).toFixed(1)+'" y="'+(y0+7)+'"'+(x > W-60 ? ' text-anchor="end"' : '')+'>'+esc(nm)+'</text>'; });
+  if(t >= a0 && t <= z){ const i = Math.min(val.length-1, Math.floor(diffD(t, a0)/7)); const y = Y(val[i].done!=null ? val[i].done : val[i].plan);
+    g += '<circle cx="'+X(i).toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="#12161B" stroke="#fff" stroke-width="2"/>'; }
+  g += '<text x="8" y="'+(top-8)+'">km per week</text></svg>';
+  g += '<div class="small">Gevuld: gelopen. Stippellijn: gepland. Vlaggen: wedstrijden. Cijfers onder de lijn: de 6 fases.</div>';
+  return g; }

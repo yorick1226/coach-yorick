@@ -28,7 +28,7 @@ document.addEventListener('click', ev => {
   if(ds.tab){ go(() => { ui.tab = ds.tab; if(ds.tab==='vandaag') ui.day = null; if(ds.tab==='log' && !ui.sid){ const it = weekItems(weekByStart(mondayOf(today()))).find(i => i.date===today() && hasEx(i.s) && !isSkipped(i.s.id)); if(it) ui.sid = it.s.id; } }); return; }
   if(ds.done){ const cur = (S.done[ds.done]||{}).d;
     if(!cur && !(S.done[ds.done]||{}).min){ const ss = S.sets.filter(x => x.sid===ds.done && !x.del).map(x=>x.ts); if(ss.length > 1) setDone(ds.done, {min: String(Math.round((Math.max(...ss)-Math.min(...ss))/60000) + 5)}); } const f = sessById(ds.done); const auto = f && matchWeek(f.w).by[ds.done];
-    if(auto && !cur){ toast('Al gedaan volgens Strava'); return; } setDone(ds.done, {d:!cur}); rerender(); return; }
+    if(auto && !cur){ toast('Al gedaan volgens Strava'); return; } setDone(ds.done, {d:!cur}); if(!cur){ ui.pop = ds.done; ui.popDay = f ? f.date : null; setTimeout(() => { ui.pop = ui.popDay = null; }, 900); } rerender(); return; }
   if(ds.norpe){ setDone(ds.norpe, {norpe:true}); rerender(); return; }
   if(ds.srpe){ const cur = (S.done[ds.srpe]||{}).rpe, v = Number(ds.v); setDone(ds.srpe, {rpe: cur===v ? null : v}); rerender(); return; }
   if(ds.open){ ui.open[ds.open] = b.dataset.isopen!=='1'; rerender(); return; }

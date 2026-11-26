@@ -1,7 +1,7 @@
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.5.0';
+const APP_VERSION = '4.6.0';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -457,7 +457,7 @@ function dayStatus(date){
 function weekStrip(start, sel, mode){
   const t = today(); let h = '<div class="strip">';
   for(let i=0;i<7;i++){ const d = addDays(start,i); const st = dayStatus(d);
-    h += '<button data-strip="'+d+'" data-mode="'+mode+'" class="'+(d===sel?'sel ':'')+(d===t?'td':'')+'">'+DAYS[i]+'<b>'+parseD(d).getDate()+'</b><span class="dot '+st+'"></span></button>'; }
+    h += '<button data-strip="'+d+'" data-mode="'+mode+'" class="'+(d===sel?'sel ':'')+(d===t?'td':'')+'">'+DAYS[i]+'<b>'+parseD(d).getDate()+'</b><span class="dot '+st+(ui.popDay===d?' pop':'')+'"></span></button>'; }
   return h+'</div>';
 }
 function nextRace(){ const t = today(); const r = (PLAN.races||[]).filter(x => x.date>=t).sort((a,b)=>a.date.localeCompare(b.date))[0]; if(!r) return '';

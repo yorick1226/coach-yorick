@@ -1,8 +1,13 @@
-:root{color-scheme:dark;--bg:#0B0C0E;--card:#16181C;--card2:#23262C;--line:#2A2E35;--tx:#F1F3F5;--tx2:#C9CED6;--mut:#8E96A3;--acc:#4ade80;--acc2:#22C55E;--warn:#FB923C;--bad:#f87171;--blue:#60A5FA;--str:#fc6a2c;
- --okbg:#0f2417;--okln:#1f5134;--otx:#c9f7d8;--wbg:#2a1a0a;--wtx:#fed7aa;--bbg:#3a1414;--btx:#ffd0d0;--ibg:#101C2E;--iln:#1E3A5F;--itx:#bfdbfe;--nav:#0B0C0E;--inp:#101215;
- --fs-xl:22px;--fs-l:17px;--fs-m:15px;--fs-s:13px}
+@font-face{font-family:'Archivo';font-style:normal;font-display:swap;font-weight:100 900;font-stretch:62% 125%;src:url(../fonts/archivo.woff2) format('woff2-variations'),url(../fonts/archivo.woff2) format('woff2')}
+/* palet (v4.6): leisteen + basalt, paars als merkkleur, trailmarkering-oranje voor wedstrijden, gletsjerblauw voor de coach, mos voor 'gedaan' */
+:root{color-scheme:dark;--bg:#12161B;--card:#1B2129;--card2:#252C36;--line:#2E3641;--tx:#EEF1F4;--tx2:#C5CCD5;--mut:#8D97A4;
+ --pur:#7B5CE6;--pur2:#B7A3FF;--trail:#F26B3A;--glac:#8EC5E8;--moss:#6FBF73;
+ --acc:#6FBF73;--acc2:#4FA857;--warn:#E9A23B;--bad:#F07A7A;--blue:#8EC5E8;--str:#fc6a2c;
+ --okbg:#16241B;--okln:#2C4C34;--otx:#CDEBCF;--wbg:#2B2112;--wtx:#F6D9A6;--bbg:#341819;--btx:#FFD3D3;--ibg:#142233;--iln:#24405E;--itx:#CFE6F5;--nav:#12161B;--inp:#161B22;
+ --fs-xs:13px;--fs-s:15px;--fs-m:17px;--fs-l:22px;--fs-xl:32px;--fs-xxl:48px;
+ --cond:'Archivo',-apple-system,sans-serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.45 Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-stretch:100%}
 body{padding:env(safe-area-inset-top) 0 calc(150px + env(safe-area-inset-bottom))}
 #back{padding:0 10px;white-space:nowrap}
 header{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 12px;border-bottom:1px solid var(--line)}
@@ -262,3 +267,52 @@ b.pn{display:block;font-size:19px;margin:0 0 4px}
 #phases details{border-top:1px solid var(--line);padding:6px 0}#phases details:first-of-type{border-top:0}
 #phases summary{display:flex;align-items:center;gap:8px;min-height:36px;list-style:none;cursor:pointer}#phases summary::-webkit-details-marker{display:none}
 #phases summary i{width:10px;height:10px;border-radius:3px;flex:none}#phases summary b{flex:1;font-size:15px}#phases summary span{font-size:12px;color:var(--mut)}
+
+/* ---------- v4.6 ontwerp: typografie, zinsvorm-kopjes, minder kaders ---------- */
+/* Eén familie (Archivo, variabele breedte): smal en zwaar voor cijfers en titels, normale breedte voor tekst. */
+.hrow h1,.tt b,.bhd h2,.bstats b,.kpi b,.grade b,.sshd b,.lims b,.pn,.gs b,.rdbars b,.hero-t,.ms b{font-stretch:72%;font-weight:750;letter-spacing:-.005em;font-variant-numeric:tabular-nums}
+.hrow h1{font-size:var(--fs-m);font-stretch:85%}
+.kpi b{font-size:var(--fs-xl);line-height:1.05}.bstats b{font-size:var(--fs-xl);line-height:1.05}.lims b{font-size:var(--fs-l)}.grade b{font-size:var(--fs-xl)}
+.sshd b{font-size:var(--fs-xxl);line-height:1}.bhd h2{font-size:var(--fs-xl);line-height:1.08}
+.tag,.kpi span,.stab .sh,.day h2,.secttl,.bstats span,.grade span,.up{text-transform:none!important;letter-spacing:0!important}
+.kpi span,.bstats span,.grade span{font-size:var(--fs-xs)}
+.eyebrow{text-transform:none;letter-spacing:0;font-size:var(--fs-s);font-weight:650;color:var(--tx);margin-bottom:6px}
+.card.coach .eyebrow{color:var(--glac)}.card.ok .eyebrow{color:var(--moss)}
+.meta-l{display:block;font-size:var(--fs-xs);color:var(--mut);margin-bottom:2px}
+.day h2,.secttl{font-size:var(--fs-s);font-weight:650;color:var(--mut)}
+.day.today h2{color:var(--pur2)}
+/* merkkleur paars */
+.btn.pri{background:var(--pur);border-color:var(--pur);color:#fff}
+.chip.on{background:var(--pur);border-color:var(--pur);color:#fff}
+nav.tabs button.on{color:var(--pur2)}
+.seg button.on{background:var(--card);color:var(--pur2)}
+.chk.on{background:var(--moss);border-color:var(--moss);color:#0c1a0e}
+.card.coach,.grade.you{background:#142233;border-color:#24405E}.grade.you span{color:var(--glac)}
+.race{color:var(--trail)}
+/* vandaag: de sessie zelf zonder kader, groot */
+.sess.hero{background:none;border:0;border-left:3px solid var(--tc);border-radius:0;padding:2px 0 6px 14px;margin:4px 0 18px}
+.sess.hero.done{background:none}
+.sess.hero .tt b{font-size:var(--fs-xl);line-height:1.08;margin-bottom:4px}
+.sess.hero .chk{width:56px;height:56px}
+/* lijstregels in plaats van kaarten */
+.list{border-top:1px solid var(--line);margin:0 0 12px}
+.list .li{display:flex;gap:10px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);color:var(--tx2);font-size:var(--fs-s)}
+.list .li .r{margin-left:auto;color:var(--mut);font-size:var(--fs-xs);white-space:nowrap}
+#rtcard{background:none;border:0;padding:0 2px;border-top:1px solid var(--line);border-radius:0;padding-top:10px}
+/* weekevaluatie: doorlopende tekst met kantlijn */
+.pm{border-top:0;padding:4px 0 4px 12px;margin:6px 0;border-left:2px solid var(--line)}
+.pm i{display:none}.pm.p{border-left-color:var(--moss)}.pm.m{border-left-color:var(--warn)}.pm.a{border-left-color:var(--glac)}
+/* seizoen: profielkaart met hoogtelijnen */
+.card.season{position:relative;overflow:hidden;background:#171C24}
+.card.season .contour{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.09}
+.card.season>*{position:relative}
+.prof{display:block;width:100%;height:auto;margin-top:4px}
+.prof text{font-family:var(--cond);font-size:11px;fill:var(--mut)}
+.prof .fl{font-stretch:75%;font-weight:700;font-size:12px;fill:var(--tx)}
+/* afvinken: één moment van beweging */
+@keyframes pop{0%{transform:scale(.7);box-shadow:0 0 0 0 rgba(111,191,115,.6)}55%{transform:scale(1.12)}100%{transform:scale(1);box-shadow:0 0 0 14px rgba(111,191,115,0)}}
+@keyframes dotin{0%{transform:scale(.3)}70%{transform:scale(1.5)}100%{transform:scale(1)}}
+.chk.pop{animation:pop .45s cubic-bezier(.2,.8,.3,1.2)}
+.strip .dot.pop{animation:dotin .5s .15s both}
+@media (prefers-reduced-motion: reduce){.chk.pop,.strip .dot.pop{animation:none}}
+:focus-visible{outline:2px solid var(--pur2);outline-offset:2px}
