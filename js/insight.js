@@ -96,6 +96,8 @@ function rInsight(){
     const over = avg(x=>x.km) > 0 && cur.km > avg(x=>x.km)*1.3;
     h += '<div class="kpis">'+tile('Lopen deze week', fmtN(cur.km)+' km', (weekByStart(thisMon) ? 'plan '+fmtN(weekStats(weekByStart(thisMon)).runPlan)+' · ' : '')+'gem. '+fmtN(avg(x=>x.km)), over?'var(--warn)':'')+tile('Trainingstijd', fmtH(cur.sec), 'gem. '+fmtH(avg(x=>x.sec)))+tile('Fietsen', fmtN(rh)+' u', 'gem. '+fmtN(rhA)+' u')+tile('Harde krachtsets', String(hs), 'deze week')+'</div>';
     { const ca = coachAdvice(); if(ca.length) h += '<div class="card" id="coachadv"><div class="coachline">'+ic('progress',18)+'<div><b>Coach</b>'+ca.map(x => '<div class="advice1" style="margin-top:4px">'+x+'</div>').join('')+'</div></div></div>'; }
+    { const ph = (PLAN.season||[]).find(x => x.from <= t && t <= x.to); const i = ph ? PLAN.season.indexOf(ph) : -1;
+      if(ph) h += '<div class="card" id="phasecard"><span class="small">Seizoensfase '+(i+1)+'/'+PLAN.season.length+' · t/m '+fmtDay(ph.to)+'</span><b style="display:block;font-size:17px;margin:2px 0">'+esc(ph.name)+'</b><div class="small">'+esc(ph.goal)+'</div><div class="small" style="margin-top:4px">Lopen '+ph.km[0]+'–'+ph.km[1]+' km/week'+(PLAN.season[i+1] ? ' · daarna: '+esc(PLAN.season[i+1].name) : '')+'</div></div>'; }
     h += loadCard();
     if(nr) h += '<div class="card nextrace"><span class="small">Volgende wedstrijd</span><b>'+esc(nr.name)+'</b><span class="small">'+fmtDay(nr.date)+' · over '+nd+' dagen</span></div>'; }
   sec('lopen'); h += tpCard() + perfCard();

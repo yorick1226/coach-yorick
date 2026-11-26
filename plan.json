@@ -1,6 +1,6 @@
 {
  "version": 5,
- "updated": "2026-11-22c",
+ "updated": "2026-11-26",
  "mozart": {
   "date": "2027-06-05",
   "longRunKm": 50,
@@ -23,19 +23,31 @@
   },
   {
    "date": "2026-11-28",
-   "name": "3 Días Trail Ibiza – halve marathon (23,5 km, ±690 hm)"
+   "name": "3 Días Trail Ibiza – halve marathon (23,5 km, ±690 hm)",
+   "prio": "B"
+  },
+  {
+   "date": "2027-01-17",
+   "name": "Vondelparkloop 10 km",
+   "prio": "C",
+   "goal": "kleine PR (onder 45:40)"
   },
   {
    "date": "2027-01-24",
-   "name": "Hyrox relay (team, stations nog te verdelen)"
+   "name": "Hyrox relay (team, stations nog te verdelen)",
+   "prio": "C",
+   "goal": "op basis van vorm, geen all-out"
   },
   {
    "date": "2027-04-04",
-   "name": "Marathon de Paris"
+   "name": "Marathon de Paris",
+   "prio": "B",
+   "goal": "3:30 (4:58/km); Mozart gaat voor"
   },
   {
    "date": "2027-06-05",
-   "name": "Mozart Ultra 84 km / 4800 hm"
+   "name": "Mozart Ultra 84 km / 4800 hm",
+   "prio": "A"
   }
  ],
  "pr": [
@@ -4678,5 +4690,73 @@
    }
   ]
  },
- "routineNote": "Vaste momenten: ma mobiliteit (±10 min), wo rug & core (±8 min), zo mobiliteit compleet (±18 min). Rest: alleen warming-up/cooldown bij de training."
+ "routineNote": "Vaste momenten: ma mobiliteit (±10 min), wo rug & core (±8 min), zo mobiliteit compleet (±18 min). Rest: alleen warming-up/cooldown bij de training.",
+ "season": [
+  {
+   "id": "herstel",
+   "name": "Herstel na Ibiza",
+   "from": "2026-11-30",
+   "to": "2026-12-06",
+   "goal": "Ibiza laten zakken",
+   "km": [
+    25,
+    35
+   ]
+  },
+  {
+   "id": "basis",
+   "name": "Basis & kracht",
+   "from": "2026-12-07",
+   "to": "2027-01-03",
+   "goal": "Motor en benen bouwen: veel rustig, 1× drempel/week, strides, 2× zware benen. Feestdagen bij familie: flexibele weken.",
+   "km": [
+    45,
+    55
+   ]
+  },
+  {
+   "id": "snelheid",
+   "name": "10 km + Hyrox",
+   "from": "2027-01-04",
+   "to": "2027-01-24",
+   "goal": "Scherp voor de Vondelparkloop (17 jan), daarna Hyrox relay op vorm. Drempel + 10 km-tempo, 1 Hyrox-sessie/week, kracht 2×.",
+   "km": [
+    45,
+    50
+   ]
+  },
+  {
+   "id": "marathon",
+   "name": "Marathonblok",
+   "from": "2027-01-25",
+   "to": "2027-04-04",
+   "goal": "3:30 in Parijs zonder Mozart te schaden: lange duur tot 32–35 km met marathontempo, drempel, elke 2–3 weken heuvels; 1 heuvelweekend (Limburg/Ardennen) in feb/mrt. Taper 2 weken.",
+   "km": [
+    55,
+    70
+   ]
+  },
+  {
+   "id": "trail",
+   "name": "Trail & klim",
+   "from": "2027-04-05",
+   "to": "2027-05-22",
+   "goal": "Week 1 herstel, dan hoogtemeters naar 1500–2500/week, back-to-back weekenden, excentrische beenkracht, voeding 70–90 g/u oefenen; trainingsweek in de bergen ±3–5 weken voor Mozart.",
+   "km": [
+    50,
+    70
+   ]
+  },
+  {
+   "id": "taper",
+   "name": "Taper",
+   "from": "2027-05-23",
+   "to": "2027-06-05",
+   "goal": "Fris aan de start: volume −40–60%, prikkels houden.",
+   "km": [
+    30,
+    45
+   ]
+  }
+ ]
 }
