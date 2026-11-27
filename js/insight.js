@@ -33,6 +33,7 @@ function loadSeries(days){ const t = today(), start = addDays(t, -days-60), L = 
   for(const a of (STRAVA.activities||[])){ const min = (a.sec||a.el||0)/60; if(!min) continue; const sid = sidOf[a.id]; const rpe = sid && S.done[sid] && S.done[sid].rpe; add(a.date, min*(rpe || estRpe(a))); }
   for(const c of S.cardio) if(!c.del && !c.sid && c.sec) add(c.date, c.sec/60*(c.rpe||4));
   for(const [sid, v] of Object.entries(S.done)){ if(!v.d || v.skip) continue; const f = sessById(sid); if(!f || Object.values(sidOf).includes(sid)) continue; const min = num(v.min) || f.s.min || 0; if(min) add(f.date, min*(v.rpe||5)); }
+  for(const [sid, v] of Object.entries(S.done)){ if(!v.inst || !v.inst.min) continue; const f = sessById(sid); if(f) add(f.date, v.inst.min*(v.inst.rpe||3)); }
   const k1 = 1-Math.exp(-1/42), k2 = 1-Math.exp(-1/7); let ctl = 0, atl = 0; const out = [];
   for(let d = start; d <= t; d = addDays(d, 1)){ const x = L[d]||0; ctl += (x-ctl)*k1; atl += (x-atl)*k2; out.push({d, x, ctl, atl}); }
   return out.slice(-days); }

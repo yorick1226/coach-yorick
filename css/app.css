@@ -352,3 +352,4 @@ nav.tabs button.on{color:var(--pur2)}
 .day>.strava{background:none;border:0;border-left:3px solid var(--str);border-radius:0;padding:6px 0 6px 13px;margin:0 0 2px;color:var(--tx2);font-size:var(--fs-s)}
 .day>.strava b{color:var(--str);font-weight:600}
 .seg button{font-size:14px;padding-left:8px;padding-right:8px}
+.instf{display:flex;flex-direction:column;gap:8px;margin-top:6px}.instf input{font-size:16px;width:100%}.instf .row{margin:0}.instf label{flex:1;font-size:var(--fs-xs);color:var(--mut)}.pill.b{background:#142233;color:var(--glac)}

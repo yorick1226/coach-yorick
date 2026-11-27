@@ -1,7 +1,7 @@
 'use strict';
 /* ==== VASTE AFSPRAKEN — zie ONDERHOUD.md. NOOIT WIJZIGEN: KEY, oefeningcodes, bestaande QSETS-versies. ==== */
 const KEY = 'yorick-coach';
-const APP_VERSION = '4.7.0';
+const APP_VERSION = '4.7.1';
 const SCHEMA = 2;
 
 /* Check-in vragen per versie. Een bestaande versie NOOIT aanpassen; voeg een nieuwe versie toe. */
@@ -65,7 +65,7 @@ const QUAL_RX = /×|drempel|heuvel|interval|tempo|vo2|strides?\b.*×|fartlek|pro
 function isQuality(s){ return (s.t==='run' && (QUAL_RX.test(s.title) || (s.tgt && s.tgt.pace))) || s.t==='hyrox' || s.t==='plyo'; }
 function adaptPlan(d, lvl){ const out = []; const w = weekByStart(mondayOf(d)); const m = matchWeek(w);
   for(const it of weekItems(w).filter(i => i.date===d)){ const s = it.s, st = S.done[s.id]||{};
-    if(st.d || m.by[s.id] || st.skip || st.alt || s.t==='race' || s.t==='rest' || s.t==='mobility') continue;
+    if(st.d || m.by[s.id] || st.skip || st.alt || st.inst || s.t==='race' || s.t==='rest' || s.t==='mobility') continue;
     const long = s.t==='run' && (s.km||0) >= 18; let alt = null;
     if(lvl==='oranje'){
       if(s.t==='run' && isQuality(s)) alt = 'Ingekort: helft van de hoofdset, zelfde tempo';
@@ -450,7 +450,7 @@ function statsCard(w){
 function dayStatus(date){
   const w = weekByStart(mondayOf(date)); if(!w) return 'rest'; const m = matchWeek(w);
   const its = weekItems(w).filter(i => i.date===date && !['rest','mobility'].includes(i.s.t)); if(!its.length) return 'rest';
-  let done = 0, alt = 0, skip = 0; for(const i of its){ const st = S.done[i.s.id]||{}; if(st.skip) skip++; else if(st.d || m.by[i.s.id]) done++; else if(st.alt) alt++; }
+  let done = 0, alt = 0, skip = 0; for(const i of its){ const st = S.done[i.s.id]||{}; if(st.skip) skip++; else if(st.d || m.by[i.s.id]) done++; else if(st.alt || st.inst) alt++; }
   if(done === its.length) return 'ok'; if(skip === its.length) return 'miss';
   if(date < today()){ return done+alt ? 'part' : 'miss'; } if(alt && !done) return 'alt'; return done ? 'part' : 'todo';
 }

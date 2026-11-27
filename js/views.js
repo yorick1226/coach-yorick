@@ -21,7 +21,7 @@ function sessCard(it, m, opt){
   const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id], skip = st.skip, done = !skip && (st.d || !!a);
   const open = ui.open[s.id] ?? !!opt.open;
   const meta = a ? (a.km ? fmtN(a.km)+' km' : '')+((a.el||a.sec) ? (a.km?' · ':'')+fmtSec(a.el||a.sec) : '') : planLine(s) || (hasEx(s) ? sessEx(s).length+' oefeningen' : '');
-  const flag = skip ? '<span class="pill o">vervallen</span>' : st.alt ? '<span class="pill o">alternatief</span>' : it.date!==it.orig ? '<span class="pill o">verplaatst</span>' : (easyFlag(s, a) ? '<span class="pill r">⚠</span>' : '');
+  const flag = st.inst ? '<span class="pill b">anders gedaan</span>' : skip ? '<span class="pill o">vervallen</span>' : st.alt ? '<span class="pill o">alternatief</span>' : it.date!==it.orig ? '<span class="pill o">verplaatst</span>' : (easyFlag(s, a) ? '<span class="pill r">⚠</span>' : '');
   let h = '<div class="card sess'+(opt.hero?' hero':'')+(opt.compact?' compact':'')+(done?' done':'')+(skip?' skip':'')+(open?' open':'')+'" id="s_'+s.id+'" style="--tc:'+(TYPE_COLOR[s.t]||'#6b7280')+'"><div class="st">';
   h += '<button class="chk'+(done?' on':'')+(done && ui.pop===s.id?' pop':'')+'" data-done="'+s.id+'" aria-label="Afvinken">✓</button>';
   h += (s.t!=='rest' ? '<button class="tt tap" data-open="'+s.id+'" data-isopen="'+(open?1:0)+'" aria-expanded="'+open+'">' : '<div class="tt">')+'<b>'+esc(s.title)+'</b><span class="meta"><span class="tag c">'+(TYPE_ICON[s.t]||'')+' '+(TYPE_LABEL[s.t]||s.t)+'</span>'+(meta?'<span>'+esc(meta)+'</span>':'')+flag+'</span>';
@@ -32,6 +32,7 @@ function sessCard(it, m, opt){
   if(it.date!==it.orig) h += '<div class="small">↪ verplaatst van '+fmtDay(it.orig)+'</div>';
   if(skip) h += '<div class="small" style="color:var(--warn)">Niet uitgevoerd: '+esc(skip)+'</div>';
   if(st.alt) h += '<div class="small" style="color:var(--blue)">Alternatief: '+esc(st.alt)+'</div>';
+  if(st.inst) h += '<div class="small" style="color:var(--blue)">Anders gedaan: '+esc(instLine(st.inst))+'</div>';
   const ef = easyFlag(s, a), iv = intervalEval(s, a);
   if(ef) h += '<div class="banner rood" style="margin:8px 0 0;padding:6px 10px;font-size:14px">⚠ '+esc(ef)+'</div>';
   if(iv) h += '<div class="banner '+(iv.good?'groen':'oranje')+'" style="margin:8px 0 0;padding:6px 10px;font-size:14px">'+(iv.good?'✓ ':'⚠ ')+esc(iv.txt)+'</div>';
@@ -61,8 +62,12 @@ function sessCard(it, m, opt){
       const w = sessById(s.id).w; const alts = altOptions(s);
       if(alts.length) h += '<div class="small" style="margin-top:10px">Alternatief doen</div><div class="chips sm">'+alts.map((t,i) => '<button class="chip'+(st.alt===t?' on':'')+'" style="font-size:14px;text-align:left;flex:1 1 100%" data-alt="'+s.id+'" data-i="'+i+'">'+esc(t)+'</button>').join('')+'</div>';
       h += '<div class="small" style="margin-top:10px">Verplaats naar</div><div class="chips sm">'+[0,1,2,3,4,5,6].map(i => { const dd = addDays(w.start,i); return '<button class="chip'+(dd===it.date?' on':'')+'" data-move="'+s.id+'" data-to="'+dd+'">'+DAYS[i]+'</button>'; }).join('')+'</div>';
+      { const I = st.inst || {}; h += '<div class="small" style="margin-top:10px">Iets anders gedaan</div><div class="instf">'
+        +'<input type="text" id="inw_'+s.id+'" placeholder="Bijv. 20.000 stappen, stad verkend" value="'+esc(I.w||'')+'">'
+        +'<div class="row"><label>Duur <input type="number" inputmode="numeric" id="inm_'+s.id+'" placeholder="min" value="'+(I.min||'')+'"></label><label>Km <input type="number" inputmode="decimal" step="0.1" id="ink_'+s.id+'" placeholder="–" value="'+(I.km||'')+'"></label><label>RPE <input type="number" inputmode="numeric" min="1" max="10" id="inr_'+s.id+'" placeholder="1–10" value="'+(I.rpe||'')+'"></label></div>'
+        +'<div class="row"><button class="btn sm pri" data-inst="'+s.id+'">'+(st.inst ? 'Bijwerken' : 'Opslaan')+'</button>'+(st.inst ? '<button class="btn sm" data-instdel="'+s.id+'">Weghalen</button>' : '')+'</div></div>'; }
       h += '<div class="small" style="margin-top:10px">Niet uitvoeren omdat…</div><div class="chips sm">'+SKIPS.map(r => '<button class="chip'+(skip===r?' on':'')+'" data-skip="'+s.id+'" data-r="'+r+'">'+r+'</button>').join('')+'</div>';
-      if(skip || st.alt || it.date!==it.orig) h += '<div class="row"><button class="btn sm" data-reset="'+s.id+'">Terug naar origineel</button></div>';
+      if(skip || st.alt || st.inst || it.date!==it.orig) h += '<div class="row"><button class="btn sm" data-reset="'+s.id+'">Terug naar origineel</button></div>';
       h += '<div class="small" style="margin-top:6px">Gemiste training niet inhalen; kies liever een alternatief of laat hem vallen.</div>';
     }
   }
@@ -300,6 +305,7 @@ function rWeek(){
   $('view').innerHTML = h;
 }
 
+function instLine(I){ return [I.w, I.min ? I.min+' min' : '', I.km ? fmtN(I.km)+' km' : '', I.rpe ? 'RPE '+I.rpe : ''].filter(Boolean).join(', '); }
 function setDone(sid, patch){
   const cur = S.done[sid] || {}; const n = Object.assign({}, cur, patch, {ts:Date.now()});
   for(const k in n) if(n[k]===null) delete n[k];

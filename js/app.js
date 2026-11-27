@@ -61,9 +61,14 @@ document.addEventListener('click', ev => {
   if(ds.laps){ ui.laps[ds.laps] = !ui.laps[ds.laps]; rerender(); return; }
   if(ds.menu){ ui.menu[ds.menu] = !ui.menu[ds.menu]; rerender(); return; }
   if(ds.move){ const f = sessById(ds.move); if(ds.to===f.d.date) delete S.moves[ds.move]; else S.moves[ds.move] = ds.to; enqueue('move', ds.move, ds.to, {to:ds.to, from:f.d.date}); rerender(); toast('Verplaatst naar '+fmtDay(ds.to)); return; }
-  if(ds.skip){ const cur = (S.done[ds.skip]||{}).skip; setDone(ds.skip, cur===ds.r ? {skip:null} : {skip:ds.r, d:false, alt:null}); ui.menu[ds.skip] = false; rerender(); return; }
-  if(ds.alt){ const f = sessById(ds.alt); const t = altOptions(f.s)[Number(ds.i)]; const cur = (S.done[ds.alt]||{}).alt; setDone(ds.alt, cur===t ? {alt:null} : {alt:t, skip:null}); ui.menu[ds.alt] = false; rerender(); toast(cur===t ? 'Alternatief weggehaald' : 'Alternatief gekozen'); return; }
-  if(ds.reset){ delete S.moves[ds.reset]; setDone(ds.reset, {skip:null, alt:null}); enqueue('move', ds.reset, '', {to:null}); rerender(); return; }
+  if(ds.skip){ const cur = (S.done[ds.skip]||{}).skip; setDone(ds.skip, cur===ds.r ? {skip:null} : {skip:ds.r, d:false, alt:null, inst:null}); ui.menu[ds.skip] = false; rerender(); return; }
+  if(ds.alt){ const f = sessById(ds.alt); const t = altOptions(f.s)[Number(ds.i)]; const cur = (S.done[ds.alt]||{}).alt; setDone(ds.alt, cur===t ? {alt:null} : {alt:t, skip:null, inst:null}); ui.menu[ds.alt] = false; rerender(); toast(cur===t ? 'Alternatief weggehaald' : 'Alternatief gekozen'); return; }
+  if(ds.inst){ const id = ds.inst, v = k => (document.getElementById(k+'_'+id)||{}).value || '';
+    const I = {w:v('inw').trim(), min:num(v('inm'))||null, km:num(v('ink'))||null, rpe:num(v('inr'))||null}; for(const k in I) if(I[k]==null || I[k]==='') delete I[k];
+    if(!I.w && !I.min){ toast('Vul in wat je deed of hoe lang'); return; }
+    setDone(id, {inst:I, skip:null, alt:null, d:false}); ui.menu[id] = false; rerender(); toast('Opgeslagen als anders gedaan'); return; }
+  if(ds.instdel){ setDone(ds.instdel, {inst:null}); rerender(); toast('Weggehaald'); return; }
+  if(ds.reset){ delete S.moves[ds.reset]; setDone(ds.reset, {skip:null, alt:null, inst:null}); enqueue('move', ds.reset, '', {to:null}); rerender(); return; }
   if(ds.logger){ go(() => { ui.sid = ds.logger; ui.tab = 'log'; }); return; }
   if(ds.pick){ ui.sid = null; rLog(); return; }
   if(ds.cardio){ const f = sessById(ds.cardio); go(() => { ui.prefill = {sid:ds.cardio, date:f.date, sport:({bike:'bike',swim:'swim'})[f.s.t]||'run'}; ui.tab='duur'; }); return; }

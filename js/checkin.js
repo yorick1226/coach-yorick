@@ -103,8 +103,8 @@ function weekText(start){
     if(!its.length && !ex.length && !hasD) continue;
     L.push(''); L.push(fmtDay(dd).toUpperCase()+(hasD ? '  [Oura readiness '+(y.rd??'–')+', slaap '+(y.sl??'–')+(y.hrv!=null?', HRV '+y.hrv:'')+(y.rhr!=null?', rust-HF '+y.rhr:'')+(y.legs!=null?', benen '+y.legs+'/5':'')+(y.pains?', pijn '+Object.entries(y.pains).map(([k,v])=>k+' '+v).join(', '):(y.pain!=null?', pijn '+y.pain+'/10':''))+']' : ''));
     for(const it of its){ const s = it.s, st = S.done[s.id] || {}, a = m.by[s.id];
-      const mark = st.skip ? '[–]' : st.d ? '[x]' : a ? '[S]' : st.alt ? '[A]' : '[ ]';
-      L.push(mark+' '+s.title+(s.km?' (gepland '+fmtN(s.km)+' km)':'')+(it.date!==it.orig?' · verplaatst van '+fmtDay(it.orig):'')+(st.skip?' · niet uitgevoerd: '+st.skip:'')+(st.alt?' · ALTERNATIEF: '+st.alt:'')+(st.rpe?' · RPE '+st.rpe:'')+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
+      const mark = st.skip ? '[–]' : st.d ? '[x]' : a ? '[S]' : st.alt || st.inst ? '[A]' : '[ ]';
+      L.push(mark+' '+s.title+(s.km?' (gepland '+fmtN(s.km)+' km)':'')+(it.date!==it.orig?' · verplaatst van '+fmtDay(it.orig):'')+(st.skip?' · niet uitgevoerd: '+st.skip:'')+(st.alt?' · ALTERNATIEF: '+st.alt:'')+(st.inst?' · ANDERS GEDAAN: '+instLine(st.inst):'')+(st.rpe?' · RPE '+st.rpe:'')+(st.min?' · '+st.min+' min':'')+(st.note?' · "'+st.note+'"':''));
       const efx = easyFlag(s, a), ivx = intervalEval(s, a); if(efx) L.push('    ⚠ '+efx); if(ivx) L.push('    Interval: '+ivx.txt);
       if(a){ L.push('    Strava: '+actLine(a)); if(a.laps) L.push('    Ronden: '+a.laps.map(l => l.m+'m '+fmtSec(l.sec)+(l.hr?'@'+l.hr:'')).join(', ')); }
       const sets = S.sets.filter(x => x.sid===s.id && !x.del).sort((a,b)=>a.ts-b.ts);
